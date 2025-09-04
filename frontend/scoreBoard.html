@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Pontuação</title>
+
+    <link rel="stylesheet" href="./menuHamburger/navegacao.css">
+    <link rel="stylesheet" href="./main.css">
+
+</head>
+<body>
+       
+    <nav class="wraperNavegacao" id="wraperNavegacao">
+        <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
+        <ul class="ulMenu" id="ulMenu">
+            <script> 
+                const baseUrl = "https://placar-gamificado-teste.onrender.com";
+                const links = document.querySelectorAll('.linkMenu');
+                links.forEach(link => {link.href = `${baseUrl}${link.getAttribute('href')}`;});
+            </script>
+            <a class="linkMenu" href="/public/index.html"><li class="listMenu">Home</li></a>
+            <a class="linkMenu" href="/pr/scoreBoard.html"><li class="listMenu">Placar</li></a>
+            <a class="linkMenu" href="/pr/regulamento.html"><li class="listMenu">Regulamento</li></a>
+        </ul>
+    </nav>
+    
+    <main id="main">
+        <h1>Tabela de Pontuação</h1>
+    
+        <div id="tabela-container"></div>        
+    </div>
+    
+    <script type="module" src="./scoreBoard.js"></script>
+    <script type="module" src="./menuHamburger/navegacao.js"></script>
+    
+</body>
+</html>
