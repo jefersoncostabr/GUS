@@ -29,10 +29,10 @@ routerUsos.get("/usos/:id", async (req, res) => {
 
 // http://localhost:3000/usos/usos
 routerUsos.post('/usos', async (req, res) => {
-    const novoUso = new usoModelo(req.body);
     try {
-        const usoSalvo = await novoUso.save();
-        res.status(201).json();
+        const novoUso = new usoModelo(req.body);
+        await novoUso.save();
+        res.status(201).json(novoUso);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

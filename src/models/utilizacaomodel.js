@@ -6,6 +6,7 @@ const usoSchema = new mongoose.Schema({
     sala: { type: Number, required: true },
     dia: { type: Number, required: true },
     hora: { type: Number, required: true },
+    diaDaSemana: { type: String, required: true },
     motivo: { type: String }
 }, { versionKey: false });
 
