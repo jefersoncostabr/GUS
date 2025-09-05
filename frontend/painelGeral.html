@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela de Pontuação</title>
+    <title>Painel Geral</title>
 
     <link rel="stylesheet" href="./menuHamburger/navegacao.css">
-    <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="./tabela.css">
+    <link rel="stylesheet" href="./style.css">
 
 </head>
 <body>
@@ -26,13 +27,50 @@
     </nav>
     
     <main id="main">
-        <h1>Tabela de Pontuação</h1>
-    
-        <div id="tabela-container"></div>        
+        <h1>Painel Geral</h1>   
+        <div class="containerPainel" id="">
+            <div class="formularioContainer">
+
+                <div>
+                    <label for="solicitante">Solicitante:</label>
+                    <input class="inputTexto" type="number" id="id"></label>
+                </div>
+                <div>
+                    <label for="sala">Sala:</label>
+                    <input class="inputNumerico" type="number" id="sala">
+                </div>
+                <div>
+                    <label for="dia">Dia:</label>
+                    <input class="inputNumerico" type="number" id="dia">
+                </div>
+                <div>
+                    <label for="diaSemana">Dia da Semana:</label>
+                    <input class="inputTexto" type="text" id="diaSemana">
+                </div>
+                <div>
+                    <label for="hora">Hora:</label>
+                    <input class="inputNumerico" type="number" id="hora">
+                </div>
+                <div>
+                    <label for="motivo">Motivo:</label>
+                    <input class="inputTexto" type="text" id="motivo">			
+                </div>
+
+            </div>
+			<div>
+				<button id="getReservasBtn">Ver</button>				
+				<button >Adicionar</button>
+				<button id="alterarReservaBtn">Alterar</button>
+				<button onclick="excluirReserva()">Excluir</button>
+			</div>
+
+			<p id="painelSaida"></p>
+		</div>
+        <div class="containerPainel" id="containerTabela" >
+        </div>
     </div>
     
-    <script type="module" src="./scoreBoard.js"></script>
-    <script type="module" src="./menuHamburger/navegacao.js"></script>
-    
+    <script type="module" src="./tabela.js"></script>
+    <script type="module" src="./menuHamburger/navegacao.js"></script>    
 </body>
 </html>

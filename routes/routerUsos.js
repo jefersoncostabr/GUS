@@ -2,11 +2,12 @@ import express from "express";
 import usoModelo from "../src/models/utilizacaomodel.js";
 
 const routerUsos = express.Router();
-
+// http://localhost:3000/usos
 routerUsos.get("/", (req, res) => {
     res.status(200).send("Rota inicial funcionando");
 });
 
+// http://localhost:3000/usos/usos
 routerUsos.get("/usos", async (req, res) => {
     const listaDeUsos = await usoModelo.find({});
     if (listaDeUsos.length === 0) {
@@ -16,6 +17,7 @@ routerUsos.get("/usos", async (req, res) => {
     }
 });
 
+// http://localhost:3000/usos/usos/:id
 routerUsos.get("/usos/:id", async (req, res) => {
     const uso = await usoModelo.findById(req.params.id);
     if (!uso) {
@@ -25,6 +27,7 @@ routerUsos.get("/usos/:id", async (req, res) => {
     }
 });
 
+// http://localhost:3000/usos/usos
 routerUsos.post('/usos', async (req, res) => {
     const novoUso = new usoModelo(req.body);
     try {
@@ -35,6 +38,7 @@ routerUsos.post('/usos', async (req, res) => {
     }
 });
 
+// http://localhost:3000/usos/usos/:id
 routerUsos.put('/usos/:id', async (req, res) => {
   try {
     const uso = await usoModelo.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -48,6 +52,7 @@ routerUsos.put('/usos/:id', async (req, res) => {
   }
 });
 
+// http://localhost:3000/usos/usos/:id
 routerUsos.delete('/usos/:id', async (req, res) => {
     try {
         const uso = await usoModelo.findByIdAndDelete(req.params.id);

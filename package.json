@@ -24,6 +24,7 @@
     "express": "^5.1.0",
     "mongodb": "^6.19.0",
     "mongoose": "^8.18.0",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "table": "^6.9.0"
   }
 }
