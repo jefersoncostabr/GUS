@@ -40,16 +40,16 @@ routerUsos.post('/usos', async (req, res) => {
 
 // http://localhost:3000/usos/usos/:id
 routerUsos.put('/usos/:id', async (req, res) => {
-  try {
-    const uso = await usoModelo.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!uso) {
-      res.status(404).json({ error: 'Uso não encontrado' });
-      return;
+    try {
+        const uso = await usoModelo.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!uso) {
+            res.status(404).json({ error: 'Uso não encontrado' });
+            return;
+        }
+        res.status(200).json(uso);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao atualizar uso' });
     }
-    res.status(200).json(uso);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao atualizar uso' });
-  }
 });
 
 // http://localhost:3000/usos/usos/:id
