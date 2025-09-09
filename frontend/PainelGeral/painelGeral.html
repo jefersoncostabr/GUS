@@ -31,6 +31,7 @@
         <div class="containerPainel" id="">
             <div class="formularioContainer">
 
+                
                 <div>
                     <label for="solicitante">Solicitante:</label>
                     <input class="inputTexto" type="text" id="solicitante"></label>
@@ -44,6 +45,7 @@
                     <input class="inputNumerico" type="number" id="dia">
                 </div>
                 <div>
+                    <!-- Retirar -->
                     <label for="diaSemana">Dia da Semana:</label>
                     <input class="inputTexto" type="text" id="diaSemana">
                 </div>
@@ -55,13 +57,17 @@
                     <label for="motivo">Motivo:</label>
                     <input class="inputTexto" type="text" id="motivo">			
                 </div>
+                <div>
+                    <label for="id">id:</label>
+                    <input class="inputTexto" type="text" id="id" disabled></label>
+                </div>
 
             </div>
 			<div>
 				<button id="getUsosBtn">Ver</button>				
 				<button id="adicionarUsoBtn">Adicionar</button>
 				<button id="alterarReservaBtn">Alterar</button>
-				<button onclick="excluirReserva()">Excluir</button>
+				<button id="excluirUsoBtn">Excluir</button>
 			</div>
 
 			<p id="painelSaida"></p>
@@ -75,5 +81,7 @@
     <script type="module" src="./ver.js"></script>
     <script type="module" src="./adicionarUso.js"></script>
     <script type="module" src="./editarUso.js"></script>
+    <script type="module" src="./apagarUso.js"></script>
+    <script type="module" src="./pegarId.js"></script>
 </body>
 </html>

@@ -27,6 +27,31 @@ routerUsos.get("/usos/:id", async (req, res) => {
     }
 });
 
+routerUsos.get('/buscaid', async (req, res) => {
+    const { solicitante, sala, dia, hora, diaDaSemana, motivo } = req.query;
+    // Validação de entrada
+    if (!solicitante || !sala || !dia || !hora) {
+        return res.status(400).json({ error: 'Parâmetros obrigatórios não fornecidos' });
+    }
+    try {
+        const uso = await usoModelo.findOne({
+            solicitante,
+            sala: Number(sala),
+            dia: Number(dia),
+            hora: Number(hora),
+            diaDaSemana,
+            motivo
+        });
+        if (!uso) {
+            return res.status(404).json({ message: 'Uso não encontrado' });
+        }
+        res.status(200).json({ id: uso._id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar uso' });
+    }
+});
+
 // http://localhost:3000/usos/usos
 routerUsos.post('/usos', async (req, res) => {
     try {

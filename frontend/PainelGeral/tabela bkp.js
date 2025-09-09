@@ -11,25 +11,8 @@ export async function getDados() {
   }
 }
 
-// Função para preencher os inputs do formulário
-function preencherInputs(dados) {
-  const formulario = document.querySelector('.formularioContainer');
-  const campos = ['solicitante', 'sala', 'dia', 'diaSemana', 'hora', 'motivo', '_id'];
-
-  formulario.querySelectorAll('input').forEach((input, index) => {
-    input.value = dados[campos[index]];
-  });
-}
-
-// Função para atribuir click ao elemento
-function atribuirClick(celula, dados) {
-  celula.addEventListener('click', () => {
-    preencherInputs(dados);
-  });
-}
-
 // Cria a tabela c dados
-export function criaTabela(informacao) {
+export function criaTabela(informacao){
     const containerTabela = document.getElementById('containerTabela');
 
     // Criar tabela HTML
@@ -47,10 +30,7 @@ export function criaTabela(informacao) {
     // Criar linhas da tabela
     informacao.forEach((dado) => {
         const linha = tabela.insertRow();
-        const celulaSolicitante = linha.insertCell();
-        celulaSolicitante.textContent = dado.solicitante;
-        atribuirClick(celulaSolicitante, dado);
-
+        linha.insertCell().textContent = dado.solicitante;
         linha.insertCell().textContent = dado.sala;
         linha.insertCell().textContent = dado.dia;
         linha.insertCell().textContent = dado.diaDaSemana;
@@ -61,3 +41,4 @@ export function criaTabela(informacao) {
     // Adicionar tabela ao documento
     containerTabela.appendChild(tabela);
 }
+

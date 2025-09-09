@@ -1,3 +1,5 @@
+import { verFetch } from "./ver.js";   
+
 async function alterarUso(id) {
     try {
     const response = await fetch(`http://localhost:3000/usos/usos/${id}`, {
@@ -18,7 +20,6 @@ async function alterarUso(id) {
     if (!response.ok) {
         throw new Error(`Erro ao alterar uso: ${response.status}`);
     }
-
         const data = await response.json();
         console.log(data);
     } catch (error) {
@@ -26,8 +27,30 @@ async function alterarUso(id) {
     }
 }
 
-// testar esta rota
+async function pegarIdUnico() {
+    try {
+        const obj = await verFetch();
+    if (obj !== undefined) {
+        console.log(obj[0]._id);
+        return obj[0]._id;
+        // colocar campo uso contendo o id lá no html
+
+    } else {
+        console.log('obj é undefined');
+    }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function pegarIdEAlterar() {
+    const id = await pegarIdUnico();
+    await alterarUso(id);
+}
 
 document.getElementById('alterarReservaBtn').addEventListener('click', function() {
-    alterarUso(id)
+    pegarIdEAlterar();
+    verFetch();
 });
+
+// Naõ consigo alterar o nome

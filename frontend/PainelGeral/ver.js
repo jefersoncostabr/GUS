@@ -6,7 +6,7 @@ function limparTabela() {
     document.getElementById('containerTabela').innerHTML = '';
 }
 
-async function verFetch(params) {
+export async function verFetch(params) {
     const inputValues = {
         solicitante: document.getElementById('solicitante').value,
         sala: document.getElementById('sala').value,
@@ -46,9 +46,10 @@ async function verFetch(params) {
         // Retorna os dados filtrados
         return filteredData;
     });
-
+    // console.log(filteredDadosGeral);
     limparTabela();
     criaTabela(filteredDadosGeral);
+    return filteredDadosGeral; // Retorna o primeiro objeto do array filtrado
 }
 
 
