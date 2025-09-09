@@ -27,7 +27,7 @@ async function alterarUso(id) {
     }
 }
 
-async function pegarIdUnico() {
+export async function pegarIdUnico() {
     try {
         const obj = await verFetch();
     if (obj !== undefined) {
