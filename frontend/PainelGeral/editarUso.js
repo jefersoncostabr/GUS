@@ -1,3 +1,4 @@
+import { limparImputs } from "./limparImputs.js";
 import { verFetch } from "./ver.js";   
 
 async function alterarUso(id) {
@@ -11,7 +12,6 @@ async function alterarUso(id) {
             solicitante: document.getElementById('solicitante').value,
             sala: document.getElementById('sala').value,
             dia: document.getElementById('dia').value,
-            diaDaSemana: document.getElementById('diaSemana').value,
             hora: document.getElementById('hora').value,
             motivo: document.getElementById('motivo').value
         })
@@ -33,7 +33,6 @@ export async function pegarIdUnico() {
     if (obj !== undefined) {
         console.log(obj[0]._id);
         return obj[0]._id;
-        // colocar campo uso contendo o id lá no html
 
     } else {
         console.log('obj é undefined');
@@ -51,6 +50,7 @@ async function pegarIdEAlterar() {
 document.getElementById('alterarReservaBtn').addEventListener('click', function() {
     pegarIdEAlterar();
     verFetch();
+    limparImputs();
 });
 
 // Naõ consigo alterar o nome

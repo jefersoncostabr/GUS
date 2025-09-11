@@ -1,5 +1,6 @@
 import {verFetch} from "./ver.js";
 import { pegarIdUnico } from "./EditarUso.js";
+import { limparImputs } from "./limparImputs.js";
 
 async function excluirUso(id) {
     try {
@@ -30,4 +31,5 @@ async function pegarIdEExcluir() {
 document.getElementById('excluirUsoBtn').addEventListener('click', function() {
     pegarIdEExcluir();
     verFetch();
+    limparImputs();
 });

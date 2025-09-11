@@ -39,7 +39,6 @@ routerUsos.get('/buscaid', async (req, res) => {
             sala: Number(sala),
             dia: Number(dia),
             hora: Number(hora),
-            diaDaSemana,
             motivo
         });
         if (!uso) {

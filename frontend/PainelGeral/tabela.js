@@ -14,7 +14,7 @@ export async function getDados() {
 // Função para preencher os inputs do formulário
 function preencherInputs(dados) {
   const formulario = document.querySelector('.formularioContainer');
-  const campos = ['solicitante', 'sala', 'dia', 'diaSemana', 'hora', 'motivo', '_id'];
+  const campos = ['solicitante', 'sala', 'dia', 'hora', 'motivo', '_id'];
 
   formulario.querySelectorAll('input').forEach((input, index) => {
     input.value = dados[campos[index]];
@@ -38,7 +38,7 @@ export function criaTabela(informacao) {
     // Criar cabeçalho da tabela
     const cabecalho = tabela.createTHead();
     const linhaCabecalho = cabecalho.insertRow();
-    ['Solicitante', 'Sala', 'Dia', 'Dia da semana', 'Hora', 'Motivo'].forEach((coluna) => {
+    ['Solicitante', 'Sala', 'Dia', 'Hora', 'Motivo'].forEach((coluna) => {
         const celula = linhaCabecalho.insertCell();
         celula.textContent = coluna;
         celula.style.fontWeight = 'bold';
@@ -53,7 +53,6 @@ export function criaTabela(informacao) {
 
         linha.insertCell().textContent = dado.sala;
         linha.insertCell().textContent = dado.dia;
-        linha.insertCell().textContent = dado.diaDaSemana;
         linha.insertCell().textContent = dado.hora;
         linha.insertCell().textContent = dado.motivo;
     });

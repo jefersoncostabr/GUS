@@ -3,7 +3,6 @@ async function adicionarUso() {
     const solicitante = document.getElementById('solicitante').value;
     const sala = document.getElementById('sala').value;
     const dia = document.getElementById('dia').value;
-    const diaSemana = document.getElementById('diaSemana').value;
     const hora = document.getElementById('hora').value;
     const motivo = document.getElementById('motivo').value;
     
@@ -11,7 +10,7 @@ async function adicionarUso() {
         solicitante: solicitante,
         sala: sala,
         dia: dia,
-        diaDaSemana: diaSemana,
+        // diaDaSemana: diaSemana,
         hora: hora,
         motivo: motivo
     };

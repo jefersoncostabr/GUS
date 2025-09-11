@@ -6,15 +6,26 @@ function limparTabela() {
     document.getElementById('containerTabela').innerHTML = '';
 }
 
+// function aparecerTabela() {
+//     document.getElementById('containerTabela').style.display = 'block';
+//     document.getElementById('esconderTabelaBtn').style.display = 'block';
+// }
+// function desaparecerTabela() {
+//     document.getElementById('containerTabela').style.display = 'none';
+// }
+
+// document.getElementById('esconderTabelaBtn').addEventListener('click', desaparecerTabela);
+
 export async function verFetch(params) {
     const inputValues = {
         solicitante: document.getElementById('solicitante').value,
         sala: document.getElementById('sala').value,
         dia: document.getElementById('dia').value,
-        diaSemana: document.getElementById('diaSemana').value,
         hora: document.getElementById('hora').value,
         motivo: document.getElementById('motivo').value,
     };
+
+    // aparecerTabela();    
 
     const filteredDadosGeral = await getDados().then((dadosGeral) => {
         // Filtra os dados com base nos valores de input do usuário
@@ -24,7 +35,7 @@ export async function verFetch(params) {
             // Itera sobre as chaves do objeto inputValues
             Object.keys(inputValues).forEach((key) => {
                 // Verifica se o valor da chave não está vazio e se a chave não é 'diaSemana'
-                if (inputValues[key] !== '' && key !== 'diaSemana') {
+                if (inputValues[key] !== '') {
                     // Verifica se o valor da chave existe no objeto dado
                     if (dado[key] !== undefined) {
                         // Verifica se a chave é 'dia', 'hora' ou 'sala' e compara como número inteiro
@@ -51,7 +62,5 @@ export async function verFetch(params) {
     criaTabela(filteredDadosGeral);
     return filteredDadosGeral; // Retorna o primeiro objeto do array filtrado
 }
-
-
 
 document.getElementById('getUsosBtn').addEventListener('click', verFetch);

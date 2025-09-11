@@ -29,9 +29,10 @@
     <main id="main">
         <h1>Painel Geral</h1>   
         <div class="containerPainel" id="">
+            <div>
+                <button id="limparImputsBtn">Limpar</button>
+            </div>
             <div class="formularioContainer">
-
-                
                 <div>
                     <label for="solicitante">Solicitante:</label>
                     <input class="inputTexto" type="text" id="solicitante"></label>
@@ -45,11 +46,6 @@
                     <input class="inputNumerico" type="number" id="dia">
                 </div>
                 <div>
-                    <!-- Retirar -->
-                    <label for="diaSemana">Dia da Semana:</label>
-                    <input class="inputTexto" type="text" id="diaSemana">
-                </div>
-                <div>
                     <label for="hora">Hora:</label>
                     <input class="inputNumerico" type="number" id="hora">
                 </div>
@@ -58,7 +54,7 @@
                     <input class="inputTexto" type="text" id="motivo">			
                 </div>
                 <div>
-                    <label for="id">id:</label>
+                    <label for="id" id="labelId">id:</label>
                     <input class="inputTexto" type="text" id="id" disabled></label>
                 </div>
 
@@ -72,7 +68,9 @@
 
 			<p id="painelSaida"></p>
 		</div>
-        <div class="containerPainel" id="containerTabela" >
+                                         <!-- style="display: none; -->
+        <div class="containerPainel" id="containerTabela">
+            <!-- <button id="esconderTabelaBtn">Esconder</button> -->
         </div>
     </div>
     
@@ -82,6 +80,6 @@
     <script type="module" src="./adicionarUso.js"></script>
     <script type="module" src="./editarUso.js"></script>
     <script type="module" src="./apagarUso.js"></script>
-    <script type="module" src="./pegarId.js"></script>
+    <script type="module" src="./limparImputs.js"></script>
 </body>
 </html>
