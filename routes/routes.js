@@ -7,7 +7,9 @@ router.get("/", (req, res) => {
     res.status(200).send("Rota inicial funcionando");
 });
 
-router.use("/pr", express.static("frontend/painelgeral"));// http://localhost:3000/painel/painelGeral.html
+// http://localhost:3000/pr/painelGeral.html
+router.use("/pr", express.static("frontend/painelgeral"));
+
 router.use("/usos", routerUsos);// http://localhost:3000/usos
 
 export default router;

@@ -2,6 +2,7 @@ import express from "express";
 import usoModelo from "../src/models/utilizacaomodel.js";
 
 const routerUsos = express.Router();
+
 // http://localhost:3000/usos
 routerUsos.get("/", (req, res) => {
     res.status(200).send("Rota inicial funcionando");

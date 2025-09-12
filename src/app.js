@@ -12,6 +12,7 @@ conexao.once("open", () => {
     console.log("Conexao com o banco feita com sucesso");
 })
 
+
 const app = express();
 app.use(express.json());
 app.use('/', router);
