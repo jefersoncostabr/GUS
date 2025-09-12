@@ -3,28 +3,20 @@
   "version": "1.0.0",
   "description": "Gerenciador de Uso de Salas",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "d": "nodemon index.js",
-    "test": "npm rum test"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jefersoncostabr/GUS.git"
-  },
+  "keywords": [],
   "author": "Jeferson Batista Da Costa",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/jefersoncostabr/GUS/issues"
-  },
-  "homepage": "https://github.com/jefersoncostabr/GUS#readme",
+  "license": "ISC",  
   "dependencies": {
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "mongodb": "^6.19.0",
     "mongoose": "^8.18.0",
-    "nodemon": "^3.1.10",
-    "table": "^6.9.0"
+    "nodemon": "^3.1.10"
   }
 }
