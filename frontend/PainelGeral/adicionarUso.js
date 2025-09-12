@@ -44,3 +44,6 @@ document.getElementById('motivo').addEventListener('keydown', function(event) {
         adicionarUso(); // Chama a função para adicionar o uso
     }
 });
+
+
+// ***** Apagar e limpar campos depois de criar

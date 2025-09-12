@@ -1,7 +1,22 @@
-import app from './src/app.js';
+import express from 'express';
 import dotenv from 'dotenv';
+import router from './routes/routes.js';
+import conectaNaDatabase from './src/config/dbConnect.js';
+
+const conexao = await conectaNaDatabase();
+
+conexao.on("error", (erro) => {
+    console.error("erro de conexão com o DB", erro);
+});
+
+conexao.once("open", () => {
+    console.log("Conexao com o banco feita com sucesso");
+})
 
 dotenv.config();
+const app = express();
+app.use(express.json());
+app.use('/', router);
 
 const PORT = process.env.PORT || 3000;
 
