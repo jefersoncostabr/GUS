@@ -1,4 +1,4 @@
-import {verFetch} from "./ver.js";
+import { verFetch } from "./ver.js";
 import { pegarIdUnico } from "./EditarUso.js";
 import { limparImputs } from "./limparImputs.js";
 
