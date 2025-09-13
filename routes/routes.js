@@ -8,7 +8,8 @@ router.get("/", (req, res) => {
 });
 
 // http://localhost:3000/pr/painelGeral.html
-router.use("/pr", express.static("frontend/painelgeral", {index: "painelGeral.html"}));
+// router.use("/pr", express.static("frontend/painelgeral", {index: "painelGeral.html"}));
+router.use(express.static('frontend/painelgeral'));
 
 router.use("/usos", routerUsos);// http://localhost:3000/usos
 
