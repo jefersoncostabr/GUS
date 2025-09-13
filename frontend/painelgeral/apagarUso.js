@@ -1,5 +1,5 @@
 import { verFetch } from "./ver.js";
-import { pegarIdUnico } from "./EditarUso.js";
+import { pegarIdUnico } from "./editarUso.js";
 import { limparImputs } from "./limparImputs.js";
 
 async function excluirUso(id) {

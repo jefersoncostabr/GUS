@@ -6,16 +6,6 @@ function limparTabela() {
     document.getElementById('containerTabela').innerHTML = '';
 }
 
-// function aparecerTabela() {
-//     document.getElementById('containerTabela').style.display = 'block';
-//     document.getElementById('esconderTabelaBtn').style.display = 'block';
-// }
-// function desaparecerTabela() {
-//     document.getElementById('containerTabela').style.display = 'none';
-// }
-
-// document.getElementById('esconderTabelaBtn').addEventListener('click', desaparecerTabela);
-
 export async function verFetch(params) {
     const inputValues = {
         solicitante: document.getElementById('solicitante').value,
