@@ -1,3 +1,12 @@
+function getBaseUrl() {
+    return window.location.hostname === "localhost"
+        ? "http://localhost:3000"
+        : "https://gus-q7nn.onrender.com";
+}
+
+    // const baseUrl = getBaseUrl();
+    //     const response = await fetch(`${baseUrl}/usos/usos/${id}`, {
+
 
 async function adicionarUso() {
     const solicitante = document.getElementById('solicitante').value;
@@ -15,7 +24,9 @@ async function adicionarUso() {
         motivo: motivo
     };
     try {
-        const response = await fetch('http://localhost:3000/usos/usos', {
+        const baseUrl = getBaseUrl();
+        const response = await fetch(`${baseUrl}/usos/usos`, {       
+        // const response = await fetch('http://localhost:3000/usos/usos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

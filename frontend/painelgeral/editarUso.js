@@ -1,9 +1,16 @@
 import { limparImputs } from "./limparImputs.js";
 import { verFetch } from "./ver.js";   
 
+function getBaseUrl() {
+    return window.location.hostname === "localhost"
+        ? "http://localhost:3000"
+        : "https://gus-q7nn.onrender.com";
+}
+
 async function alterarUso(id) {
     try {
-    const response = await fetch(`http://localhost:3000/usos/usos/${id}`, {
+    const baseUrl = getBaseUrl();
+        const response = await fetch(`${baseUrl}/usos/usos/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
