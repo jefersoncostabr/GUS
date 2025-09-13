@@ -18,6 +18,8 @@ const app = express();
 app.use(express.json());
 app.use('/', router);
 
+app.use(express.static('frontend/painelgeral'));
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, '0.0.0.0', () => {
