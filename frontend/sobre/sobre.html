@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre</title>
+
+    <link rel="stylesheet" href="./menuHamburger/navegacao.css">
+    <link rel="stylesheet" href="./tabela.css">
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+       
+    <nav class="wraperNavegacao" id="wraperNavegacao">
+        <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
+        <ul class="ulMenu" id="ulMenu">
+            <script> 
+                const baseUrl = "https://gus-q7nn.onrender.com/";
+                const links = document.querySelectorAll('.linkMenu');
+                links.forEach(link => {link.href = `${baseUrl}${link.getAttribute('href')}`;});
+            </script>
+            <a class="linkMenu" href="/painelGeral.html"><li class="listMenu">Home</li></a>
+            <a class="linkMenu" href="/painelAdm.html"><li class="listMenu">Adm</li></a>
+            <a class="linkMenu" href="/sobre.html"><li class="listMenu">Sobre</li></a>
+        </ul>
+    </nav>
+    
+    <main id="main">
+        <h1>Sobre</h1>   
+      
+    </div>
+    
+    <script type="module" src="./menuHamburger/navegacao.js"></script>  
+</body>
+</html>

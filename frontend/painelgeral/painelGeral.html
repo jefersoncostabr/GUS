@@ -16,13 +16,13 @@
         <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
         <ul class="ulMenu" id="ulMenu">
             <script> 
-                const baseUrl = "https://placar-gamificado-teste.onrender.com";
+                const baseUrl = "https://gus-q7nn.onrender.com/";
                 const links = document.querySelectorAll('.linkMenu');
                 links.forEach(link => {link.href = `${baseUrl}${link.getAttribute('href')}`;});
             </script>
-            <a class="linkMenu" href="/public/index.html"><li class="listMenu">Home</li></a>
-            <a class="linkMenu" href="/pr/scoreBoard.html"><li class="listMenu">Placar</li></a>
-            <a class="linkMenu" href="/pr/regulamento.html"><li class="listMenu">Regulamento</li></a>
+            <a class="linkMenu" href="/painelGeral.html"><li class="listMenu">Home</li></a>
+            <a class="linkMenu" href="/painelAdm.html"><li class="listMenu">Adm</li></a>
+            <a class="linkMenu" href="/sobre.html"><li class="listMenu">Sobre</li></a>
         </ul>
     </nav>
     
@@ -59,7 +59,7 @@
                 </div>
 
             </div>
-			<div>
+			<div class="botoesInfContainer">
 				<button id="getUsosBtn">Ver</button>				
 				<button id="adicionarUsoBtn">Adicionar</button>
 				<button id="alterarReservaBtn">Alterar</button>

@@ -53,8 +53,7 @@ document.getElementById('motivo').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Evita o comportamento padrão do Enter
         adicionarUso(); // Chama a função para adicionar o uso
+        verFetch();
+        limparImputs();
     }
 });
-
-
-// ***** Apagar e limpar campos depois de criar
