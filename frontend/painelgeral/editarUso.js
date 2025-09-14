@@ -1,5 +1,5 @@
 import { limparImputs } from "./limparImputs.js";
-import { verFetch } from "./ver.js";   
+import { verFetch } from "..painelgeral/ver.js";   
 
 function getBaseUrl() {
     return window.location.hostname === "localhost"

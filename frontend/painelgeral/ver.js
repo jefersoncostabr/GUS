@@ -7,6 +7,7 @@ function limparTabela() {
 }
 
 export async function verFetch(params) {
+    document.getElementById('containerTabela').style.display = 'block';
     const inputValues = {
         solicitante: document.getElementById('solicitante').value,
         sala: document.getElementById('sala').value,

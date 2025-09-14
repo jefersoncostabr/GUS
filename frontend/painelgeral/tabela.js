@@ -1,3 +1,5 @@
+document.getElementById('containerTabela').style.display = 'none';
+
 // Pega todos os dados sem filtro
 export async function getDados() {
     try {
@@ -48,7 +50,7 @@ export function criaTabela(informacao) {
     ['Solicitante', 'Sala', 'Dia', 'Hora', 'Motivo'].forEach((coluna) => {
         const celula = linhaCabecalho.insertCell();
         celula.textContent = coluna;
-        celula.style.fontWeight = 'bold';
+        // celula.style.fontWeight = 'bold';
     });
 
     // Criar linhas da tabela

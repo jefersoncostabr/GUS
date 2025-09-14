@@ -1,4 +1,4 @@
-import { verFetch } from "./ver.js";
+import { verFetch } from "..painelgeral/ver.js";
 import { pegarIdUnico } from "./editarUso.js";
 import { limparImputs } from "./limparImputs.js";
 
@@ -7,11 +7,6 @@ function getBaseUrl() {
         ? "http://localhost:3000"
         : "https://gus-q7nn.onrender.com";
 }
-
-    // const baseUrl = getBaseUrl();
-    //     const response = await fetch(`${baseUrl}/usos/usos/${id}`, {
-
-
 
 async function excluirUso(id) {
     try {
