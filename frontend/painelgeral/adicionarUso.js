@@ -1,14 +1,11 @@
 import { verFetch } from "./ver.js";
+import { limparImputs } from "./limparImputs.js";
 
 function getBaseUrl() {
     return window.location.hostname === "localhost"
         ? "http://localhost:3000"
         : "https://gus-q7nn.onrender.com";
 }
-
-    // const baseUrl = getBaseUrl();
-    //     const response = await fetch(`${baseUrl}/usos/usos/${id}`, {
-
 
 async function adicionarUso() {
     const solicitante = document.getElementById('solicitante').value;
@@ -34,7 +31,10 @@ async function adicionarUso() {
                 'Content-Type': 'application/json',
         },
         body: JSON.stringify(novoUso),
+        
     });
+        verFetch()
+        limparImputs();
 
     // Verifique se a resposta foi bem-sucedida
     if (!response.ok) {
@@ -55,7 +55,6 @@ document.getElementById('motivo').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Evita o comportamento padrão do Enter
         adicionarUso(); // Chama a função para adicionar o uso
-        verFetch();
-        limparImputs();
+        
     }
 });

@@ -17,6 +17,8 @@ async function excluirUso(id) {
         'Content-Type': 'application/json'
         }
     });
+    verFetch();
+    limparImputs();
 
     if (!response.ok) {
         throw new Error(`Erro ao excluir uso: ${response.status}`);
@@ -32,11 +34,8 @@ async function excluirUso(id) {
 async function pegarIdEExcluir() {
     const id = await pegarIdUnico()
     excluirUso(id);
-
 }
 
 document.getElementById('excluirUsoBtn').addEventListener('click', function() {
-    pegarIdEExcluir();
-    verFetch();
-    limparImputs();
+    pegarIdEExcluir();    
 });
