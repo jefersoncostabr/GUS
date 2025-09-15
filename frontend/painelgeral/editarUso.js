@@ -35,6 +35,12 @@ async function alterarUso(id) {
 }
 
 export async function pegarIdUnico() {
+    // Tenta pegar o valor do input com id="id"
+    const inputId = document.getElementById('id');
+    if (inputId && inputId.value) {
+        console.log(inputId.value);
+        return inputId.value;
+    }
     try {
         const obj = await verFetch();
     if (obj !== undefined) {
@@ -52,12 +58,12 @@ export async function pegarIdUnico() {
 async function pegarIdEAlterar() {
     const id = await pegarIdUnico();
     await alterarUso(id);
+    limparImputs();
 }
 
 document.getElementById('alterarReservaBtn').addEventListener('click', function() {
     pegarIdEAlterar();
     verFetch();
-    limparImputs();
 });
 
 // Naõ consigo alterar o nome
