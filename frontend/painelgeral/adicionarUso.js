@@ -1,4 +1,4 @@
-import { verFetch } from ".ver.js";
+import { verFetch } from "./ver.js";
 
 function getBaseUrl() {
     return window.location.hostname === "localhost"
