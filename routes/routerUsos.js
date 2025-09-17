@@ -12,7 +12,7 @@ routerUsos.get("/", (req, res) => {
 routerUsos.get("/usos", async (req, res) => {
     const listaDeUsos = await usoModelo.find({});
     if (listaDeUsos.length === 0) {
-        res.status(404).json({ message: 'Nenhum artista encontrado' });
+        res.status(404).json({ message: 'Nenhum uso encontrado' });
     } else {
         res.status(200).json(listaDeUsos);
     }
@@ -29,7 +29,7 @@ routerUsos.get("/usos/:id", async (req, res) => {
 });
 
 routerUsos.get('/buscaid', async (req, res) => {
-    const { solicitante, sala, dia, hora, diaDaSemana, motivo } = req.query;
+    const { solicitante, sala, dia, hora, motivo } = req.query;
     // Validação de entrada
     if (!solicitante || !sala || !dia || !hora) {
         return res.status(400).json({ error: 'Parâmetros obrigatórios não fornecidos' });

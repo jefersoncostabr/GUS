@@ -1,0 +1,74 @@
+O que você já tem:
+
+✅ Express + express-session configurado.
+
+✅ Middleware authMiddleware para proteger rotas.
+
+✅ Rota de login/logout funcionando.
+
+✅ Estrutura de rotas organizada.
+
+✅ Conexão com banco Mongo (ainda não está usando para autenticação, mas já pronto).
+
+O que falta / pode melhorar:
+
+Cadastro de usuários (signup)
+
+Hoje você tem usuariosCadastrados hardcoded.
+
+Ideal: criar User no MongoDB e usar bcrypt para salvar senhas com hash.
+
+Persistência da sessão
+
+Atualmente, as sessões ficam só na memória → ao reiniciar o servidor, os usuários logados caem fora.
+
+Melhor: usar connect-mongo ou connect-redis para salvar sessões no banco.
+
+Tela de login (frontend)
+
+Agora você só manda login via JSON (POST /login).
+
+Melhor: ter uma página HTML com formulário de login → usuário digita usuário/senha.
+
+Feedback ao usuário não autenticado
+
+Hoje authMiddleware retorna só { error: "Não autorizado" }.
+
+Você pode redirecionar para a página de login (res.redirect("/login.html")) quando for uma aplicação web.
+
+Segurança extra
+
+Usar cookie: { httpOnly: true, secure: true }.
+
+Colocar dotenv para SESSION_SECRET (não deixar fixo no código).
+
+🤔 "Dá para fazer login usando prompt de usuário?"
+
+Se você fala do prompt() do JavaScript no navegador → até dá, mas não é recomendado.
+
+Exemplo:
+
+<script>
+  const username = prompt("Usuário:");
+  const password = prompt("Senha:");
+  fetch("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  }).then(res => res.json()).then(console.log);
+</script>
+
+
+Isso envia usuário/senha para o backend.
+
+❌ Problema: feio, inseguro, não dá experiência boa.
+
+Melhor → criar um formulário de login (login.html) com <input> para usuário e senha, que faz POST /login.
+
+👉 Resumindo: seu projeto está correto, mas falta:
+
+Cadastro de usuários no Mongo
+
+Formulário/tela de login (em vez de só JSON ou prompt)
+
+Persistência de sessões no banco
