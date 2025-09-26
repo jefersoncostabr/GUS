@@ -51,3 +51,7 @@ async function logout() {
 
 // attach the logout function to the logout button
 document.getElementById('logoutBtn').addEventListener('click', logout);
+
+document.getElementById('criarBtn').addEventListener('click', () => {
+    window.location.href = '/loginCriar.html';
+});

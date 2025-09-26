@@ -1,0 +1,65 @@
+*{margin:0; padding:0; }
+
+.wraperNavegacao{
+    background-color: black;
+    color: white;     
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+}
+
+.painelInfoUser{
+    display: flex;
+    gap: 10px;
+    margin: 15px;
+    color: red;
+}
+
+.linkMenu{
+    text-decoration: none;
+    color: inherit;
+    padding: 15px;
+    cursor: pointer;    
+}
+
+.listMenu{
+    list-style-type: none;
+}
+
+.ulMenu{
+    display:flex;
+    flex-direction: row;
+    justify-content: right;    
+}
+
+.menuHamburger{
+    display: none;
+    padding: 10px;
+    font-size:  21.5px;
+}
+
+/*    Celular    */
+@media (max-width: 360px) {
+    .ulMenu{        
+        visibility: hidden;  
+        align-items: center;        
+        height: 1px;   
+        flex-direction: column;
+        transition: all 1s; 
+        font-size: 0;        
+    }
+
+    .ulMenuClicado{
+        visibility: visible;        
+        height: 300px; 
+        font-size: 100%; 
+        padding:20px;          
+    }
+    
+    .menuHamburger{
+        display:block;  
+        margin-left: auto;
+        width: fit-content;
+    }    
+}

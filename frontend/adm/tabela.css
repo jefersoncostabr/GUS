@@ -1,0 +1,35 @@
+table {
+    border-collapse: collapse;
+    background-color: transparent;
+    /* border: 2px solid black; */
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+th, td {
+    padding: 5px 15px;
+    border: 1px solid black;
+    width:fit-content;
+}
+
+th {
+    font-weight: bold;
+}
+
+td:nth-child(1) {
+    font-weight: bold;
+    /* font-size: 1.4rem; */
+}
+
+@media (max-width: 393px) {}
+  
+/* @media (min-width: 394px) and (max-width: 618px) { */
+@media (max-width: 618px) {
+    table {
+        font-size: 0.6rem;
+    }   
+}
+
+@media (min-width: 619px) and (max-width: 768px) {}
+
+@media (min-width: 769px) {}

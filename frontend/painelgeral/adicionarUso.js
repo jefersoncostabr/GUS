@@ -18,14 +18,12 @@ async function adicionarUso() {
         solicitante: solicitante,
         sala: sala,
         dia: dia,
-        // diaDaSemana: diaSemana,
         hora: hora,
         motivo: motivo
     };
     try {
         const baseUrl = getBaseUrl();
         const response = await fetch(`${baseUrl}/usos/usos`, {       
-        // const response = await fetch('http://localhost:3000/usos/usos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -53,8 +51,8 @@ document.getElementById('adicionarUsoBtn').addEventListener('click', adicionarUs
 // ao clicar em enter no campo motivo ele aciona o adicionar uso
 document.getElementById('motivo').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Evita o comportamento padrão do Enter
-        adicionarUso(); // Chama a função para adicionar o uso
+        event.preventDefault();
+        adicionarUso();
         
     }
 });

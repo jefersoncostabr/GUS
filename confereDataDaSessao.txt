@@ -1,0 +1,32 @@
+// 1. Cria objeto com data/hora atual e salva no localStorage
+function salvarSolicitacao(obj) {
+  const agora = new Date();
+  const dataComHora = {
+    ...obj,
+    timestamp: agora.toISOString() // ISO é fácil de comparar
+  };
+  localStorage.setItem("solicitacao", JSON.stringify(dataComHora));
+}
+
+// 2. Recupera objeto do localStorage
+function obterSolicitacao() {
+  const item = localStorage.getItem("solicitacao");
+  return item ? JSON.parse(item) : null;
+}
+
+// 3. Verifica se já passaram 10 minutos desde o timestamp
+function passouDezMinutos() {
+  const dados = obterSolicitacao();
+  if (!dados || !dados.timestamp) return false;
+
+  const salvo = new Date(dados.timestamp);
+  const agora = new Date();
+  const diffMin = (agora - salvo) / 1000 / 60;
+
+  return diffMin > 10;
+}
+
+// Exemplo de uso:
+salvarSolicitacao({ solicitante: "teste", role: "user" });
+console.log(obterSolicitacao());
+console.log(passouDezMinutos());

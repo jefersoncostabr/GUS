@@ -1,0 +1,9 @@
+class MyHeader extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `<div><p>Teste</p></div>`;
+  }
+}
+customElements.define("my-header", MyHeader);
+
+
+<my-header></my-header>

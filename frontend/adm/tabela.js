@@ -10,7 +10,10 @@ export async function getDados() {
         const response = await fetch(`${baseUrl}/usos/usos`);
         const data = await response.json();
         const dataArray = Object.values(data);
-     
+        // console.log(`Lista de todos os usos Registrados:\n`, dataArray);
+        
+        // forma antiga que funcionada no local
+        // return dataArray;
         return Array.isArray(dataArray) ? dataArray : [];
     } catch (error) {
         console.error('Erro:', error);

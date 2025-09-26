@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Geral</title>
+    <title>Painel Adm</title>
 
     <link rel="stylesheet" href="./tabela.css">
-    <link rel="stylesheet" href="./stylepg.css">
+    <link rel="stylesheet" href="./styleAdm.css">
+
 </head>
 <body>
+       
     <!-- Menu navegação inicio -->
-    <link rel="stylesheet" href="./navegacaopg.css">
+    <link rel="stylesheet" href="./navegacaoPainelAdm.css">
 
     <nav class="wraperNavegacao" id="wraperNavegacao">
         <div class="painelInfoUser" id="painelInfoUser">
-            <p id="painelNomeHmaburger"></p>
-            <p id="painelRoleHamburger"></p>
+            <p id="painelNomeHmaburger">não logado</p>
+            <p id="painelRoleHamburger">teste</p>
         </div>
 
         <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
@@ -34,12 +36,12 @@
     </nav>
     <!-- Menu navegação fim -->
 
-    <script type="module" src="./navegacaopg.js"></script>
+    <script type="module" src="./navegacaoPainelAdm.js"></script>
     
     <main id="main">
         <!-- <h1>Painel Geral</h1>    -->
         <div class="containerPainel" id="">
-            <div class="containerBotoesTopo">
+            <div>
                 <button id="limparImputsBtn">Limpar</button>
             </div>
             <div class="formularioContainer">
@@ -78,16 +80,10 @@
 
 			<p id="painelSaida"></p>
 		</div>
-
-        <div class="containerPainel" id="containerTabela">            
+        <div class="containerPainel" id="containerTabela">
         </div>
     </main>
     
     <script type="module" src="./tabela.js"></script>
-    <script type="module" src="./ver.js"></script>
-    <script type="module" src="./adicionarUso.js"></script>
-    <script type="module" src="./editarUso.js"></script>
-    <script type="module" src="./apagarUso.js"></script>
-    <script type="module" src="./limparImputs.js"></script>
 </body>
 </html>

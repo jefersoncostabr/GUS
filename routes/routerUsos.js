@@ -1,5 +1,6 @@
 import express from "express";
 import usoModelo from "../src/models/utilizacaomodel.js";
+import { verificaRole, authMiddleware, verificaSolicitante } from "../middleware/authMiddleware.js";
 
 const routerUsos = express.Router();
 
@@ -64,11 +65,15 @@ routerUsos.post('/usos', async (req, res) => {
 });
 
 // http://localhost:3000/usos/usos/:id
-routerUsos.put('/usos/:id', async (req, res) => {
+routerUsos.put('/usos/:id', verificaSolicitante, async (req, res) => {
     try {
         const uso = await usoModelo.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!uso) {
             res.status(404).json({ error: 'Uso não encontrado' });
+            return;
+        }
+        if (uso && uso.solicitante !== req.session.user.solicitante) {
+            res.status(403).json({ error: 'Você não tem permissão para editar este uso' });
             return;
         }
         res.status(200).json(uso);
@@ -77,14 +82,15 @@ routerUsos.put('/usos/:id', async (req, res) => {
     }
 });
 
-// http://localhost:3000/usos/usos/:id
-routerUsos.delete('/usos/:id', async (req, res) => {
+routerUsos.delete('/usos/:id', verificaSolicitante, async (req, res) => {
     try {
-        const uso = await usoModelo.findByIdAndDelete(req.params.id);
+        const uso = await usoModelo.findById(req.params.id);
         if (!uso) {
             res.status(404).json({ error: 'Uso não encontrado' });
             return;
         }
+        // Se o uso for encontrado e o solicitante for o mesmo, remove o uso do banco de dados
+        await usoModelo.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Uso removido com sucesso' });
     } catch (err) {
         res.status(500).json({ error: 'Erro ao remover uso' });

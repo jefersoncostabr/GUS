@@ -3,6 +3,17 @@
 .wraperNavegacao{
     background-color: black;
     color: white;     
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+}
+
+.painelInfoUser{
+    display: flex;
+    gap: 10px;
+    margin: 15px;
+    color: red;
 }
 
 .linkMenu{

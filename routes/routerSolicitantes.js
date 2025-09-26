@@ -1,6 +1,7 @@
 import express from "express";
 import solicitanteModelo from "../src/models/usuariosmodel.js";
 import bcrypt from "bcrypt";
+// import { retornarUserRoleDaSessao } from "../frontend/painelgeral/navegacaopg.js";
 
 const routerSolicitantes = express.Router();
 
@@ -50,7 +51,20 @@ routerSolicitantes.get('/buscaidsolicitante', async (req, res) => {
     }
 });
 
-// http://localhost:3000/solicitantes/solicitantes
+
+routerSolicitantes.get('/usersess', async (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+        console.log('Usuário não encontrado na sessão.');
+        return user;
+    }
+    // console.log('Usuário atual:', user.solicitante);
+    // console.log('Role:', user.role);
+    res.status(200).json({ solicitante: user.solicitante, role: user.role });
+});
+
+
+//http://localhost:3000/solicitantes/solicitantes
 routerSolicitantes.post('/solicitantes', async (req, res) => {
     console.log("Requisição para criar novo solicitante:", req.body);
     try {
@@ -60,16 +74,18 @@ routerSolicitantes.post('/solicitantes', async (req, res) => {
 
         const novoSolicitante = new solicitanteModelo({ // cria um novo objeto solicitante
             ...req.body, // copia os demais campos do corpo da requisição
-            senha: hashedPassword // substitui a senha pelo hash gerado
+            senha: hashedPassword, // substitui a senha pelo hash gerado
+            role: "user"
         });
         await novoSolicitante.save(); // salva o novo objeto no banco de dados
         console.log("Novo solicitante criado:", novoSolicitante);
 
-        res.status(201).json(novoSolicitante); // responde com o novo objeto solicitante
+        res.status(201).json(novoSolicitante); 
     } catch (error) {
-        res.status(400).json({ message: error.message }); // responde com o erro
+        res.status(400).json({ message: error.message }); 
     }
 });
+
 
 // http://localhost:3000/solicitantes/solicitantes/:id
 routerSolicitantes.put('/solicitantes/:id', async (req, res) => {

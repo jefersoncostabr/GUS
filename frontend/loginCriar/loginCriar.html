@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login Criar</title>
 
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./loginStyle.css">
@@ -11,7 +11,7 @@
 </head>
 <body>       
     <!-- Menu navegação inicio -->
-    <link rel="stylesheet" href="./navegacaoLogin.css">
+    <link rel="stylesheet" href="./navegacaoLoginCriar.css">
 
     <nav class="wraperNavegacao" id="wraperNavegacao">
         <div class="painelInfoUser" id="painelInfoUser">
@@ -35,20 +35,16 @@
     </nav>
     <!-- Menu navegação fim -->
 
-    <script type="module" src="./navegacaoLogin.js"></script>
+    <script type="module" src="./navegacaoLoginCriar.js"></script>
     
     <div class="mainLogin">
         <div class="login-box">
-            <div class="divSuperiorCriar">
-                <h2>Login</h2>
-                <button class="btnLogin" id="criarBtn">Cadastrar</button>
-            </div>
-
-            <form id="loginForm">
+            <h2>Login</h2>
+            <form id="criarForm">
                 <input type="text" id="username" placeholder="Usuário" required>
+                <input type="text" id="estudio" name="estudio" placeholder="Estúdio" required>
                 <input type="password" id="password" placeholder="Senha" required>
-                <button class="btnLogin" type="submit">Entrar</button>
-                <button class="btnLogin" id="logoutBtn">Sair</button>
+                <button class="btnLogin" type="submit">Criar</button>
             </form>
         <div class="msg" id="msg"></div>
         </div>
