@@ -63,6 +63,18 @@ routerSolicitantes.get('/usersess', async (req, res) => {
     res.status(200).json({ solicitante: user.solicitante, role: user.role });
 });
 
+routerSolicitantes.get('/usersess', async (req, res) => {
+    const user = req.session.user;
+    console.log('req.session:', req.session);
+    if (!user) {
+        console.log('Usuário não encontrado na sessão.');
+        return res.status(200).json({ solicitante: null, role: null });
+    }
+    // console.log('Usuário atual:', user.solicitante);
+    // console.log('Role:', user.role);
+    res.status(200).json({ solicitante: user.solicitante, role: user.role });
+});
+
 
 //http://localhost:3000/solicitantes/solicitantes
 routerSolicitantes.post('/solicitantes', async (req, res) => {

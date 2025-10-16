@@ -30,6 +30,10 @@ async function alterarUso(id) {
         const data = await response.json();
         console.log(data);
     } catch (error) {
+        document.getElementById('painelSaida').innerText = 'Negado';
+        setTimeout(() => {
+            document.getElementById('painelSaida').innerText = '';
+        }, 3000);
         console.error(`Erro ao alterar uso: ${error.message}`);
     }
 }

@@ -1,13 +1,45 @@
 import {criaTabela} from "./tabela.js";
 import {getDados} from "./tabela.js";
+import {voltarPaginacao, avancarPaginacao} from "./tabela.js";
+
 
 function limparTabela() {
     // Limpa a tabela anterior
     document.getElementById('containerTabela').innerHTML = '';
 }
 
+
+function criarElementospaginacaoTab() {
+    var containerTabBotoes = document.createElement('div');
+    containerTabBotoes.className = 'containerTabBotoes';
+    containerTabBotoes.style.margin = '10px 0 0 0';
+    containerTabBotoes.id = 'containerTabBotoes';
+
+    var btnVoltarTab = document.createElement('button');
+    btnVoltarTab.className = 'btnVoltarTab';
+    btnVoltarTab.id = 'btnVoltarTab';
+    btnVoltarTab.textContent = 'Voltar';
+    btnVoltarTab.style.marginRight = '10px';  
+    btnVoltarTab.addEventListener('click', voltarPaginacao);
+
+
+    var btnAvancarTab = document.createElement('button');
+    btnAvancarTab.className = 'btnAvancarTab';
+    btnAvancarTab.id = 'btnAvancarTab';
+    btnAvancarTab.textContent = 'Avançar';
+    btnAvancarTab.addEventListener('click', avancarPaginacao);   
+
+    containerTabBotoes.appendChild(btnVoltarTab);
+    containerTabBotoes.appendChild(btnAvancarTab);
+
+    var containerTabela = document.getElementById('containerTabela');
+    containerTabela.appendChild(containerTabBotoes);
+}
+
 export async function verFetch(params) {
+    // console.log('verFetch chamado');
     document.getElementById('containerTabela').style.display = 'block';
+
     const inputValues = {
         solicitante: document.getElementById('solicitante').value,
         sala: document.getElementById('sala').value,
@@ -15,8 +47,6 @@ export async function verFetch(params) {
         hora: document.getElementById('hora').value,
         motivo: document.getElementById('motivo').value,
     };
-
-    // aparecerTabela();    
 
     const filteredDadosGeral = await getDados().then((dadosGeral) => {
         // Filtra os dados com base nos valores de input do usuário
@@ -51,6 +81,8 @@ export async function verFetch(params) {
     // console.log(filteredDadosGeral);
     limparTabela();
     criaTabela(filteredDadosGeral);
+    criarElementospaginacaoTab();
+    // renderTabelaComPaginacao(filteredDadosGeral);
     return filteredDadosGeral; // Retorna o primeiro objeto do array filtrado
 }
 

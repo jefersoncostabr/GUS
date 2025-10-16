@@ -36,7 +36,11 @@ async function adicionarUso() {
 
     // Verifique se a resposta foi bem-sucedida
     if (!response.ok) {
-        throw new Error(`Erro ao adicionar novo uso: ${response.status}`);
+        document.getElementById('painelSaida').innerText = 'Negado ou Já existe';
+        setTimeout(() => {
+            document.getElementById('painelSaida').innerText = '';
+        }, 3000);
+        throw new Error(`Erro na resposta ao adicionar novo uso: ${response.status}`);
     }
         // Obtenha os dados da resposta
         const data = await response.json();

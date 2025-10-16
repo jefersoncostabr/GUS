@@ -1,3 +1,7 @@
+import {paginar} from './paginacao.js';
+import { verFetch } from './ver.js';
+import { itensPorPagina } from './paginacao.js';
+
 document.getElementById('containerTabela').style.display = 'none';
 
 // Pega todos os dados sem filtro
@@ -34,8 +38,9 @@ function atribuirClick(celula, dados) {
   });
 }
 
-// Cria a tabela c dados
-export function criaTabela(informacao) {
+function renderTabelaComPaginacao(data) {
+    // console.log('renderTabelaComPaginacao chamado');
+    // console.log(data);
     const containerTabela = document.getElementById('containerTabela');
 
     // Criar tabela HTML
@@ -51,7 +56,7 @@ export function criaTabela(informacao) {
     });
 
     // Criar linhas da tabela
-    informacao.forEach((dado) => {
+    data.forEach((dado) => {
         const linha = tabela.insertRow();
         const celulaSolicitante = linha.insertCell();
         celulaSolicitante.textContent = dado.solicitante;
@@ -65,4 +70,39 @@ export function criaTabela(informacao) {
 
     // Adicionar tabela ao documento
     containerTabela.appendChild(tabela);
+}
+
+let paginaAtual = 0;
+
+// Refatorar
+export async function voltarPaginacao() {
+    // Criado no ver.js criar elementosPaginacaoTab
+    if (paginaAtual > 0) { // se tiver na segunda página ele podde voltar
+        paginaAtual--;
+        verFetch();
+    }
+}
+
+// Refatorar
+export async function avancarPaginacao() {
+    // Criado no ver.js criar elementosPaginacaoTab
+    const lengthDados = await getDados().then((dados) => dados.length);
+    if (paginaAtual < lengthDados / itensPorPagina - 1) {
+        paginaAtual ++
+        verFetch();
+    }
+}
+
+// Cria a tabela c dados
+export function criaTabela(data) {
+    const paginatedData = paginar(data);
+  
+    //Container para exibir a tabela
+    const containerTabela = document.getElementById('containerTabela');
+    
+    // Limpar o container antes de renderizar a tabela
+    containerTabela.innerHTML = '';
+
+    // Chamar a função para criar a tabela com os dados paginados
+    renderTabelaComPaginacao(paginatedData[paginaAtual]);
 }

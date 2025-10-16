@@ -16,6 +16,10 @@ th {
     font-weight: bold;
 }
 
+.containerTabBotoes {
+    gap: 10px;
+}
+
 td:nth-child(1) {
     font-weight: bold;
     /* font-size: 1.4rem; */

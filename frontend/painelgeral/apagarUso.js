@@ -21,12 +21,17 @@ async function excluirUso(id) {
     limparImputs();
 
     if (!response.ok) {
+        document.getElementById('painelSaida').innerText = 'Negado';
+        setTimeout(() => {
+            document.getElementById('painelSaida').innerText = '';
+        }, 3000);
         throw new Error(`Erro ao excluir uso: ${response.status}`);
     }
 
     const data = await response.json();
     console.log(data);
     } catch (error) {
+        
         console.error(`Erro ao excluir uso: ${error.message}`);
     }
 }

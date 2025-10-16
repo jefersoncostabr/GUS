@@ -1,6 +1,6 @@
 import express from "express";
 import usoModelo from "../src/models/utilizacaomodel.js";
-import { verificaRole, authMiddleware, verificaSolicitante } from "../middleware/authMiddleware.js";
+import { verificaRole, authMiddleware, verificaSolicitante, verificaDuplicidade } from "../middleware/authMiddleware.js";
 
 const routerUsos = express.Router();
 
@@ -54,7 +54,7 @@ routerUsos.get('/buscaid', async (req, res) => {
 });
 
 // http://localhost:3000/usos/usos
-routerUsos.post('/usos', async (req, res) => {
+routerUsos.post('/usos', verificaDuplicidade, async (req, res) => {
     try {
         const novoUso = new usoModelo(req.body);
         await novoUso.save();
