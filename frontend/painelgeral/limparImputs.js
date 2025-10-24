@@ -43,12 +43,6 @@ function adicionaPreenchimentoSolicitante() {
     inputs.forEach(inputId => {
         document.getElementById(inputId).addEventListener('focus', preencherSolicitante);
     });
-
-    // document.getElementById('solicitante').addEventListener('focus', preencherSolicitante);
-    // document.getElementById('sala').addEventListener('click', preencherSolicitante);
-    // document.getElementById('dia').addEventListener('click', preencherSolicitante);
-    // document.getElementById('hora').addEventListener('click', preencherSolicitante);
-    // document.getElementById('motivo').addEventListener('click', preencherSolicitante);
 }
 
 adicionaPreenchimentoSolicitante();

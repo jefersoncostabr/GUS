@@ -74,12 +74,18 @@ button {
 input {
     text-align: center;
 }
+
+
 .inputNumerico {
     width: 50px;
     /* height: auto; */
     font-size: 25px;
     border-radius: 10px;
     border-style: none;
+}
+
+.inputAno {
+    width: 80px;
 }
 
 .inputTexto {

@@ -55,14 +55,28 @@
                 <div>
                     <label for="dia">Dia:</label>
                     <input class="inputNumerico" type="number" id="dia">
+                    <input class="inputNumerico" type="number" id="mes">
+                    <input class="inputNumerico inputAno" type="number" id="ano">
+                    <script>
+                        document.getElementById('mes').value = new Date().getMonth() + 1;
+                        document.getElementById('ano').value = new Date().getFullYear();
+                    </script>
                 </div>
                 <div>
                     <label for="hora">Hora:</label>
                     <input class="inputNumerico" type="number" id="hora">
                 </div>
-                <div>
+                <!-- <div>
                     <label for="motivo">Motivo:</label>
                     <input class="inputTexto" type="text" id="motivo">			
+                </div> -->
+                <div>
+                <label for="motivo">Motivo:</label>
+                    <select class="inputTexto selectMotivo" id="motivo">
+                        <option value="opcao1">Particular</option>
+                        <option value="opcao2">Ensaio</option>
+                        <option value="opcao3">Regular</option>
+                    </select>
                 </div>
                 <div>
                     <label for="id" id="labelId">id:</label>
@@ -85,6 +99,8 @@
                 <button class="btnAvancarTab" id="btnAvancarTab">Avançar</button>           
             </div>  -->
         </div>
+
+
     </main>
     
     <script type="module" src="./tabela.js"></script>
