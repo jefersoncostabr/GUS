@@ -83,10 +83,6 @@ routerUsos.get('/buscaid', async (req, res) => {
 });
 
 // http://localhost:3000/usos/usos
-<<<<<<< HEAD
-=======
-// ***** Nao pode ter duas rotas com o mesmo endpoint
->>>>>>> format-inputs
 routerUsos.post('/usos', verificaDuplicidade, async (req, res) => {
     try {
         const { solicitante, sala, dia, hora, motivo } = req.body;
