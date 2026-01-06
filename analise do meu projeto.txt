@@ -1,0 +1,36 @@
+STATUS ATUAL DO PROJETO (Atualizado)
+
+✅ BACKEND
+   - Express + express-session configurado com persistência no MongoDB (connect-mongo).
+   - Conexão com MongoDB (Mongoose) estabelecida.
+   - Middlewares de segurança robustos implementados:
+     - authMiddleware: Protege rotas (redireciona para login).
+     - verificaRole: Controle de acesso (Admin).
+     - verificaSolicitante: Garante que apenas o dono edite/exclua.
+     - verificaDuplicidade: Evita agendamentos conflitantes.
+   - Segurança: Variáveis de ambiente (.env) configuradas para o segredo da sessão.
+   - Model atualizado: Campos 'dia' e 'hora' alterados para String (suporte a DD/MM e HH:MM).
+
+✅ FRONTEND
+   - Painéis (Geral e Adm) estruturados.
+   - CRUD Completo (Ver, Adicionar, Editar, Excluir) integrado com API.
+   - Sistema de Paginação:
+     - Frontend preparado para paginação no servidor (envia page/limit).
+     - Correção de bug de sobreposição de tabelas implementada.
+     - Documentação (JSDoc) adicionada em `paginacao.js` e `tabela.js`.
+   - Filtros de pesquisa inteligentes (ignora maiúsculas/minúsculas).
+   - Feedback visual para o usuário (mensagens de erro/sucesso).
+   - Tratamento e validação de dados implementados (tratamentodedados.js).
+   - Exibição dinâmica do usuário logado no Painel Geral.
+
+⚠️ PONTOS DE ATENÇÃO / MELHORIAS NECESSÁRIAS
+
+1. Conclusão da Paginação no Backend (Próximos Passos)
+   - O Frontend já está pronto (itens d, e concluídos).
+   - Falta implementar no Backend:
+   a. Alterar controller para receber query params (page, limit) 
+    	-> Para capturar qual página e quantidade de itens o usuário deseja.
+   b. Implementar .skip() e .limit() na consulta Mongoose 
+	 	-> Para buscar no banco apenas os dados da página atual (performance).
+   c. Retornar metadados (total de itens, páginas totais) junto com os dados 
+	 	-> Para que o frontend saiba calcular o total de páginas e habilitar os botões.

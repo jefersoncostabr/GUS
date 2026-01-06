@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="./stylepg.css">
+    <link rel="stylesheet" href="./responsividade.css">
+    <link rel="stylesheet" href="./navbar.css">
+</head>
+<body>
+    <!-- Menu navegação inicio -->
+    <nav class="wraperNavegacao" id="wraperNavegacao">
+        <div class="painelInfoUser" id="painelInfoUser">
+            <p id="painelNomeHmaburger">não logado</p>
+            <p id="painelRoleHamburger">indefinido</p>
+        </div>
+
+        <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
+
+        <ul class="ulMenu" id="ulMenu">
+        </ul>
+    </nav>
+    
+    <script type="module" src="./navbar.js"></script>
+    <!-- Menu navegação fim -->
+
+    <script type="module" src="./login.js"></script>
+
+    <main id="main">
+        <div class="containerPainel">
+            <h1>Login</h1>
+            <!-- Ajuste a action conforme sua rota de login no backend -->
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px;">
+                <input class="inputTexto" type="text" name="username" placeholder="Usuário" required>
+                <input class="inputTexto" type="password" name="password" placeholder="Senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <p id="painelSaida" style="margin-top: 10px; color: red;"></p>
+        </div>
+    </main>
+</body>
+</html>

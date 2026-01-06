@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Adm</title>
+
+    <link rel="stylesheet" href="./tabela.css">
+    <link rel="stylesheet" href="./styleAdm.css">
+    <link rel="stylesheet" href="./responsividade.css">
+
+</head>
+<body>
+       
+    <!-- Menu navegação unificado -->
+    <link rel="stylesheet" href="./navbar.css">
+    <script src="./navbar.js"></script>
+    
+    <main id="main">
+        <!-- <h1>Painel Geral</h1>    -->
+        <div class="containerPainel" id="">
+            <div>
+                <button id="limparImputsBtn">Limpar</button>
+            </div>
+            <div class="formularioContainer">
+                <div>
+                    <label for="solicitante">Solicitante:</label>
+                    <input class="inputTexto" type="text" id="solicitante"></label>
+                </div>
+                <div>
+                    <label for="sala">Sala:</label>
+                    <input class="inputNumerico" type="number" id="sala">
+                </div>
+                <div>
+                    <label for="dia">Dia:</label>
+                    <input class="inputNumerico" type="number" id="dia">
+                </div>
+                <div>
+                    <label for="hora">Hora:</label>
+                    <input class="inputNumerico" type="number" id="hora">
+                </div>
+                <div>
+                    <label for="motivo">Motivo:</label>
+                    <input class="inputTexto" type="text" id="motivo">			
+                </div>
+                <div>
+                    <label for="id" id="labelId">id:</label>
+                    <input class="inputTexto" type="text" id="id" disabled></label>
+                </div>
+
+            </div>
+			<div class="botoesInfContainer">
+				<button id="getUsosBtn">Ver</button>				
+				<button id="adicionarUsoBtn">Adicionar</button>
+				<button id="alterarReservaBtn">Alterar</button>
+				<button id="excluirUsoBtn">Excluir</button>
+			</div>
+
+			<p id="painelSaida"></p>
+		</div>
+        <div class="containerPainel" id="containerTabela">
+        </div>
+    </main>
+    
+    <script type="module" src="./tabela.js"></script>
+</body>
+</html>

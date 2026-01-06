@@ -116,3 +116,43 @@ routerSolicitantes.delete('/solicitantes/:id', async (req, res) => {
 });
 
 export default routerSolicitantes;
+
+/*
+================================================================================
+LISTA DE ENDPOINTS
+================================================================================
+
+GET /solicitantes/
+    - Descrição: Rota inicial de teste.
+    - Retorno: Mensagem simples confirmando funcionamento.
+
+GET /solicitantes/solicitantes
+    - Descrição: Retorna todos os registros de solicitantes.
+    - Retorno: Array JSON com os objetos de solicitantes.
+
+GET /solicitantes/solicitantes/:id
+    - Descrição: Busca os detalhes de um solicitante específico pelo ID.
+    - Retorno: Objeto JSON do solicitante.
+
+GET /solicitantes/buscaidsolicitante
+    - Descrição: Busca o _id de um solicitante com base em parâmetros (solicitante, estudio).
+    - Query Params: solicitante, estudio.
+    - Retorno: JSON com o _id do solicitante.
+
+GET /solicitantes/usersess
+    - Descrição: Retorna informações do usuário logado na sessão (solicitante e role).
+    - Retorno: JSON com dados da sessão.
+
+POST /solicitantes/solicitantes
+    - Descrição: Cria um novo solicitante (com hash de senha).
+    - Retorno: Objeto criado.
+
+PUT /solicitantes/solicitantes/:id
+    - Descrição: Atualiza um solicitante existente.
+    - Retorno: Objeto atualizado.
+
+DELETE /solicitantes/solicitantes/:id
+    - Descrição: Remove um registro de solicitante.
+    - Retorno: Mensagem de sucesso.
+================================================================================
+*/
