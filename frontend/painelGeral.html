@@ -7,34 +7,26 @@
 
     <link rel="stylesheet" href="./tabela.css">
     <link rel="stylesheet" href="./stylepg.css">
+    <link rel="stylesheet" href="./responsividade.css">
+    <link rel="stylesheet" href="./navbar.css">
+
 </head>
 <body>
     <!-- Menu navegação inicio -->
-    <link rel="stylesheet" href="./navegacaopg.css">
-
     <nav class="wraperNavegacao" id="wraperNavegacao">
         <div class="painelInfoUser" id="painelInfoUser">
-            <p id="painelNomeHmaburger"></p>
-            <p id="painelRoleHamburger"></p>
+            <p id="painelNomeHmaburger">não logado</p>
+            <p id="painelRoleHamburger">indefinido</p>
         </div>
 
         <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
 
         <ul class="ulMenu" id="ulMenu">
-            <script> 
-                const baseUrl = window.location.hostname === "localhost"
-                    ? "http://localhost:3000"
-                    : "https://gus-q7nn.onrender.com";
-                const links = document.querySelectorAll('.linkMenu');
-                links.forEach(link => {link.href = `${baseUrl}${link.getAttribute('href')}`;});
-
-            </script>
-
         </ul>
     </nav>
+    
+    <script type="module" src="./navbar.js"></script>
     <!-- Menu navegação fim -->
-
-    <script type="module" src="./navegacaopg.js"></script>
     
     <main id="main">
         <!-- <h1>Painel Geral</h1>    -->
@@ -94,10 +86,15 @@
 			<p id="painelSaida"></p>
 		</div>
         <div class="containerPainel" id="containerTabela">
+<<<<<<< HEAD:frontend/painelgeral/painelGeral.html
             <!-- <div class="containerTabBotoes" id="containerTabBotoes">
                 <button class="btnVoltarTab" id="btnVoltarTab">Voltar</button>           
                 <button class="btnAvancarTab" id="btnAvancarTab">Avançar</button>           
             </div>  -->
+=======
+            <div id="tableInner"></div>
+            <div id="containerPaginacao"></div>
+>>>>>>> format-inputs:frontend/painelGeral.html
         </div>
 
 

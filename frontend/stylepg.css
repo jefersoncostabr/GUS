@@ -74,8 +74,11 @@ button {
 input {
     text-align: center;
 }
+<<<<<<< HEAD:frontend/painelgeral/stylepg.css
 
 
+=======
+>>>>>>> format-inputs:frontend/stylepg.css
 .inputNumerico {
     width: 50px;
     /* height: auto; */

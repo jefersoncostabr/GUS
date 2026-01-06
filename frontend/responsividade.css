@@ -1,0 +1,19 @@
+/* ================================================================
+   REGRAS DE RESPONSIVIDADE
+   ================================================================ */
+
+/* --- CONTROLES DE PAGINAÇÃO --- */
+/* Para telas pequenas (celulares) com largura de até 600px */
+@media (max-width: 600px) {
+    /* Reduz o tamanho dos botões de paginação */
+    .btnVoltarTab,
+    .btnAvancarTab {
+        padding: 6px 10px; /* Reduz o preenchimento interno */
+        font-size: 16px; /* Ajusta o tamanho da fonte (bom para as setas) */
+    }
+
+    /* Ajusta o texto de informação da página */
+    #paginaInfo {
+        font-size: 14px; /* Reduz o tamanho da fonte */
+    }
+}

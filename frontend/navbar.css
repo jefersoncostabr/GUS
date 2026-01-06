@@ -1,0 +1,96 @@
+/* ================================================================
+   NAVBAR GLOBAL - Estilos unificados
+   ================================================================ */
+
+/* Reset básico para garantir consistência no menu */
+.wraperNavegacao * {
+    box-sizing: border-box;
+}
+
+.wraperNavegacao {
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between; /* Separa logo/info do menu */
+    padding: 0 20px;
+    height: 60px; /* Altura fixa para evitar pulos */
+    position: relative;
+}
+
+/* Área de Informação do Usuário (Esquerda/Centro) */
+.painelInfoUser {
+    display: flex;
+    gap: 10px;
+    color: red;
+    font-size: 1rem;
+}
+
+/* Links do Menu */
+.linkMenu {
+    text-decoration: none;
+    color: white;
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.linkMenu:hover {
+    background-color: #333;
+}
+
+.listMenu {
+    list-style-type: none;
+}
+
+/* --- VERSÃO DESKTOP (PADRÃO) --- */
+.ulMenu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+.menuHamburger {
+    display: none; /* Escondido no desktop */
+}
+
+/* --- VERSÃO MOBILE (Telas menores que 768px) --- */
+@media (max-width: 768px) {
+    .menuHamburger {
+        display: block;
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+    }
+
+    .ulMenu {
+        display: none; /* Escondido por padrão no mobile */
+        flex-direction: column;
+        position: absolute;
+        top: 60px; /* Logo abaixo da barra preta */
+        left: 0;
+        width: 100%;
+        background-color: black;
+        z-index: 1000;
+        padding-bottom: 20px;
+        border-top: 1px solid #333;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Sombra para destacar o menu sobre o conteúdo */
+    }
+
+    /* Classe ativada pelo JS para mostrar o menu */
+    .ulMenu.ulMenuClicado {
+        display: flex;
+    }
+
+    .linkMenu {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 20px;
+        border-bottom: 1px solid #222;
+    }
+}

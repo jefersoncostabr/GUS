@@ -6,16 +6,44 @@ const routerUsos = express.Router();
 
 // http://localhost:3000/usos
 routerUsos.get("/", (req, res) => {
-    res.status(200).send("Rota inicial funcionando");
+    res.status(200).send("Rota inicial usos funcionando");
 });
 
 // http://localhost:3000/usos/usos
 routerUsos.get("/usos", async (req, res) => {
-    const listaDeUsos = await usoModelo.find({});
-    if (listaDeUsos.length === 0) {
-        res.status(404).json({ message: 'Nenhum uso encontrado' });
-    } else {
-        res.status(200).json(listaDeUsos);
+    try {
+        const { solicitante, sala, dia } = req.query;
+        const query = {};
+
+        if (solicitante) query.solicitante = { $regex: solicitante, $options: 'i' };
+        if (sala) query.sala = sala;
+        if (dia) query.dia = dia;
+
+        // Paginação: aceitar query params ?page=X&limit=Y
+        let page = parseInt(req.query.page, 10) || 1;
+        let limit = parseInt(req.query.limit, 10) || 5; // default 5
+        const maxLimit = 100;
+        if (limit > maxLimit) limit = maxLimit;
+        if (page < 1) page = 1;
+
+        const totalItems = await usoModelo.countDocuments(query);
+        const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+        if (page > totalPages) page = totalPages;
+
+        const skip = (page - 1) * limit;
+        const listaDeUsos = await usoModelo.find(query).skip(skip).limit(limit);
+
+        // Retorna dados + metadados de paginação
+        return res.status(200).json({
+            data: listaDeUsos,
+            page,
+            limit,
+            totalItems,
+            totalPages
+        });
+    } catch (error) {
+        console.error('Erro ao buscar usos paginados:', error);
+        res.status(500).json({ error: 'Erro ao buscar usos' });
     }
 });
 
@@ -29,6 +57,7 @@ routerUsos.get("/usos/:id", async (req, res) => {
     }
 });
 
+// http://localhost:3000/usos/buscaid
 routerUsos.get('/buscaid', async (req, res) => {
     const { solicitante, sala, dia, hora, motivo } = req.query;
     // Validação de entrada
@@ -54,8 +83,17 @@ routerUsos.get('/buscaid', async (req, res) => {
 });
 
 // http://localhost:3000/usos/usos
+<<<<<<< HEAD
+=======
+// ***** Nao pode ter duas rotas com o mesmo endpoint
+>>>>>>> format-inputs
 routerUsos.post('/usos', verificaDuplicidade, async (req, res) => {
     try {
+        const { solicitante, sala, dia, hora, motivo } = req.body;
+        // Validação: Impede o cadastro se algum campo estiver vazio
+        if (!solicitante || !sala || !dia || !hora || !motivo) {
+            return res.status(400).json({ message: 'Todos os campos devem ser preenchidos.' });
+        }
         const novoUso = new usoModelo(req.body);
         await novoUso.save();
         res.status(201).json(novoUso);
@@ -72,16 +110,13 @@ routerUsos.put('/usos/:id', verificaSolicitante, async (req, res) => {
             res.status(404).json({ error: 'Uso não encontrado' });
             return;
         }
-        if (uso && uso.solicitante !== req.session.user.solicitante) {
-            res.status(403).json({ error: 'Você não tem permissão para editar este uso' });
-            return;
-        }
         res.status(200).json(uso);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao atualizar uso' });
     }
 });
 
+// http://localhost:3000/usos/usos/:id
 routerUsos.delete('/usos/:id', verificaSolicitante, async (req, res) => {
     try {
         const uso = await usoModelo.findById(req.params.id);
@@ -98,3 +133,42 @@ routerUsos.delete('/usos/:id', verificaSolicitante, async (req, res) => {
 });
 
 export default routerUsos;
+
+/*
+================================================================================
+LISTA DE ENDPOINTS
+================================================================================
+
+GET /usos/
+    - Descrição: Rota inicial de teste.
+    - Retorno: Mensagem simples confirmando funcionamento.
+
+GET /usos/usos
+    - Descrição: Retorna todos os registros de uso.
+    - Retorno: Array JSON com os objetos de uso.
+
+GET /usos/usos/:id
+    - Descrição: Busca os detalhes de um uso específico pelo ID.
+    - Retorno: Objeto JSON do uso.
+
+GET /usos/buscaid
+    - Descrição: Busca o _id de um uso com base em parâmetros (solicitante, sala, dia, hora, motivo).
+    - Query Params: solicitante, sala, dia, hora, motivo.
+    - Retorno: JSON com o _id do uso.
+
+POST /usos/usos
+    - Descrição: Cria um novo registro de uso.
+    - Middleware: verificaDuplicidade.
+    - Retorno: Objeto criado.
+
+PUT /usos/usos/:id
+    - Descrição: Atualiza um uso existente.
+    - Middleware: verificaSolicitante (apenas o dono pode editar).
+    - Retorno: Objeto atualizado.
+
+DELETE /usos/usos/:id
+    - Descrição: Remove um registro de uso.
+    - Middleware: verificaSolicitante (apenas o dono pode remover).
+    - Retorno: Mensagem de sucesso.
+================================================================================
+*/
