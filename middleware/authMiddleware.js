@@ -15,10 +15,7 @@ export async function verificaRole(req, res, next) {
 
     if (userRole !== role) {
         console.log('Você não tem permissão para acessar');
-<<<<<<< HEAD
         document.getElementById('painelSaida').innerText = 'Sem permissão';
-=======
->>>>>>> format-inputs
         return res.status(403).json({ error: 'Você não tem permissão para acessar esta rota' });
     }
 
@@ -41,7 +38,6 @@ export async function verificaSolicitante(req, res, next) {
 
         if (!solicitanteSession) {
             console.log('Usuário não autenticado');
-<<<<<<< HEAD
             document.getElementById('painelSaida').innerText = 'Não autenticado';
             return res.status(401).json({ error: 'Usuário não autenticado' });
         }
@@ -50,15 +46,6 @@ export async function verificaSolicitante(req, res, next) {
             console.log('Você não tem permissão para excluir este uso');
             document.getElementById('painelSaida').innerText = 'Sem permissão';
             return res.status(403).json({ error: 'Você não tem permissão para excluir/editar este uso' });
-=======
-            return res.status(401).json({ error: 'Usuário não autenticado' });
-        }
-        
-        // Permite se for o dono (ignorando case/espaços) OU se for admin
-        if (solicitanteUso.trim().toLowerCase() !== solicitanteSession.trim().toLowerCase() && roleSession !== 'admin') {
-            console.log('Você não tem permissão para excluir este uso');
-            return res.status(403).json({ error: 'Você não tem permissão para excluir este uso' });
->>>>>>> format-inputs
         }
         
         next();

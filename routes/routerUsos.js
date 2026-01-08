@@ -1,5 +1,6 @@
 import express from "express";
 import usoModelo from "../src/models/utilizacaomodel.js";
+import solicitanteModelo from "../src/models/usuariosmodel.js";
 import { verificaRole, authMiddleware, verificaSolicitante, verificaDuplicidade } from "../middleware/authMiddleware.js";
 
 const routerUsos = express.Router();
@@ -15,7 +16,12 @@ routerUsos.get("/usos", async (req, res) => {
         const { solicitante, sala, dia } = req.query;
         const query = {};
 
-        if (solicitante) query.solicitante = { $regex: solicitante, $options: 'i' };
+        // Correção para busca por nome após migração para ObjectId
+        if (solicitante) {
+            const usuarios = await solicitanteModelo.find({ solicitante: { $regex: solicitante, $options: 'i' } });
+            const idsUsuarios = usuarios.map(u => u._id);
+            query.solicitante = { $in: idsUsuarios };
+        }
         if (sala) query.sala = sala;
         if (dia) query.dia = dia;
 
@@ -31,7 +37,7 @@ routerUsos.get("/usos", async (req, res) => {
         if (page > totalPages) page = totalPages;
 
         const skip = (page - 1) * limit;
-        const listaDeUsos = await usoModelo.find(query).skip(skip).limit(limit);
+        const listaDeUsos = await usoModelo.find(query).populate({ path: 'solicitante', model: solicitanteModelo }).skip(skip).limit(limit);
 
         // Retorna dados + metadados de paginação
         return res.status(200).json({
@@ -49,7 +55,7 @@ routerUsos.get("/usos", async (req, res) => {
 
 // http://localhost:3000/usos/usos/:id
 routerUsos.get("/usos/:id", async (req, res) => {
-    const uso = await usoModelo.findById(req.params.id);
+    const uso = await usoModelo.findById(req.params.id).populate({ path: 'solicitante', model: solicitanteModelo });
     if (!uso) {
         res.status(404).json({ message: 'Uso não encontrado com esse id' });
     } else {
@@ -65,8 +71,17 @@ routerUsos.get('/buscaid', async (req, res) => {
         return res.status(400).json({ error: 'Parâmetros obrigatórios não fornecidos' });
     }
     try {
+        // Se o solicitante vier como nome (String), precisamos achar o ID dele primeiro
+        let idSolicitante = solicitante;
+        const usuarioEncontrado = await solicitanteModelo.findOne({ solicitante: solicitante });
+        
+        if (usuarioEncontrado) {
+            idSolicitante = usuarioEncontrado._id;
+        }
+        // Se não achar usuário pelo nome, assume-se que o valor passado já seja um ID ou falhará no cast abaixo
+
         const uso = await usoModelo.findOne({
-            solicitante,
+            solicitante: idSolicitante,
             sala: Number(sala),
             dia: Number(dia),
             hora: Number(hora),
@@ -85,12 +100,21 @@ routerUsos.get('/buscaid', async (req, res) => {
 // http://localhost:3000/usos/usos
 routerUsos.post('/usos', verificaDuplicidade, async (req, res) => {
     try {
-        const { solicitante, sala, dia, hora, motivo } = req.body;
+        const { sala, dia, hora, motivo } = req.body;
+        // Pega o ID do usuário logado na sessão (garante integridade)
+        const solicitanteId = req.session.user ? req.session.user._id : null;
+
         // Validação: Impede o cadastro se algum campo estiver vazio
-        if (!solicitante || !sala || !dia || !hora || !motivo) {
+        if (!solicitanteId || !sala || !dia || !hora || !motivo) {
             return res.status(400).json({ message: 'Todos os campos devem ser preenchidos.' });
         }
-        const novoUso = new usoModelo(req.body);
+        const novoUso = new usoModelo({
+            solicitante: solicitanteId,
+            sala,
+            dia,
+            hora,
+            motivo
+        });
         await novoUso.save();
         res.status(201).json(novoUso);
     } catch (error) {

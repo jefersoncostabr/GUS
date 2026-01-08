@@ -10,12 +10,13 @@ STATUS ATUAL DO PROJETO (Atualizado)
      - verificaDuplicidade: Evita agendamentos conflitantes.
    - Segurança: Variáveis de ambiente (.env) configuradas para o segredo da sessão.
    - Model atualizado: Campos 'dia' e 'hora' alterados para String (suporte a DD/MM e HH:MM).
+   - Rotas: Verificação e tratamento de conversão 'solicitante' (Nome -> ObjectId) concluídos.
 
 ✅ FRONTEND
    - Painéis (Geral e Adm) estruturados.
    - CRUD Completo (Ver, Adicionar, Editar, Excluir) integrado com API.
    - Sistema de Paginação:
-     - Frontend preparado para paginação no servidor (envia page/limit).
+     - Frontend e Backend integrados.
      - Correção de bug de sobreposição de tabelas implementada.
      - Documentação (JSDoc) adicionada em `paginacao.js` e `tabela.js`.
    - Filtros de pesquisa inteligentes (ignora maiúsculas/minúsculas).
@@ -23,14 +24,17 @@ STATUS ATUAL DO PROJETO (Atualizado)
    - Tratamento e validação de dados implementados (tratamentodedados.js).
    - Exibição dinâmica do usuário logado no Painel Geral.
 
-⚠️ PONTOS DE ATENÇÃO / MELHORIAS NECESSÁRIAS
+🚧 PLANO DE MIGRAÇÃO DE ESTRUTURA (FRONTEND)
 
-1. Conclusão da Paginação no Backend (Próximos Passos)
-   - O Frontend já está pronto (itens d, e concluídos).
-   - Falta implementar no Backend:
-   a. Alterar controller para receber query params (page, limit) 
-    	-> Para capturar qual página e quantidade de itens o usuário deseja.
-   b. Implementar .skip() e .limit() na consulta Mongoose 
-	 	-> Para buscar no banco apenas os dados da página atual (performance).
-   c. Retornar metadados (total de itens, páginas totais) junto com os dados 
-	 	-> Para que o frontend saiba calcular o total de páginas e habilitar os botões.
+1. Estrutura de Pastas
+   - Criar pasta `frontend/assets/css`.
+   - Criar pasta `frontend/js`.
+
+2. Movimentação e Ajustes (Para não quebrar referências)
+   - Mover `.css` -> `frontend/assets/css`. Atualizar `<link>` nos HTMLs (ex: `./style.css` -> `./assets/css/style.css`).
+   - Mover `.js` -> `frontend/js`. Atualizar `<script>` nos HTMLs (ex: `./script.js` -> `./js/script.js`).
+   - Atualizar imports JS: Ajustar caminhos relativos externos (ex: `../tratamentodedados.js` vira `../../tratamentodedados.js`).
+
+3. Verificação de Rotas e Servidor
+   - Ajustar rotas de arquivos estáticos no Backend caso necessário (ex: garantir que `express.static` cubra as novas pastas).
+   - Testar navegação e carregamento de recursos para assegurar que nenhuma rota foi quebrada (`404 Not Found`).

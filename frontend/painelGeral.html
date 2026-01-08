@@ -6,27 +6,14 @@
     <title>Painel Geral</title>
 
     <link rel="stylesheet" href="./tabela.css">
-    <link rel="stylesheet" href="./stylepg.css">
+    <link rel="stylesheet" href="./styleGeral.css">
     <link rel="stylesheet" href="./responsividade.css">
-    <link rel="stylesheet" href="./navbar.css">
-
+    
 </head>
 <body>
-    <!-- Menu navegação inicio -->
-    <nav class="wraperNavegacao" id="wraperNavegacao">
-        <div class="painelInfoUser" id="painelInfoUser">
-            <p id="painelNomeHmaburger">não logado</p>
-            <p id="painelRoleHamburger">indefinido</p>
-        </div>
-
-        <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
-
-        <ul class="ulMenu" id="ulMenu">
-        </ul>
-    </nav>
-    
+    <!-- Menu navegação inicio -->    
+    <link rel="stylesheet" href="./navbar.css">
     <script type="module" src="./navbar.js"></script>
-    <!-- Menu navegação fim -->
     
     <main id="main">
         <!-- <h1>Painel Geral</h1>    -->
@@ -38,7 +25,7 @@
             <div class="formularioContainer">
                 <div>
                     <label for="solicitante">Solicitante:</label>
-                    <input class="inputTexto" type="text" id="solicitante"></label>
+                    <input class="inputTexto" type="text" id="solicitante" autocomplete="off"></label>
                 </div>
                 <div>
                     <label for="sala">Sala:</label>
@@ -65,9 +52,7 @@
                 <div>
                 <label for="motivo">Motivo:</label>
                     <select class="inputTexto selectMotivo" id="motivo">
-                        <option value="opcao1">Particular</option>
-                        <option value="opcao2">Ensaio</option>
-                        <option value="opcao3">Regular</option>
+                        <!-- Opções carregadas dinamicamente via carregarMotivos.js -->
                     </select>
                 </div>
                 <div>
@@ -86,15 +71,8 @@
 			<p id="painelSaida"></p>
 		</div>
         <div class="containerPainel" id="containerTabela">
-<<<<<<< HEAD:frontend/painelgeral/painelGeral.html
-            <!-- <div class="containerTabBotoes" id="containerTabBotoes">
-                <button class="btnVoltarTab" id="btnVoltarTab">Voltar</button>           
-                <button class="btnAvancarTab" id="btnAvancarTab">Avançar</button>           
-            </div>  -->
-=======
             <div id="tableInner"></div>
             <div id="containerPaginacao"></div>
->>>>>>> format-inputs:frontend/painelGeral.html
         </div>
 
 
@@ -106,5 +84,6 @@
     <script type="module" src="./editarUso.js"></script>
     <script type="module" src="./apagarUso.js"></script>
     <script type="module" src="./limparImputs.js"></script>
+    <script type="module" src="./carregarMotivos.js"></script>
 </body>
 </html>

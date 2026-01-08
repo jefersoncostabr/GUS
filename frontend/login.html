@@ -7,24 +7,11 @@
 
     <link rel="stylesheet" href="./stylepg.css">
     <link rel="stylesheet" href="./responsividade.css">
-    <link rel="stylesheet" href="./navbar.css">
 </head>
 <body>
-    <!-- Menu navegação inicio -->
-    <nav class="wraperNavegacao" id="wraperNavegacao">
-        <div class="painelInfoUser" id="painelInfoUser">
-            <p id="painelNomeHmaburger">não logado</p>
-            <p id="painelRoleHamburger">indefinido</p>
-        </div>
-
-        <p class="linkMenu menuHamburger" id="idMenuHamburger">&#9776;</p>
-
-        <ul class="ulMenu" id="ulMenu">
-        </ul>
-    </nav>
-    
+    <!-- Menu navegação inicio -->    
+    <link rel="stylesheet" href="./navbar.css">
     <script type="module" src="./navbar.js"></script>
-    <!-- Menu navegação fim -->
 
     <script type="module" src="./login.js"></script>
 
@@ -33,7 +20,7 @@
             <h1>Login</h1>
             <!-- Ajuste a action conforme sua rota de login no backend -->
             <form id="loginForm" style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px;">
-                <input class="inputTexto" type="text" name="username" placeholder="Usuário" required>
+                <input class="inputTexto" type="text" name="solicitante" placeholder="Usuário" required>
                 <input class="inputTexto" type="password" name="password" placeholder="Senha" required>
                 <button type="submit">Entrar</button>
             </form>

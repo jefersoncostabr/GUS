@@ -35,12 +35,57 @@ export async function getDados(page = 1, limit = 5, filters = {}) {
 
 // Função para preencher os inputs do formulário
 function preencherInputs(dados) {
-  const formulario = document.querySelector('.formularioContainer');
-  const campos = ['solicitante', 'sala', 'dia', 'hora', 'motivo', '_id'];
+    // Busca elementos pelo ID para garantir o preenchimento correto
+    const elSolicitante = document.getElementById('solicitante');
+    const elSala = document.getElementById('sala');
+    const elDia = document.getElementById('dia');
+    const elMes = document.getElementById('mes'); // Existe apenas no Painel Geral
+    const elHora = document.getElementById('hora');
+    const elMotivo = document.getElementById('motivo'); // Pode ser Select ou Input
+    const elId = document.getElementById('id');
 
-  formulario.querySelectorAll('input').forEach((input, index) => {
-    input.value = dados[campos[index]];
-  });
+    // Preenchimento básico
+    if (elSolicitante) {
+        if (dados.solicitante && typeof dados.solicitante === 'object' && dados.solicitante.solicitante) {
+            elSolicitante.value = dados.solicitante.solicitante;
+        } else {
+            elSolicitante.value = dados.solicitante || '';
+        }
+    }
+    if (elSala) elSala.value = dados.sala || '';
+    if (elId) elId.value = dados._id || '';
+
+    // Tratamento para Dia (formato DD/MM)
+    if (dados.dia && dados.dia.toString().includes('/')) {
+        const [diaVal, mesVal] = dados.dia.split('/');
+        if (elDia) elDia.value = diaVal;
+        if (elMes) elMes.value = mesVal;
+    } else {
+        if (elDia) elDia.value = dados.dia || '';
+    }
+
+    // Tratamento para Hora (formato HH:MM)
+    if (elHora) {
+        // Se o input for numérico, pega apenas a hora (antes dos dois pontos)
+        if (elHora.type === 'number' && dados.hora && dados.hora.toString().includes(':')) {
+            elHora.value = dados.hora.split(':')[0];
+        } else {
+            elHora.value = dados.hora || '';
+        }
+    }
+
+    // Tratamento para Motivo (Select ou Input)
+    if (elMotivo) {
+        if (elMotivo.tagName === 'SELECT') {
+            // Itera pelas opções para selecionar aquela cujo TEXTO corresponde ao motivo salvo
+            // (pois o value pode ser 'opcao1' enquanto o dado é 'Particular')
+            Array.from(elMotivo.options).forEach((option, index) => {
+                if (option.text === dados.motivo) elMotivo.selectedIndex = index;
+            });
+        } else {
+            elMotivo.value = dados.motivo || '';
+        }
+    }
 }
 
 // Função para atribuir click ao elemento
@@ -68,7 +113,12 @@ function renderTabelaComPaginacao(data) {
     data.forEach((dado) => {
         const linha = tabela.insertRow();
         const celulaSolicitante = linha.insertCell();
-        celulaSolicitante.textContent = dado.solicitante;
+        
+        if (dado.solicitante && typeof dado.solicitante === 'object' && dado.solicitante.solicitante) {
+            celulaSolicitante.textContent = dado.solicitante.solicitante;
+        } else {
+            celulaSolicitante.textContent = dado.solicitante || '---';
+        }
         atribuirClick(celulaSolicitante, dado);
 
         linha.insertCell().textContent = dado.sala;

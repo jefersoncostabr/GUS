@@ -1,7 +1,7 @@
 /**
  * Lista de motivos permitidos no sistema.
  */
-export const OPCOES_MOTIVO = ['Particular', 'Ensaio', 'Reunião', 'Aula Regular', 'sublocação'];
+export const OPCOES_MOTIVO = ['Particular', 'Ensaio', 'Reunião', 'Aula Regular', 'Sublocação'];
 
 /**
  * Trata e formata os dados de uso (Solicitante, Sala, Dia, Hora, Motivo)

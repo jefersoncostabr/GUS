@@ -52,34 +52,16 @@ routerSolicitantes.get('/buscaidsolicitante', async (req, res) => {
 });
 
 
-routerSolicitantes.get('/usersess', async (req, res) => {
-    const user = req.session.user;
-    if (!user) {
-        console.log('Usuário não encontrado na sessão.');
-        return user;
-    }
-    // console.log('Usuário atual:', user.solicitante);
-    // console.log('Role:', user.role);
-    res.status(200).json({ solicitante: user.solicitante, role: user.role });
-});
-
-routerSolicitantes.get('/usersess', async (req, res) => {
-    const user = req.session.user;
-    console.log('req.session:', req.session);
-    if (!user) {
-        console.log('Usuário não encontrado na sessão.');
-        return res.status(200).json({ solicitante: null, role: null });
-    }
-    // console.log('Usuário atual:', user.solicitante);
-    // console.log('Role:', user.role);
-    res.status(200).json({ solicitante: user.solicitante, role: user.role });
-});
-
-
 //http://localhost:3000/solicitantes/solicitantes
 routerSolicitantes.post('/solicitantes', async (req, res) => {
     console.log("Requisição para criar novo solicitante:", req.body);
     try {
+        // Capitaliza a primeira letra do solicitante e remove espaços extras
+        if (req.body.solicitante && typeof req.body.solicitante === 'string') {
+            const nome = req.body.solicitante.trim();
+            req.body.solicitante = nome.charAt(0).toUpperCase() + nome.slice(1);
+        }
+
         const { senha } = req.body; // extrai a senha do corpo da requisição
         const saltRounds = 10; // número de rodadas para o hash
         const hashedPassword = await bcrypt.hash(senha, saltRounds); // gera o hash da senha
@@ -150,10 +132,6 @@ GET /solicitantes/buscaidsolicitante
     - Descrição: Busca o _id de um solicitante com base em parâmetros (solicitante, estudio).
     - Query Params: solicitante, estudio.
     - Retorno: JSON com o _id do solicitante.
-
-GET /solicitantes/usersess
-    - Descrição: Retorna informações do usuário logado na sessão (solicitante e role).
-    - Retorno: JSON com dados da sessão.
 
 POST /solicitantes/solicitantes
     - Descrição: Cria um novo solicitante (com hash de senha).

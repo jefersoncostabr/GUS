@@ -40,7 +40,14 @@ async function handleLogin(event) {
             window.location.href = './painelGeral.html';
         } else {
             // Erro: Exibe mensagem (ex: Senha incorreta)
-            painelSaida.textContent = 'Usuário ou senha incorretos.';
+            let errorMessage = 'Usuário ou senha incorretos.';
+            try {
+                const errorData = await response.json();
+                if (errorData.error) errorMessage = errorData.error;
+            } catch (e) {
+                console.error('Erro ao ler resposta do servidor:', e);
+            }
+            painelSaida.textContent = errorMessage;
         }
     } catch (error) {
         console.error('Erro no login:', error);

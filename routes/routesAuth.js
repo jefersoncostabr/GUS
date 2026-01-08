@@ -22,7 +22,12 @@ async function comparePasswords(password, hashedPassword) {
 // Busca um usuário no banco de dados pelo nome do solicitante
 async function encontraUmUsuario(nomeSolicitante) {
     try {
-        const usuario = await solicitanteModelo.findOne({ solicitante: nomeSolicitante })
+        if (!nomeSolicitante || typeof nomeSolicitante !== 'string') return null
+
+        // Busca utilizando Regex para ignorar maiúsculas/minúsculas (Case Insensitive)
+        // O .trim() remove espaços acidentais no início/fim e ^...$ garante correspondência exata
+        const nomeRegex = new RegExp(`^${nomeSolicitante.trim()}$`, 'i')
+        const usuario = await solicitanteModelo.findOne({ solicitante: { $regex: nomeRegex } })
         return usuario
     } catch (err) {
         console.error('Erro na query de usuário:', err)
@@ -49,7 +54,7 @@ routesAuth.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Senha inválida' })
         }
 
-        req.session.user = { solicitante: usuario.solicitante, role: usuario.role }
+        req.session.user = { solicitante: usuario.solicitante, role: usuario.role, _id: usuario._id }
         return res.json({ message: 'Login realizado!' })
     } catch (err) {
         console.error('Erro no login:', err)
