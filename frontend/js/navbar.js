@@ -1,9 +1,10 @@
+import { resetarNavbar } from "./resetarNavbar.js";
+
 /**
  * NAVBAR GLOBAL
  * Este script injeta o cabeçalho e gerencia a lógica de navegação.
  */
 
-(function() {
     // 1. Definição da URL Base
     const baseUrl = window.location.hostname.includes("onrender.com")
         ? "https://gus-q7nn.onrender.com"
@@ -84,6 +85,9 @@
             const nomeEl = document.getElementById('painelNomeHmaburger');
             const roleEl = document.getElementById('painelRoleHamburger');
 
+            // Busca o link de login/logout para alterar o texto dinamicamente
+            const loginLink = document.querySelector('a[href*="login.html"]');
+
             if (data && data.solicitante) {
                 // Usuário Logado
                 if (nomeEl) {
@@ -97,10 +101,20 @@
                     roleEl.style.color = 'blue';
                     roleEl.style.fontWeight = 'bold';
                 }
+                // Se tem usuário, o botão deve ser "Sair"
+                if (loginLink) loginLink.textContent = "Sair";
             } 
-            // Se não logado, o HTML padrão já é "Visitante"
+            else {
+                // Se não logado, garante que o visual seja resetado
+                // Se não tem usuário, o botão deve ser "Entrar"
+                if (loginLink) loginLink.textContent = "Entrar";
+                resetarNavbar();
+            }
         } catch (error) {
             console.error('Erro ao verificar sessão:', error);
+            const loginLink = document.querySelector('a[href*="login.html"]');
+            if (loginLink) loginLink.textContent = "Entrar";
+            resetarNavbar();
         }
     }
 
@@ -125,5 +139,3 @@
         renderNavbar();
         verificarUsuarioLogado();
     }
-
-})();

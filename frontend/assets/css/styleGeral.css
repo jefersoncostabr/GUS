@@ -46,8 +46,16 @@ h1 {
     min-height: 100vh;
 }
 
+#painelSaida{
+    margin-top: 20px;
+    font-size: 20px;
+    color: rgb(155, 90, 11);
+}
+
 .containerBotoesTopo {
     margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
 }
 
 button {

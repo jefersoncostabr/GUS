@@ -15,7 +15,6 @@ export async function verificaRole(req, res, next) {
 
     if (userRole !== role) {
         console.log('Você não tem permissão para acessar');
-        document.getElementById('painelSaida').innerText = 'Sem permissão';
         return res.status(403).json({ error: 'Você não tem permissão para acessar esta rota' });
     }
 
@@ -32,19 +31,19 @@ export async function verificaSolicitante(req, res, next) {
             return res.status(404).json({ error: 'Registro não encontrado' });
         }
 
-        const solicitanteUso = uso.solicitante;
-        const solicitanteSession = req.session.user?.solicitante; 
+        // Compara IDs (convertendo para string para garantir igualdade)
+        const solicitanteIdUso = uso.solicitante.toString();
+        const solicitanteIdSession = req.session.user?._id; 
         const roleSession = req.session.user?.role;
 
-        if (!solicitanteSession) {
+        if (!solicitanteIdSession) {
             console.log('Usuário não autenticado');
-            document.getElementById('painelSaida').innerText = 'Não autenticado';
             return res.status(401).json({ error: 'Usuário não autenticado' });
         }
         
-        if (solicitanteUso !== solicitanteSession) {
+        // Verifica se é o dono do registro OU se é admin
+        if (roleSession !== 'admin' && solicitanteIdUso !== String(solicitanteIdSession)) {
             console.log('Você não tem permissão para excluir este uso');
-            document.getElementById('painelSaida').innerText = 'Sem permissão';
             return res.status(403).json({ error: 'Você não tem permissão para excluir/editar este uso' });
         }
         

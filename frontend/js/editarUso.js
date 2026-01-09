@@ -1,6 +1,6 @@
 import { limparImputs } from "./limparImputs.js";
 import { verFetch } from "./ver.js";   
-import { tratarDados, OPCOES_MOTIVO } from "../tratamentodedados.js";
+import { tratarDados, OPCOES_MOTIVO } from "./tratamentoDeDados.js";
 
 /**
  * Determina a URL base da API verificando o hostname atual.

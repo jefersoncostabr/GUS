@@ -19,6 +19,12 @@ export async function getDados(page = 1, limit = 5, filters = {}) {
         });
 
         const response = await fetch(`${baseUrl}/usos/usos?${params.toString()}`);
+        
+        if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Servidor retornou erro ${response.status}: ${errorMsg}`);
+        }
+
         const json = await response.json();
 
         // Compatibilidade: caso o backend retorne um array diretamente (antigo), normalize

@@ -6,6 +6,8 @@ import router from './routes/routes.js';
 import conectaNaDatabase from './src/config/dbConnect.js';
 import routesAuth from "./routes/routesAuth.js";
 
+dotenv.config();
+
 const conexao = await conectaNaDatabase();
 
 conexao.on("error", (erro) => {
@@ -16,7 +18,6 @@ conexao.once("open", () => {
     console.log("Conexao com o banco feita com sucesso");
 })
 
-dotenv.config();
 const app = express();
 app.use(express.json());
 
@@ -30,6 +31,9 @@ app.use(session({
     }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 dia
 }));
+
+// Configuração para servir arquivos estáticos (CSS, JS, Imagens)
+app.use(express.static('frontend'));
 
 app.use(routesAuth);
 app.use('/', router);

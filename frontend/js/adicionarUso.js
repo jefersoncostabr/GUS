@@ -1,6 +1,6 @@
 import { verFetch } from "./ver.js";
 import { limparImputs } from "./limparImputs.js";
-import { tratarDados, OPCOES_MOTIVO } from "../tratamentodedados.js";
+import { tratarDados, OPCOES_MOTIVO } from "./tratamentoDeDados.js";
 
 /**
  * Determina a URL base da API verificando o hostname atual.
@@ -45,8 +45,8 @@ async function adicionarUso() {
         body: JSON.stringify(novoUso),
         
     });
-        verFetch()
         limparImputs();
+        verFetch()
 
     // Verifique se a resposta foi bem-sucedida
     if (!response.ok) {
