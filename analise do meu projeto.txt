@@ -11,6 +11,7 @@ STATUS ATUAL DO PROJETO (Atualizado)
    - Segurança: Variáveis de ambiente (.env) configuradas para o segredo da sessão.
    - Model atualizado: Campos 'dia' e 'hora' alterados para String (suporte a DD/MM e HH:MM).
    - Rotas: Verificação e tratamento de conversão 'solicitante' (Nome -> ObjectId) concluídos.
+   - Arquitetura MVC implementada: Controllers criados e rotas refatoradas.
 
 ✅ FRONTEND
    - Painéis (Geral e Adm) estruturados.
@@ -22,19 +23,54 @@ STATUS ATUAL DO PROJETO (Atualizado)
    - Filtros de pesquisa inteligentes (ignora maiúsculas/minúsculas).
    - Feedback visual para o usuário (mensagens de erro/sucesso).
    - Tratamento e validação de dados implementados (tratamentodedados.js).
-   - Exibição dinâmica do usuário logado no Painel Geral.
 
-🚧 PLANO DE MIGRAÇÃO DE ESTRUTURA (FRONTEND)
+Nova etapa do projeto:
+1-Criação da área do administrador.
+2-Usando a base do painer geral como formatação e exibição em forma de tabela com a mesma formatação de tabela.
+3-Partes gerenciaveis pelo adm:
+4-nome do estudio, quantidade de salas, gerenciamento de role, motivos disponiveis. edição de aulas regulares
+5-devo criar um banco de dados para opcoes? ou um para cada coisa?
 
-1. Estrutura de Pastas
-   - Criar pasta `frontend/assets/css`.
-   - Criar pasta `frontend/js`.
+Observações Principais
 
-2. Movimentação e Ajustes (Para não quebrar referências)
-   - Mover `.css` -> `frontend/assets/css`. Atualizar `<link>` nos HTMLs (ex: `./style.css` -> `./assets/css/style.css`).
-   - Mover `.js` -> `frontend/js`. Atualizar `<script>` nos HTMLs (ex: `./script.js` -> `./js/script.js`).
-   - Atualizar imports JS: Ajustar caminhos relativos externos (ex: `../tratamentodedados.js` vira `../../tratamentodedados.js`).
+HTML/Front: painelGeral.html implementa o formulário e tabela; carrega módulos em js e estilos em css.
+Duplicidade de ID: há duas ocorrências de id="painelSaida" (div e p) — causa comportamento imprevisível do DOM.
+Estrutura de carregamento: há um link de CSS dentro do body (navbar.css) — colocar no head é mais correto.
+Validação: inputs não mostram validações visíveis (ex.: sala, dia, hora) — client-side fraco; depender somente do cliente é arriscado.
+Acessibilidade: labels existem, mas botões/inputs podem melhorar com aria-* e type="submit"/form semântica.
+Segurança/Backend: projeto tem authMiddleware.js, routesAuth.js e controllers, mas é preciso garantir sanitização/validação server-side e uso de queries parametrizadas (ver src).
+Riscos Críticos
 
-3. Verificação de Rotas e Servidor
-   - Ajustar rotas de arquivos estáticos no Backend caso necessário (ex: garantir que `express.static` cubra as novas pastas).
-   - Testar navegação e carregamento de recursos para assegurar que nenhuma rota foi quebrada (`404 Not Found`).
+Injeção/SQL: sem validação no servidor, inputs numéricos/texto podem permitir injeção.
+Autenticação/Sessão: confirme que authMiddleware valida sessão e que cookies são HttpOnly/Secure.
+Duplicidade DOM: IDs duplicados quebram scripts que selecionam #painelSaida.
+UX confusa: campos separados dia/mes/ano e hora sem máscaras podem gerar entradas inválidas.
+Recomendações Prioritárias (curto prazo)
+
+Corrigir IDs: substitua/remova um dos painelSaida — localizar em painelGeral.html.
+Mover CSS para head: coloque <link rel="stylesheet" href="./assets/css/navbar.css"> no head.
+Validação client + server: implementar validação com mensagens claras no cliente e validação forte no servidor (express-validator ou similar).
+Sanitização/Queries parametrizadas: revisar controllers e models para usar queries parametrizadas / ORM.
+Feedback ao usuário: mostrar estados de sucesso/erro consistentes (ex.: área única painelSaida).
+Teste de ponta a ponta: ao menos cenários básicos: adicionar, editar, excluir, ver paginação.
+Plano Melhorado (curto prazo, 1–2 semanas)
+
+1 — Correções rápidas (dia 1):
+Arquivo: painelGeral.html — remover ID duplicado e mover navbar.css para head.
+Objetivo: eliminar bugs DOM e padronizar carregamento de estilos.
+2 — Validação e UX (2–3 dias):
+Adicionar: validação client-side em limparImputs.js ou formulário dedicado; mostrar erros em #painelSaida.
+Melhorar: placeholders, maxlength, required, e máscaras para data/hora.
+3 — Segurança e backend (3–5 dias):
+Revisar: src/controllers/* e src/models/* para sanitização e queries parametrizadas; adicionar express-validator.
+Confirmar: configuração de sessão em rotas/auth (cookies HttpOnly, Secure, SameSite).
+4 — Testes e logging (3–4 dias):
+Criar: testes unitários para controllers (mocha/jest) + integração rápida para rotas cruciais; adicionar logs de erro estruturados.
+5 — Auditoria e deploy (final):
+Executar: revisão de segurança (dependências), automatizar linting/format, e configurar HTTPS em produção.
+Sugestões de ações concretas agora
+
+Corrigir duplicidade de ID: editar painelGeral.html trocando o <p id="painelSaida"> por <p id="painelMensagem"> (ou remover o duplicado).
+Mover CSS: mover a linha que referencia assets/css/navbar.css para o head.
+Adicionar validação minimal: no adicionarUso.js e editarUso.js verifique campos obrigatórios e formatos antes de enviar o fetch.
+Server-side: adicionar express-validator nas rotas que recebem uso/reserva (ver routerUsos.js ou routes.js).

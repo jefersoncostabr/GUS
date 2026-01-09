@@ -1,3 +1,18 @@
+import { resetarNavbar } from "./resetarNavbar.js";
+
+// Ao carregar a página de login, fazemos uma requisição para garantir que a sessão seja encerrada no servidor
+(async function logoutAutomatico() {
+    try {
+        const baseUrl = getBaseUrl();
+        await fetch(`${baseUrl}/logout`, { method: 'POST' });
+        console.log('Sessão encerrada.');
+
+        resetarNavbar();
+    } catch (error) {
+        console.error('Erro ao tentar fazer logout:', error);
+    }
+})();
+
 /**
  * Determina a URL base da API verificando o hostname atual.
  * @returns {string} A URL base para as requisições (localhost ou produção).

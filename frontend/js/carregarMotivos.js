@@ -1,4 +1,4 @@
-import { OPCOES_MOTIVO } from '../tratamentodedados.js';
+import { OPCOES_MOTIVO } from './tratamentoDeDados.js';
 
 const selectMotivo = document.getElementById('motivo');
 
