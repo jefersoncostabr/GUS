@@ -38,6 +38,10 @@ h1 {
     margin-bottom: 30px;
 }
 
+.h1Login {
+    color: rgb(155, 90, 11);
+}
+
 #main {
     font-family: Arial, sans-serif;
     display: flex;
@@ -46,7 +50,7 @@ h1 {
     min-height: 100vh;
 }
 
-#painelSaida{
+#painelSaida {
     margin-top: 20px;
     font-size: 20px;
     color: rgb(155, 90, 11);
@@ -78,7 +82,8 @@ button {
     font-size: 15px;
 }
 
-.inputNumerico, .inputTexto {
+.inputNumerico,
+.inputTexto {
     font-size: 15px;
     border-radius: 5px;
     border-style: none;
@@ -122,3 +127,5 @@ label {
         margin: 5px;
     }
 }
+
+/* Admin styles moved to assets/css/painelAdm.css */

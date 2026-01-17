@@ -1,0 +1,174 @@
+import { baseUrl, fetchJson, showMessage, setAdminVisibility, populateEstudiosOptions } from './admin.js';
+import { setUsersData } from './adminUsers.js';
+import { setEstudiosData, setEstudiosOptions } from './adminEstudios.js';
+import { setSalasData } from './adminSalas.js';
+
+/**
+ * adminDataLayer.js
+ * - Escuta eventos disparados pela UI (admin:* ) e realiza as chamadas HTTP correspondentes.
+ * - Carrega listas iniciais e verifica sessão/role para chamar `setAdminVisibility`.
+ * - Usa `fetchJson` e `baseUrl` do `admin.js` para consistência.
+ */
+
+async function safeFetchJson(url, options) {
+  try {
+    const res = await fetchJson(url, options);
+    return res;
+  } catch (err) {
+    console.error('adminDataLayer fetch error:', err);
+    showMessage('Erro de rede. Veja o console.', 'error', 5000);
+    throw err;
+  }
+}
+
+// Loaders
+async function loadUsers() {
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/solicitantes`);
+    if (Array.isArray(data)) setUsersData(data);
+  } catch (e) { console.warn('Falha ao carregar usuários', e); }
+}
+
+async function loadEstudios() {
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/estudios`);
+    if (Array.isArray(data)) {
+      setEstudiosData(data);
+      // cache for populating dynamic selects
+      window.__estudiosCache = data;
+      setEstudiosOptions(data);
+      // also provide helper populator
+      if (typeof populateEstudiosOptions === 'function') {
+        // find primary select if present
+        const sel = document.getElementById('salaEstudio');
+        if (sel) populateEstudiosOptions(sel, data);
+      }
+    }
+  } catch (e) { console.warn('Falha ao carregar estúdios', e); }
+}
+
+async function loadSalas() {
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/salas`);
+    if (Array.isArray(data)) setSalasData(data);
+  } catch (e) { console.warn('Falha ao carregar salas', e); }
+}
+
+// Session check
+async function checkSessionAndInit() {
+  try {
+    const sess = await safeFetchJson(`${baseUrl}/usuario-logado`);
+    const isAdmin = sess && sess.role === 'admin';
+    setAdminVisibility(!!isAdmin);
+    if (isAdmin) {
+      // load admin resources
+      await Promise.all([loadUsers(), loadEstudios(), loadSalas()]);
+    }
+  } catch (e) {
+    console.warn('Falha na checagem de sessão', e);
+    setAdminVisibility(false);
+  }
+}
+
+// Handlers for events
+async function handleUserCreate(e) {
+  const { nome, role } = e.detail || {};
+  if (!nome) { showMessage('Nome é obrigatório.', 'error'); return; }
+  try {
+    await safeFetchJson(`${baseUrl}/admin/solicitantes`, { method: 'POST', body: { nome, role } });
+    showMessage('Usuário criado.', 'success');
+    await loadUsers();
+  } catch (err) { /* already handled */ }
+}
+
+async function handleUserUpdate(e) {
+  const { id, nome, role } = e.detail || {};
+  if (!id) { showMessage('ID ausente para atualização.', 'error'); return; }
+  try {
+    await safeFetchJson(`${baseUrl}/admin/solicitantes/${id}`, { method: 'PUT', body: { nome, role } });
+    showMessage('Usuário atualizado.', 'success');
+    await loadUsers();
+  } catch (err) { }
+}
+
+async function handleUserDelete(e) {
+  const { id } = e.detail || {};
+  if (!id) { showMessage('ID ausente para exclusão.', 'error'); return; }
+  try {
+    await safeFetchJson(`${baseUrl}/admin/solicitantes/${id}`, { method: 'DELETE' });
+    showMessage('Usuário excluído.', 'success');
+    await loadUsers();
+  } catch (err) { }
+}
+
+async function handleEstudioSave(e) {
+  const payload = e.detail || {};
+  const { id } = payload;
+  try {
+    if (id) {
+      await safeFetchJson(`${baseUrl}/admin/estudios/${id}`, { method: 'PUT', body: payload });
+      showMessage('Estúdio atualizado.', 'success');
+    } else {
+      await safeFetchJson(`${baseUrl}/admin/estudios`, { method: 'POST', body: payload });
+      showMessage('Estúdio criado.', 'success');
+    }
+    await loadEstudios();
+    await loadSalas(); // salas may be affected
+  } catch (err) { }
+}
+
+async function handleEstudioDelete(e) {
+  const { id } = e.detail || {};
+  if (!id) { showMessage('ID ausente para exclusão de estúdio.', 'error'); return; }
+  try {
+    await safeFetchJson(`${baseUrl}/admin/estudios/${id}`, { method: 'DELETE' });
+    showMessage('Estúdio excluído.', 'success');
+    await loadEstudios();
+    await loadSalas();
+  } catch (err) { }
+}
+
+async function handleSalaSave(e) {
+  const payload = e.detail || {};
+  const { id } = payload;
+  try {
+    if (id) {
+      await safeFetchJson(`${baseUrl}/admin/salas/${id}`, { method: 'PUT', body: payload });
+      showMessage('Sala atualizada.', 'success');
+    } else {
+      await safeFetchJson(`${baseUrl}/admin/salas`, { method: 'POST', body: payload });
+      showMessage('Sala criada.', 'success');
+    }
+    await loadSalas();
+  } catch (err) { }
+}
+
+async function handleSalaDelete(e) {
+  const { id } = e.detail || {};
+  if (!id) { showMessage('ID ausente para exclusão de sala.', 'error'); return; }
+  try {
+    await safeFetchJson(`${baseUrl}/admin/salas/${id}`, { method: 'DELETE' });
+    showMessage('Sala excluída.', 'success');
+    await loadSalas();
+  } catch (err) { }
+}
+
+export function initAdminDataLayer() {
+  // attach listeners
+  document.addEventListener('admin:user:create', handleUserCreate);
+  document.addEventListener('admin:user:update', handleUserUpdate);
+  document.addEventListener('admin:user:delete', handleUserDelete);
+  document.addEventListener('admin:estudio:save', handleEstudioSave);
+  document.addEventListener('admin:estudio:delete', handleEstudioDelete);
+  document.addEventListener('admin:sala:save', handleSalaSave);
+  document.addEventListener('admin:sala:delete', handleSalaDelete);
+
+  // start session check and data load
+  checkSessionAndInit();
+}
+
+// Auto-init if included directly on painelAdm.html
+if (document.getElementById('adminArea')) {
+  // small delay to allow UI modules to bind first
+  window.addEventListener('DOMContentLoaded', () => setTimeout(() => initAdminDataLayer(), 50));
+}

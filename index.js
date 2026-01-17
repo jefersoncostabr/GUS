@@ -5,6 +5,7 @@ import MongoStore from 'connect-mongo';
 import router from './routes/routes.js';
 import conectaNaDatabase from './src/config/dbConnect.js';
 import routesAuth from "./routes/routesAuth.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use(session({
 app.use(express.static('frontend'));
 
 app.use(routesAuth);
+app.use('/admin', adminRoutes); // Todas as rotas de admin começarão com /admin (ex: /admin/estudios)
 app.use('/', router);
 
 const PORT = process.env.PORT || 3000;

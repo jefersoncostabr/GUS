@@ -8,17 +8,19 @@
     <link rel="stylesheet" href="./assets/css/tabela.css">
     <link rel="stylesheet" href="./assets/css/styleGeral.css">
     <link rel="stylesheet" href="./assets/css/responsividade.css">
+    <link rel="stylesheet" href="./assets/css/navbar.css">
+    <link rel="stylesheet" href="./assets/css/painelAdm.css">
 
 </head>
 <body>
        
     <!-- Menu navegação unificado -->
-    <link rel="stylesheet" href="./assets/css/navbar.css">
     <script type="module" src="./js/navbar.js"></script>
     
     <main id="main">
+        <p id="painelSaida" class="mensagem" aria-live="polite"></p>
         <!-- <h1>Painel Geral</h1>    -->
-        <div class="containerPainel" id="">
+        <!-- <div class="containerPainel" id="">
             <div>
                 <button id="limparImputsBtn">Limpar</button>
             </div>
@@ -57,11 +59,120 @@
 			</div>
 
 			<p id="painelSaida"></p>
-		</div>
+		</div> -->
+
+        <!-- === Área administrativa === -->
+        <section id="adminArea" aria-label="Área administrativa">
+
+            <div id="estudiosPanel" class="adminPanel">
+                <h3>Estúdios</h3>
+                <form id="formEstudio">
+
+                    <div>
+                        <legend>Filiais / Unidades</legend>
+                        <div id="estudioFiliaisContainer">
+                            <div class="filialItem">
+
+                            </div>
+                        </div>
+                        <button type="button" id="addFilialBtn" class="btnSmall">+ Filial</button>
+                    </div>
+
+
+                    <div class="botoesForm">
+                        <button type="button" id="salvarEstudioBtn">Salvar</button>
+                        <button type="button" id="cancelarEstudioBtn">Cancelar</button>
+                    </div>
+                </form>
+                <div id="tableEstudios"></div>
+            </div>
+
+
+            <div id="salasPanel" class="adminPanel">
+                <h3>Salas</h3>
+                <form id="formSala">
+                    <div id="salasListContainer" style="margin-top:10px;"></div>
+                    <div style="margin-top:8px;"><button type="button" id="addSalaBtn" class="btnSmall">+ Sala</button></div>
+                    <div class="botoesForm">
+                        <button type="button" id="salvarSalaBtn">Salvar</button>
+                        <button type="button" id="cancelarSalaBtn">Cancelar</button>
+                    </div>
+                </form>
+                <div id="tableSalas"></div>
+            </div>
+
+
+            <div id="usuariosPanel" class="adminPanel">
+                <h3>Usuários</h3>
+                <div id="tableUsuarios"></div>
+                <div style="margin-top:8px;"><button type="button" id="addUsuarioBtn" class="btnSmall">+ Usuário</button></div>
+            </div>
+
+            <div id="aulasRegularesPanel" class="adminPanel">
+                <h3>Aulas Regulares</h3>
+                <form id="formAula">
+                    <input type="hidden" id="aulaId">
+                    <div class="formularioContainer">
+                        <div>
+                            <label for="aulaEstudio">Estúdio:</label>
+                            <select id="aulaEstudio" class="inputTexto">
+                                <option value="">-- selecione --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="aulaSala">Sala:</label>
+                            <input type="text" id="aulaSala" class="inputTexto" placeholder="Sala">
+                        </div>
+                        <div>
+                            <label for="aulaDia">Dia:</label>
+                            <select id="aulaDia" class="inputTexto">
+                                <option value="">-- selecione --</option>
+                                <option value="segunda">Segunda-feira</option>
+                                <option value="terca">Terça-feira</option>
+                                <option value="quarta">Quarta-feira</option>
+                                <option value="quinta">Quinta-feira</option>
+                                <option value="sexta">Sexta-feira</option>
+                                <option value="sabado">Sábado</option>
+                                <option value="domingo">Domingo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="aulaHora">Hora:</label>
+                            <input type="time" id="aulaHora" class="inputNumerico">
+                        </div>
+                        <div>
+                            <label for="aulaModalidade">Modalidade:</label>
+                            <input type="text" id="aulaModalidade" class="inputTexto" placeholder="Ex: Yoga">
+                        </div>
+                        <div>
+                            <label for="aulaProfessor">Professor:</label>
+                            <input type="text" id="aulaProfessor" class="inputTexto">
+                        </div>
+                    </div>
+
+                    <div style="margin-top:8px;">
+                        <button type="button" id="addAulaBtn" class="btnSmall">+ Aula</button>
+                    </div>
+
+                    <div class="botoesForm">
+                        <button type="button" id="salvarAulaBtn">Salvar</button>
+                        <button type="button" id="cancelarAulaBtn">Cancelar</button>
+                    </div>
+                </form>
+                <div id="tableAulas"></div>
+            </div>
+        </section>
+
         <div class="containerPainel" id="containerTabela">
         </div>
     </main>
     
     <script type="module" src="./js/tabela.js"></script>
+    <script type="module" src="./js/admin.js"></script>
+    <script type="module" src="./js/adminEstudios.js"></script>
+    <script type="module" src="./js/adminSalas.js"></script>
+    <script type="module" src="./js/adminUsers.js"></script>
+    <script type="module" src="./js/adminAulas.js"></script>
+    <script type="module" src="./js/adminDataLayer.js"></script>
 </body>
 </html>

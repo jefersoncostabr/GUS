@@ -24,12 +24,75 @@ STATUS ATUAL DO PROJETO (Atualizado)
    - Feedback visual para o usuário (mensagens de erro/sucesso).
    - Tratamento e validação de dados implementados (tratamentodedados.js).
 
-Nova etapa do projeto:
-1-Criação da área do administrador.
-2-Usando a base do painer geral como formatação e exibição em forma de tabela com a mesma formatação de tabela.
-3-Partes gerenciaveis pelo adm:
-4-nome do estudio, quantidade de salas, gerenciamento de role, motivos disponiveis. edição de aulas regulares
-5-devo criar um banco de dados para opcoes? ou um para cada coisa?
+NOVA ETAPA (DETALHAMENTO ATÉ O ITEM 4)
+
+Objetivo geral
+  Criar uma área administrativa que permita gerenciar configurações do sistema
+  (estúdios, quantidade de salas, motivos válidos, papéis/roles e aulas regulares),
+  com APIs protegidas, validação e UI administrativa.
+
+1 — Criação da área do Administrador (backend + frontend)
+  Backend:
+    - Criar rota protegida /admin/* para ações administrativas.
+    - Adicionar verificação de role usando o middleware [`verificaRole`](middleware/authMiddleware.js).
+    - Criar controllers administrativos (ex.: `src/controllers/adminController.js`) com funções:
+      - listarConfig(), criarConfig(), atualizarConfig(), deletarConfig().
+    - Adicionar validação com `express-validator` nas rotas administrativas.
+
+  Frontend: ✅ (implementado — melhorias pendentes)
+    - Criar página administrativa: [frontend/painelAdm.html](frontend/painelAdm.html) ✅ (implementado; melhorar conforme abaixo).
+    - Proteger links/ações no frontend via verificação da sessão (`/usuario-logado`) e exibir apenas para admin. ✅
+    - Reutilizar componentes de tabela e paginação ([frontend/js/tabela.js](frontend/js/tabela.js), [frontend/js/paginacao.js](frontend/js/paginacao.js)). ✅
+
+  Estado atual: Em andamento — Foco atual: Implementar backend para `/admin/*` (criar modelos `Estudio`, `Motivo`, `AulaRegular`, `src/controllers/adminController.js`, `routes/routerAdmin.js` e registrar em `index.js`).
+
+2 — Usar base do painel geral para formatação/exibição
+  - Reaproveitar layout e classes CSS de [frontend/painelGeral.html](frontend/painelGeral.html) e [frontend/assets/css/tabela.css](frontend/assets/css/tabela.css).
+  - Criar nova tabela/visão específica para entidades administrativas (estúdios, motivos, roles).
+  - Arquitetura:
+    - Frontend: novas chamadas para as APIs administrativas e componentes para criar/editar/excluir.
+    - Backend: endpoints RESTful (GET/POST/PUT/DELETE) em `/admin/configs` e `/admin/motivos`, etc.
+
+3 — Partes gerenciáveis pelo admin (especificação funcional)
+  - Nome do estúdio
+    - Modelo: `Estudio` (nome, localização opcional, ativo).
+    - Endpoints: CRUD em `/admin/estudios`.
+  - Quantidade de salas
+    - Campo em `Estudio` ou coleção separada `Salas` (recomendado: armazenar quantidade em `Estudio` e, se necessário, coleção `Salas` para gerenciamento detalhado).
+  - Gerenciamento de roles
+    - Permitido alterar papéis (`user`, `admin`) via endpoint seguro `/admin/solicitantes/:id/role`.
+    - Usar [`listarSolicitantes`](src/controllers/solicitanteController.js) e estender com `atualizarRole`.
+  - Motivos disponíveis
+    - Criar coleção `Motivo` ou `config` (campo array) com CRUD em `/admin/motivos`.
+    - Sincronizar com frontend (carregar via API, substituir uso de constante `OPCOES_MOTIVO` em [frontend/js/tratamentoDeDados.js](frontend/js/tratamentoDeDados.js) por chamada dinâmica).
+  - Aulas regulares (criar/editar)
+    - Modelo `AulaRegular` (estudioId, sala, diaSemana, horaInicio, duracao, professor, ativo).
+    - Endpoints: `/admin/aulas` com CRUD completo.
+    - Validação de conflitos reutilizando lógica de `verificaDuplicidade` (middleware).
+
+4 — Fluxo mínimo recomendado e arquivos a alterar
+  Backend:
+    - Novos modelos: `src/models/estudiomodel.js`, `src/models/motivosmodel.js`, `src/models/aulasmodel.js`.
+    - Novo controller: `src/controllers/adminController.js`.
+    - Novas rotas: `routes/routerAdmin.js` e registro em [index.js](index.js).
+    - Reaproveitar middlewares existentes: [`verificaRole`](middleware/authMiddleware.js), [`verificaDuplicidade`](middleware/authMiddleware.js) onde aplicável.
+    - Adicionar validação (express-validator) e testes unitários.
+
+  Frontend:
+    - Página administrativa: melhorar [frontend/painelAdm.html](frontend/painelAdm.html), carregar dados via fetch para `/admin/*`.
+    - Substituir constantes estáticas por chamadas dinâmicas (ex: motivos via API; ajustar [frontend/js/carregarMotivos.js](frontend/js/carregarMotivos.js) e [frontend/js/tratamentoDeDados.js](frontend/js/tratamentoDeDados.js)).
+    - Garantir que o botão "Criar", "Editar", "Excluir" chamem endpoints adequados e exibam mensagens em área única (corrigir duplicidade de `id="painelSaida"` em [frontend/painelGeral.html](frontend/painelGeral.html)).
+
+Cronograma sugerido (estimativa)
+  - Dia 1: Modelos e rotas backend (estúdios, motivos), middleware e validação básica.
+  - Dia 2–3: Controllers, testes unitários básicos e endpoints protegidos.
+  - Dia 4–5: Frontend admin (UI), chamadas APIs e integração com paginação/tabela.
+  - Dia 6: Revisão de segurança, testes manuais e ajustes de UX.
+
+Notas finais
+  - Preferência por coleções separadas para entidades que cresçam (Estudio, Motivo, Aula) para flexibilidade e auditoria.
+  - Para configurações globais pequenas, uma coleção `Config` pode ser mais simples (document único).
+
 
 Observações Principais
 
