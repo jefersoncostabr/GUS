@@ -1,5 +1,8 @@
 import { showMessage } from './admin.js'
 
+let cachedData = [];
+let isExpanded = false;
+
 /**
  * Renderiza a tabela de estúdios a partir de dados fornecidos.
  * @param {Array<Object>} data - Array de estúdios
@@ -7,21 +10,24 @@ import { showMessage } from './admin.js'
 export function renderEstudiosUI(data = []) {
   const table = document.getElementById('tableEstudios')
   if (!table) return
-  if (!Array.isArray(data) || !data.length) { table.innerHTML = 'Nenhum estúdio encontrado.'; return }
 
   const html = [`<table class="painelTabela">
-    <thead><tr><th>Nome</th><th>Filiais (Salas)</th><th>Ativo</th><th>Ações</th></tr></thead>
+    <thead><tr><th>Nome do Estúdio</th><th>Filiais (Salas)</th><th>Ações</th></tr></thead>
     <tbody>`]
-  data.forEach(e => {
-    // render filiais list (unidade — endereco) with salas
-    let filiaisHtml = ''
-    if (Array.isArray(e.filiais) && e.filiais.length) {
-      filiaisHtml = e.filiais.map(f => `${f.local || f.unidade || ''}${(f.endereco ? ' — ' + f.endereco : '')} (${(f.salas||0)})`).join('<br>')
-    } else if (e.localizacao) {
-      filiaisHtml = e.localizacao
-    }
-    html.push(`<tr data-id="${e._id}"><td>${e.nome || ''}</td><td>${filiaisHtml}</td><td>${e.ativo ? 'Sim' : 'Não'}</td><td><button class="editEstudio">Editar</button> <button class="delEstudio">Excluir</button></td></tr>`)
-  })
+  if (!Array.isArray(data) || !data.length) {
+    html.push('<tr><td colspan="3" style="text-align: center;">Estúdio não cadastrado</td></tr>')
+  } else {
+    data.forEach(e => {
+      // render filiais list (unidade — endereco) with salas
+      let filiaisHtml = ''
+      if (Array.isArray(e.filiais) && e.filiais.length) {
+        filiaisHtml = e.filiais.map(f => `${f.nome || f.local || f.unidade || ''}${(f.endereco ? ' — ' + f.endereco : '')} (${(f.salas||0)})`).join('<br>')
+      } else if (e.localizacao) {
+        filiaisHtml = e.localizacao
+      }
+      html.push(`<tr data-id="${e._id}"><td>${e.nome || ''}</td><td>${filiaisHtml}</td><td><button class="editEstudio">Editar</button> <button class="delEstudio">Excluir</button></td></tr>`)
+    })
+  }
   html.push('</tbody></table>')
   table.innerHTML = html.join('\n')
 
@@ -32,14 +38,13 @@ export function renderEstudiosUI(data = []) {
       const item = data.find(x => (x._id||x.id) == id)
       if (!item) return
       document.getElementById('estudioId').value = id
-      document.getElementById('estudioNome').value = item.nome || ''
       // Populate filiais (localizações) into inputs
       const container = document.getElementById('estudioFiliaisContainer')
       if (container) {
         container.innerHTML = ''
         let locs = []
         if (Array.isArray(item.filiais) && item.filiais.length) {
-          locs = item.filiais.map(f => ({ nome: f.local || f.unidade || '', endereco: f.endereco || '', salas: f.salas || 0 }))
+          locs = item.filiais.map(f => ({ nome: f.nome || f.local || f.unidade || '', endereco: f.endereco || '', salas: f.salas || 0 }))
         } else {
           // legacy: parse localizacao string into nome only
           locs = (item.localizacao || '').split(';').map(s => ({ nome: s.trim(), endereco: '', salas: 0 })).filter(x => x.nome)
@@ -52,8 +57,6 @@ export function renderEstudiosUI(data = []) {
       }
       const salasField = document.getElementById('estudioSalas')
       if (salasField) salasField.value = item.salas || ''
-      const ativoField = document.getElementById('estudioAtivo')
-      if (ativoField) ativoField.checked = !!item.ativo
       showMessage('Pronto para editar o estúdio.', 'info', 3000)
     })
   })
@@ -74,7 +77,10 @@ export function renderEstudiosUI(data = []) {
  * Setter para injetar dados de estúdios no UI.
  * @param {Array<Object>} data
  */
-export function setEstudiosData(data = []) { renderEstudiosUI(data) }
+export function setEstudiosData(data = []) { 
+  cachedData = data;
+  if (isExpanded) renderEstudiosUI(data);
+}
 
 /**
  * Salva (cria ou atualiza) um estúdio com as informações do formulário.
@@ -85,23 +91,29 @@ export function setEstudiosData(data = []) { renderEstudiosUI(data) }
 function salvarEstudio() {
   const idEl = document.getElementById('estudioId')
   const id = idEl ? idEl.value : ''
-  const nome = (document.getElementById('estudioNome') || {}).value.trim()
   const filialWrappers = Array.from(document.querySelectorAll('.filialItem'))
   const filiais = filialWrappers.map(w => {
-    const unidade = (w.querySelector('.estudioFilialName') || {}).value || ''
+    const nome = (w.querySelector('.estudioFilialName') || {}).value || ''
     const endereco = (w.querySelector('.estudioLocalAddress') || {}).value || ''
     const salas = parseInt((w.querySelector('.estudioLocalSalas') || {}).value) || 0
-    const local = (unidade || endereco || '').trim()
-    return { local, unidade: unidade.trim(), endereco: endereco.trim(), salas }
+    const local = (nome || endereco || '').trim()
+    return { local, nome: nome.trim(), endereco: endereco.trim(), salas }
   }).filter(f => f.local)
   const local = filiais.map(f => f.local).join('; ')
-  const ativo = !!((document.getElementById('estudioAtivo') || {}).checked)
 
-  if (!nome) { showMessage('Nome é obrigatório.', 'error'); return }
   if (!filiais.length) { showMessage('Adicione ao menos uma filial.', 'error'); return }
 
+  const nome = filiais[0].nome || filiais[0].local || 'Estúdio'
+  const endereco = filiais[0].endereco || ''
+  const salas = filiais[0].salas || 0
+
+  // Lógica de confirmação para alteração
+  if (id) {
+    if (!confirm('O estúdio já existe. Deseja salvar as alterações?')) return;
+  }
+
   // Dispatch event with payload; actual network call should be done by the data layer.
-  const payload = { id: id || null, nome, localizacao: local, filiais, ativo }
+  const payload = { id: id || null, nome, endereco, salas, filiais }
   document.dispatchEvent(new CustomEvent('admin:estudio:save', { detail: payload }))
   showMessage('Solicitado salvar estúdio.', 'info', 3000)
   clearForm()
@@ -113,11 +125,8 @@ function salvarEstudio() {
 function clearForm() {
   const idEl = document.getElementById('estudioId')
   if (idEl) idEl.value = ''
-  const nomeEl = document.getElementById('estudioNome')
-  if (nomeEl) nomeEl.value = ''
   const container = document.getElementById('estudioFiliaisContainer')
   if (container) container.innerHTML = ''
-  document.getElementById('estudioAtivo') && (document.getElementById('estudioAtivo').checked = true)
 }
 
 /**
@@ -190,6 +199,25 @@ function addFilial() {
 }
 
 /**
+ * Alterna a visibilidade do painel de estúdios e renderiza os dados se expandido.
+ */
+function toggleEstudiosPanel() {
+  const content = document.getElementById('estudiosContent');
+  const btn = document.getElementById('toggleEstudiosBtn');
+  if (!content) return;
+
+  isExpanded = !isExpanded;
+  content.style.display = isExpanded ? 'block' : 'none';
+  
+  if (btn) btn.textContent = isExpanded ? '-' : '+';
+
+  if (isExpanded) {
+    // Solicita dados atualizados ao banco (via DataLayer) ao invés de usar o cache
+    document.dispatchEvent(new CustomEvent('admin:estudio:fetch'));
+  }
+}
+
+/**
  * Nota: este módulo é responsável apenas pela UI dos estúdios.
  * - Utilize `setEstudiosData(array)` para injetar dados carregados pela camada de dados.
  * - Escute os eventos `admin:estudio:save` e `admin:estudio:delete` para realizar chamadas à API.
@@ -203,6 +231,8 @@ const cancelarBtn = document.getElementById('cancelarEstudioBtn')
 if (cancelarBtn) cancelarBtn.addEventListener('click', clearForm)
 const addBtn = document.getElementById('addFilialBtn')
 if (addBtn) addBtn.addEventListener('click', addFilial)
+const toggleBtn = document.getElementById('toggleEstudiosBtn')
+if (toggleBtn) toggleBtn.addEventListener('click', toggleEstudiosPanel)
 
 // Make sure first row exists by default - removed so +Filial controls rows
 
@@ -223,4 +253,3 @@ export function setEstudiosOptions(estudios = []) {
     estudios.forEach(e => { const opt = document.createElement('option'); opt.value = e._id || e.id || ''; opt.textContent = e.nome || e.name || '--'; s.appendChild(opt); })
   })
 }
-

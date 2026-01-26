@@ -53,6 +53,24 @@ export async function verificaSolicitante(req, res, next) {
     }
 }
 
+// Verifica se o usuário logado é o dono da conta que está tentando alterar
+export async function verificaPermissaoSolicitante(req, res, next) {
+    try {
+        const idAlvo = req.params.id;
+        const idSessao = req.session.user?._id;
+        const role = req.session.user?.role;
+
+        // Admin pode tudo, usuário comum só pode mexer no próprio ID
+        if (role !== 'admin' && idAlvo !== idSessao) {
+            return res.status(403).json({ error: 'Você não tem permissão para alterar este usuário' });
+        }
+
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: 'Erro ao verificar permissão de usuário' });
+    }
+}
+
 //verifica duplicidade do uso para evitar o registro do mesmo uso
 export async function verificaDuplicidade(req, res, next) {
     const { sala, dia, hora } = req.body;

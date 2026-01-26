@@ -2,6 +2,7 @@ import { baseUrl, fetchJson, showMessage, setAdminVisibility, populateEstudiosOp
 import { setUsersData } from './adminUsers.js';
 import { setEstudiosData, setEstudiosOptions } from './adminEstudios.js';
 import { setSalasData } from './adminSalas.js';
+import { setAulasData, setAulasEstudiosOptions, setAulasProfessoresOptions, setAulasSalasCache } from './adminAulas.js';
 
 /**
  * adminDataLayer.js
@@ -24,8 +25,11 @@ async function safeFetchJson(url, options) {
 // Loaders
 async function loadUsers() {
   try {
-    const data = await safeFetchJson(`${baseUrl}/admin/solicitantes`);
-    if (Array.isArray(data)) setUsersData(data);
+    const data = await safeFetchJson(`${baseUrl}/solicitantes/solicitantes`);
+    if (Array.isArray(data)) {
+      setUsersData(data);
+      setAulasProfessoresOptions(data);
+    }
   } catch (e) { console.warn('Falha ao carregar usuários', e); }
 }
 
@@ -37,6 +41,7 @@ async function loadEstudios() {
       // cache for populating dynamic selects
       window.__estudiosCache = data;
       setEstudiosOptions(data);
+      setAulasEstudiosOptions(data);
       // also provide helper populator
       if (typeof populateEstudiosOptions === 'function') {
         // find primary select if present
@@ -50,8 +55,18 @@ async function loadEstudios() {
 async function loadSalas() {
   try {
     const data = await safeFetchJson(`${baseUrl}/admin/salas`);
-    if (Array.isArray(data)) setSalasData(data);
+    if (Array.isArray(data)) {
+      setSalasData(data);
+      setAulasSalasCache(data);
+    }
   } catch (e) { console.warn('Falha ao carregar salas', e); }
+}
+
+async function loadAulas() {
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/aulas`);
+    if (Array.isArray(data)) setAulasData(data);
+  } catch (e) { console.warn('Falha ao carregar aulas', e); }
 }
 
 // Session check
@@ -62,7 +77,7 @@ async function checkSessionAndInit() {
     setAdminVisibility(!!isAdmin);
     if (isAdmin) {
       // load admin resources
-      await Promise.all([loadUsers(), loadEstudios(), loadSalas()]);
+      await Promise.all([loadUsers(), loadEstudios(), loadSalas(), loadAulas()]);
     }
   } catch (e) {
     console.warn('Falha na checagem de sessão', e);
@@ -72,10 +87,10 @@ async function checkSessionAndInit() {
 
 // Handlers for events
 async function handleUserCreate(e) {
-  const { nome, role } = e.detail || {};
-  if (!nome) { showMessage('Nome é obrigatório.', 'error'); return; }
+  const { nome, role, senha, estudio } = e.detail || {};
+  if (!nome || !senha || !estudio) { showMessage('Nome, Senha e Estúdio são obrigatórios.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/admin/solicitantes`, { method: 'POST', body: { nome, role } });
+    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes`, { method: 'POST', body: { solicitante: nome, senha, role, estudio } });
     showMessage('Usuário criado.', 'success');
     await loadUsers();
   } catch (err) { /* already handled */ }
@@ -85,7 +100,7 @@ async function handleUserUpdate(e) {
   const { id, nome, role } = e.detail || {};
   if (!id) { showMessage('ID ausente para atualização.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/admin/solicitantes/${id}`, { method: 'PUT', body: { nome, role } });
+    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes/${id}`, { method: 'PUT', body: { solicitante: nome, role } });
     showMessage('Usuário atualizado.', 'success');
     await loadUsers();
   } catch (err) { }
@@ -95,7 +110,7 @@ async function handleUserDelete(e) {
   const { id } = e.detail || {};
   if (!id) { showMessage('ID ausente para exclusão.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/admin/solicitantes/${id}`, { method: 'DELETE' });
+    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes/${id}`, { method: 'DELETE' });
     showMessage('Usuário excluído.', 'success');
     await loadUsers();
   } catch (err) { }
@@ -153,15 +168,30 @@ async function handleSalaDelete(e) {
   } catch (err) { }
 }
 
+async function handleAulaDelete(e) {
+  const { id } = e.detail || {};
+  if (!id) { showMessage('ID ausente para exclusão de aula.', 'error'); return; }
+  try {
+    await safeFetchJson(`${baseUrl}/admin/aulas/${id}`, { method: 'DELETE' });
+    showMessage('Aula excluída.', 'success');
+    await loadAulas();
+  } catch (err) { }
+}
+
 export function initAdminDataLayer() {
   // attach listeners
   document.addEventListener('admin:user:create', handleUserCreate);
   document.addEventListener('admin:user:update', handleUserUpdate);
   document.addEventListener('admin:user:delete', handleUserDelete);
+  document.addEventListener('admin:user:fetch', loadUsers);
   document.addEventListener('admin:estudio:save', handleEstudioSave);
   document.addEventListener('admin:estudio:delete', handleEstudioDelete);
+  document.addEventListener('admin:estudio:fetch', loadEstudios);
   document.addEventListener('admin:sala:save', handleSalaSave);
   document.addEventListener('admin:sala:delete', handleSalaDelete);
+  document.addEventListener('admin:sala:fetch', loadSalas);
+  document.addEventListener('admin:aula:fetch', loadAulas);
+  document.addEventListener('admin:aula:delete', handleAulaDelete);
 
   // start session check and data load
   checkSessionAndInit();

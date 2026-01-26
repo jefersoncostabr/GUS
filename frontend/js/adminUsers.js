@@ -1,5 +1,9 @@
 import { showMessage } from './admin.js';
 
+let cachedData = [];
+let isExpanded = false;
+const toggleIds = ['tableUsuarios', 'addUsuarioBtn'];
+
 /**
  * adminUsers.js — UI-only module
  * - Use `setUsersData(array)` para injetar dados
@@ -20,11 +24,10 @@ export function renderUsersUI(data = []) {
   const table = document.getElementById('tableUsuarios');
   if (!table) return;
   if (!Array.isArray(data) || !data.length) { table.innerHTML = 'Nenhum usuário encontrado.'; return; }
-  const html = [`<table class="painelTabela"><thead><tr><th>Nome</th><th>Email</th><th>Role</th><th>Ações</th></tr></thead><tbody>`];
+  const html = [`<table class="painelTabela"><thead><tr><th>Nome</th><th>Role</th><th>Ações</th></tr></thead><tbody>`];
   data.forEach(u => {
     const nomeEsc = (u.nome || u.solicitante || '').replace(/"/g, '&quot;');
-    const email = u.email || '';
-    html.push(`<tr data-id="${u._id}"><td><input class="userNome" type="text" value="${nomeEsc}"></td><td>${email}</td><td><select class="roleSelect"><option value="user">user</option><option value="admin">admin</option></select></td><td><div class="actionButtons"><button class="saveUser">Salvar</button> <button class="cancelUser">Cancelar</button> <button class="delUser">Excluir</button></div></td></tr>`);
+    html.push(`<tr data-id="${u._id}"><td><input class="userNome" type="text" value="${nomeEsc}"></td><td><select class="roleSelect"><option value="user">user</option><option value="admin">admin</option></select></td><td><div class="actionButtons"><button class="saveUser">Salvar</button> <button class="cancelUser">Cancelar</button> <button class="delUser">Excluir</button></div></td></tr>`);
   });
   html.push('</tbody></table>');
   table.innerHTML = html.join('\n');
@@ -70,7 +73,59 @@ export function renderUsersUI(data = []) {
  * Setter para injetar dados de usuários no UI.
  * @param {Array<Object>} data
  */
-export function setUsersData(data = []) { renderUsersUI(data); }
+export function setUsersData(data = []) {
+  cachedData = data;
+  if (isExpanded) {
+    renderUsersUI(data);
+    const table = document.getElementById('tableUsuarios');
+    if (table) table.style.display = '';
+  }
+}
+
+function toggleUsersPanel() {
+  const btn = document.getElementById('toggleUsuariosBtn');
+  
+  isExpanded = !isExpanded;
+  
+  toggleIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isExpanded ? '' : 'none';
+  });
+
+  if (btn) btn.textContent = isExpanded ? '-' : '+';
+
+  if (isExpanded) {
+    document.dispatchEvent(new CustomEvent('admin:user:fetch'));
+  }
+}
+
+// Inicialização: Injeta o botão e esconde a tabela/botões
+const table = document.getElementById('tableUsuarios');
+if (table) {
+  // Inicia escondido
+  toggleIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Tenta encontrar o cabeçalho anterior (H1-H6) para adicionar o botão
+  let header = table.previousElementSibling;
+  for(let i=0; i<3; i++) {
+    if (header && /^H[1-6]$/.test(header.tagName)) break;
+    if (header) header = header.previousElementSibling;
+  }
+  const target = header || table.previousElementSibling;
+
+  if (target) {
+    const btn = document.createElement('button');
+    btn.id = 'toggleUsuariosBtn';
+    btn.textContent = '+';
+    btn.style.marginLeft = '10px';
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', toggleUsersPanel);
+    target.appendChild(btn);
+  }
+}
 
 // +Usuário button behavior: append an empty row for creating a new user
 const addUserBtn = document.getElementById('addUsuarioBtn');
@@ -88,6 +143,25 @@ if (addUserBtn) addUserBtn.addEventListener('click', () => {
   inputNome.placeholder = 'Nome';
   inputNome.style.width = '240px';
 
+  const inputSenha = document.createElement('input');
+  inputSenha.type = 'password';
+  inputSenha.className = 'userSenha';
+  inputSenha.placeholder = 'Senha';
+  inputSenha.style.width = '120px';
+
+  const selectEstudio = document.createElement('select');
+  selectEstudio.className = 'estudioSelect';
+  selectEstudio.style.width = '140px';
+  selectEstudio.innerHTML = '<option value="">-- Estúdio --</option>';
+  if (window.__estudiosCache && Array.isArray(window.__estudiosCache)) {
+    window.__estudiosCache.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e._id || e.id;
+      opt.textContent = e.nome || e.name;
+      selectEstudio.appendChild(opt);
+    });
+  }
+
   const selectRole = document.createElement('select');
   selectRole.className = 'roleSelect';
   selectRole.innerHTML = '<option value="user">user</option><option value="admin">admin</option>';
@@ -97,8 +171,11 @@ if (addUserBtn) addUserBtn.addEventListener('click', () => {
   saveBtn.textContent = 'Salvar';
   saveBtn.addEventListener('click', () => {
     const nomeVal = inputNome.value || '';
+    const senhaVal = inputSenha.value || '';
+    const estudioVal = selectEstudio.value || '';
     const roleVal = selectRole.value || 'user';
-    document.dispatchEvent(new CustomEvent('admin:user:create', { detail: { nome: nomeVal, role: roleVal } }));
+    if (!estudioVal) { showMessage('Estúdio é obrigatório.', 'error'); return; }
+    document.dispatchEvent(new CustomEvent('admin:user:create', { detail: { nome: nomeVal, senha: senhaVal, role: roleVal, estudio: estudioVal } }));
     showMessage('Solicitada criação de usuário.', 'info', 3000);
     container.remove();
   });
@@ -110,6 +187,8 @@ if (addUserBtn) addUserBtn.addEventListener('click', () => {
 
 
   container.appendChild(inputNome);
+  container.appendChild(inputSenha);
+  container.appendChild(selectEstudio);
   container.appendChild(selectRole);
   const actions = document.createElement('div'); actions.className = 'actionButtons';
   actions.appendChild(saveBtn); actions.appendChild(cancelBtn);

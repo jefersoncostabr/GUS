@@ -1,6 +1,7 @@
-import EstudioModelo from "../models/estudiomodel.js";
+import EstudioModelo from "../models/estudioModel.js";
 import MotivoModelo from "../models/motivosmodel.js";
-import ConfigModelo from "../models/configmodel.js";
+import SalaModelo from "../models/salaModel.js";
+import AulaModelo from "../models/aulaModel.js";
 
 class AdminController {
     // --- ESTÚDIOS ---
@@ -61,6 +62,16 @@ class AdminController {
         }
     }
 
+    static async atualizarMotivo(req, res) {
+        try {
+            const { id } = req.params;
+            await MotivoModelo.findByIdAndUpdate(id, req.body);
+            res.status(200).json({ message: "Motivo atualizado com sucesso" });
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao atualizar motivo` });
+        }
+    }
+
     static async deletarMotivo(req, res) {
         try {
             const { id } = req.params;
@@ -70,27 +81,97 @@ class AdminController {
             res.status(500).json({ message: `${erro.message} - falha ao excluir motivo` });
         }
     }
-    
-    // --- CONFIGURAÇÕES GERAIS ---
-    static async listarConfig(req, res) {
+
+    // --- SALAS ---
+    static async listarSalas(req, res) {
         try {
-            // Busca a config geral ou cria se não existir (Upsert manual)
-            let config = await ConfigModelo.findOne({ chave: "geral" });
-            if (!config) {
-                config = await ConfigModelo.create({ chave: "geral" });
-            }
-            res.status(200).json(config);
+            const salas = await SalaModelo.find({}).populate('estudioId', 'nome');
+            // Formata para o frontend que espera estudioNome
+            const salasFormatadas = salas.map(s => ({
+                _id: s._id,
+                numero: s.numero,
+                nome: s.nome,
+                ativo: s.ativo,
+                estudioId: s.estudioId ? s.estudioId._id : null,
+                estudioNome: s.estudioId ? s.estudioId.nome : 'N/A'
+            }));
+            res.status(200).json(salasFormatadas);
         } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao buscar configurações` });
+            res.status(500).json({ message: `${erro.message} - falha ao listar salas` });
         }
     }
 
-    static async atualizarConfig(req, res) {
+    static async criarSala(req, res) {
         try {
-            const config = await ConfigModelo.findOneAndUpdate({ chave: "geral" }, req.body, { new: true, upsert: true });
-            res.status(200).json({ message: "Configurações atualizadas", config });
+            const novaSala = await SalaModelo.create(req.body);
+            res.status(201).json({ message: "Sala criada com sucesso", sala: novaSala });
         } catch (erro) {
-            res.status(500).json({ message: `${erro.message} - falha ao atualizar configurações` });
+            res.status(500).json({ message: `${erro.message} - falha ao cadastrar sala` });
+        }
+    }
+
+    static async atualizarSala(req, res) {
+        try {
+            const { id } = req.params;
+            await SalaModelo.findByIdAndUpdate(id, req.body);
+            res.status(200).json({ message: "Sala atualizada com sucesso" });
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao atualizar sala` });
+        }
+    }
+
+    static async deletarSala(req, res) {
+        try {
+            const { id } = req.params;
+            await SalaModelo.findByIdAndDelete(id);
+            res.status(200).json({ message: "Sala excluída com sucesso" });
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao excluir sala` });
+        }
+    }
+
+    // --- AULAS REGULARES ---
+    static async listarAulas(req, res) {
+        try {
+            const aulas = await AulaModelo.find({})
+                .populate('estudio', 'nome')
+                .populate('professor', 'solicitante');
+            
+            // Formatação para facilitar o consumo no frontend (evita [object Object])
+            const aulasFormatadas = aulas.map(a => ({
+                _id: a._id,
+                estudioNome: a.estudio ? a.estudio.nome : 'N/A',
+                estudioId: a.estudio ? a.estudio._id : null,
+                sala: a.sala,
+                diaSemana: a.diaSemana,
+                horaInicio: a.horaInicio,
+                modalidade: a.modalidade,
+                professorNome: a.professor ? a.professor.solicitante : 'N/A',
+                professorId: a.professor ? a.professor._id : null
+            }));
+
+            res.status(200).json(aulasFormatadas);
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao listar aulas` });
+        }
+    }
+
+    static async criarAula(req, res) {
+        try {
+            const novaAula = await AulaModelo.create(req.body);
+            res.status(201).json({ message: "Aula criada com sucesso", aula: novaAula });
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao cadastrar aula` });
+        }
+    }
+
+    static async deletarAula(req, res) {
+        try {
+            const { id } = req.params;
+            await AulaModelo.findByIdAndDelete(id);
+            res.status(200).json({ message: "Aula excluída com sucesso" });
+        } catch (erro) {
+            res.status(500).json({ message: `${erro.message} - falha ao excluir aula` });
         }
     }
 }

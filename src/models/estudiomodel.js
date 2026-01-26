@@ -1,10 +1,17 @@
 import mongoose from "mongoose";
 
-const filialSchema = new mongoose.Schema({
-    unidade: { type: String, required: true, default: "Matriz" }, // Nome/ID da filial
+const esquemaComum = {
+    nome: { type: String, required: true },
     endereco: { type: String },
-    salas: { type: Number, default: 1 },       // Quantidade de salas nesta filial
-}, { _id: false }, { versionKey: false }); // _id false pois é um subdocumento simples dentro do estúdio
+    salas: { type: Number, default: 1 }
+};
+
+const filialSchema = new mongoose.Schema(esquemaComum);
+
+const estudioSchema = new mongoose.Schema({
+    ...esquemaComum,
+    filiais: [filialSchema]
+}, { versionKey: false });
 
 const EstudioModelo = mongoose.model("Estudio", estudioSchema);
 

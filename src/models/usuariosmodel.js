@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 const solicitanteSchema = new mongoose.Schema({
     id: { type: mongoose.Schema.Types.ObjectId },
     solicitante: { type: String, required: true },
-    estudio: { type: String, required: true },
+    estudio: { type: mongoose.Schema.Types.ObjectId, ref: 'Estudio', required: true },
     senha: { type: String, required: true },
     role: { type: String, required: false }
 }, { versionKey: false });

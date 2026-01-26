@@ -18,12 +18,14 @@ router.delete("/estudios/:id", AdminController.deletarEstudio);// http://localho
 // Rotas de Motivos
 router.get("/motivos", AdminController.listarMotivos);// http://localhost:3000/admin/motivos - Lista todos os motivos
 router.post("/motivos", AdminController.criarMotivo);// http://localhost:3000/admin/motivos - Cria um novo motivo
+router.put("/motivos/:id", AdminController.atualizarMotivo);// http://localhost:3000/admin/motivos/:id - Atualiza um motivo existente
 router.delete("/motivos/:id", AdminController.deletarMotivo);// http://localhost:3000/admin/motivos/:id - Remove um motivo
 
-
-// Rotas de Configurações
-router.get("/config", AdminController.listarConfig);// http://localhost:3000/admin/config - Lista as configurações gerais
-router.put("/config", AdminController.atualizarConfig);// http://localhost:3000/admin/config - Atualiza as configurações gerais
+// Rotas de Salas
+router.get("/salas", AdminController.listarSalas);
+router.post("/salas", AdminController.criarSala);
+router.put("/salas/:id", AdminController.atualizarSala);
+router.delete("/salas/:id", AdminController.deletarSala);
 
 export default router;
 

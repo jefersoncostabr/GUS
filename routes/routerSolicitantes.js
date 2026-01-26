@@ -1,4 +1,5 @@
 import express from "express";
+import { authMiddleware, verificaPermissaoSolicitante } from "../middleware/authMiddleware.js";
 import { 
     listarSolicitantes, 
     buscarSolicitantePorId, 
@@ -27,7 +28,7 @@ routerSolicitantes.get('/buscaidsolicitante', buscarIdSolicitante);
 routerSolicitantes.post('/solicitantes', criarSolicitante);
 
 // http://localhost:3000/solicitantes/solicitantes/:id
-routerSolicitantes.put('/solicitantes/:id', atualizarSolicitante);
+routerSolicitantes.put('/solicitantes/:id', authMiddleware, verificaPermissaoSolicitante, atualizarSolicitante);
 
 // http://localhost:3000/solicitantes/solicitantes/:id
 routerSolicitantes.delete('/solicitantes/:id', deletarSolicitante);

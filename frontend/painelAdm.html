@@ -19,72 +19,35 @@
     
     <main id="main">
         <p id="painelSaida" class="mensagem" aria-live="polite"></p>
-        <!-- <h1>Painel Geral</h1>    -->
-        <!-- <div class="containerPainel" id="">
-            <div>
-                <button id="limparImputsBtn">Limpar</button>
-            </div>
-            <div class="formularioContainer">
-                <div>
-                    <label for="solicitante">Solicitante:</label>
-                    <input class="inputTexto" type="text" id="solicitante" ></label>
-                </div>
-                <div>
-                    <label for="sala">Sala:</label>
-                    <input class="inputNumerico" type="number" id="sala">
-                </div>
-                <div>
-                    <label for="dia">Dia:</label>
-                    <input class="inputNumerico" type="number" id="dia">
-                </div>
-                <div>
-                    <label for="hora">Hora:</label>
-                    <input class="inputNumerico" type="number" id="hora">
-                </div>
-                <div>
-                    <label for="motivo">Motivo:</label>
-                    <input class="inputTexto" type="text" id="motivo">			
-                </div>
-                <div>
-                    <label for="id" id="labelId">id:</label>
-                    <input class="inputTexto" type="text" id="id" disabled></label>
-                </div>
-
-            </div>
-			<div class="botoesInfContainer">
-				<button id="getUsosBtn">Ver</button>				
-				<button id="adicionarUsoBtn">Adicionar</button>
-				<button id="alterarReservaBtn">Alterar</button>
-				<button id="excluirUsoBtn">Excluir</button>
-			</div>
-
-			<p id="painelSaida"></p>
-		</div> -->
-
+    
         <!-- === Área administrativa === -->
         <section id="adminArea" aria-label="Área administrativa">
 
             <div id="estudiosPanel" class="adminPanel">
-                <h3>Estúdios</h3>
-                <form id="formEstudio">
+                <h3>Estúdios <button type="button" id="toggleEstudiosBtn" class="btnSmall" style="margin-left: 10px;">+</button></h3>
+                <div id="estudiosContent" style="display: none;">
+                    <form id="formEstudio">
 
-                    <div>
-                        <legend>Filiais / Unidades</legend>
-                        <div id="estudioFiliaisContainer">
-                            <div class="filialItem">
+                        <input type="hidden" id="estudioId">
 
+                        <div>
+                            <legend>Filiais / Unidades</legend>
+                            <div id="estudioFiliaisContainer">
+                                <div class="filialItem">
+
+                                </div>
                             </div>
+                            <button type="button" id="addFilialBtn" class="btnSmall">+ Filial</button>
                         </div>
-                        <button type="button" id="addFilialBtn" class="btnSmall">+ Filial</button>
-                    </div>
 
 
-                    <div class="botoesForm">
-                        <button type="button" id="salvarEstudioBtn">Salvar</button>
-                        <button type="button" id="cancelarEstudioBtn">Cancelar</button>
-                    </div>
-                </form>
-                <div id="tableEstudios"></div>
+                        <div class="botoesForm">
+                            <button type="button" id="salvarEstudioBtn">Salvar</button>
+                            <button type="button" id="cancelarEstudioBtn">Cancelar</button>
+                        </div>
+                    </form>
+                    <div id="tableEstudios"></div>
+                </div>
             </div>
 
 
@@ -150,13 +113,10 @@
                         </div>
                     </div>
 
-                    <div style="margin-top:8px;">
-                        <button type="button" id="addAulaBtn" class="btnSmall">+ Aula</button>
-                    </div>
-
                     <div class="botoesForm">
                         <button type="button" id="salvarAulaBtn">Salvar</button>
                         <button type="button" id="cancelarAulaBtn">Cancelar</button>
+                        <button type="button" id="excluirAulaBtn" class="btnExcluir">Excluir</button>
                     </div>
                 </form>
                 <div id="tableAulas"></div>
@@ -172,7 +132,6 @@
     <script type="module" src="./js/adminEstudios.js"></script>
     <script type="module" src="./js/adminSalas.js"></script>
     <script type="module" src="./js/adminUsers.js"></script>
-    <script type="module" src="./js/adminAulas.js"></script>
     <script type="module" src="./js/adminDataLayer.js"></script>
 </body>
 </html>

@@ -6,6 +6,8 @@ import router from './routes/routes.js';
 import conectaNaDatabase from './src/config/dbConnect.js';
 import routesAuth from "./routes/routesAuth.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import sistemaRoutes from "./routes/sistemaRoutes.js";
+import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
 
 dotenv.config();
 
@@ -38,6 +40,8 @@ app.use(express.static('frontend'));
 
 app.use(routesAuth);
 app.use('/admin', adminRoutes); // Todas as rotas de admin começarão com /admin (ex: /admin/estudios)
+app.use('/admin/aulas', aulaRegularRoutes); // Rotas específicas para aulas regulares
+app.use('/', sistemaRoutes);
 app.use('/', router);
 
 const PORT = process.env.PORT || 3000;
@@ -48,7 +52,7 @@ app.listen(PORT, '0.0.0.0', () => {
     // Implementação de teste: Verifica a URL base no backend
    const baseUrl = process.env.NODE_ENV === 'production'
       ? "https://gus-q7nn.onrender.com"
-      : `http://localhost:${PORT}`;
+      : `http://localhost:${PORT}/painelgeral.html`;
    console.log("Resultado do teste de URL:", baseUrl);
 });
 
