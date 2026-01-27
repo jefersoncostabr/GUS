@@ -3,21 +3,6 @@ import { showMessage } from './admin.js'
 let cachedData = []
 let cachedSalas = []
 let isExpanded = false
-const toggleIds = [
-    'tableAulas',
-    'salvarAulaBtn',
-    'cancelarAulaBtn',
-    'excluirAulaBtn',
-    'aulasListContainer',
-    'aulaId',
-    'aulaEstudio',
-    'aulaSala',
-    'aulaDia',
-    'aulaHora',
-    'aulaModalidade',
-    'aulaProfessor',
-    'aulaAtivo',
-]
 
 /**
  * Renderiza a tabela de aulas regulares.
@@ -32,30 +17,69 @@ export function renderAulasUI(data = []) {
     }
 
     const html = [
-        `<table class="painelTabela"><thead><tr><th>Estúdio</th><th>Dia</th><th>Hora</th><th>Modalidade</th><th>Prof</th><th>Ações</th></tr></thead><tbody>`,
+        `<table class="painelTabela"><thead><tr><th>Estúdio</th><th>Sala</th><th>Dia</th><th>Hora</th><th>Modalidade</th><th>Prof</th><th>Ações</th></tr></thead><tbody>`,
     ]
 
     data.forEach(a => {
+        let salaShow = a.salaNome || '';
+        if (!salaShow && a.sala) {
+            const sId = (typeof a.sala === 'object') ? (a.sala._id || a.sala.id) : a.sala;
+            const s = cachedSalas.find(x => (x._id || x.id) == sId);
+            if (s) salaShow = s.nome || `Sala ${s.numero}`;
+            else salaShow = sId;
+        }
         html.push(`<tr data-id="${a._id}">
       <td>${a.estudioNome || a.estudio || ''}</td>
+      <td>${salaShow}</td>
       <td>${a.diaSemana || ''}</td>
       <td>${a.horaInicio || ''}</td>
       <td>${a.modalidade || ''}</td>
-      <td>${a.professorNome || a.professor || ''}</td>
-      <td><button class="delAula">Excluir</button></td>
+      <td>${a.professorNome || a.professor || ''}</td>    
+      <td><button class="delElemento btnSmall">Excluir</button></td>
     </tr>`)
     })
     html.push('</tbody></table>')
     table.innerHTML = html.join('\n')
 
-    table.querySelectorAll('.delAula').forEach(btn =>
-        btn.addEventListener('click', ev => {
-            const tr = ev.target.closest('tr')
+    table.querySelectorAll('tbody tr').forEach(tr => {
+        tr.style.cursor = 'pointer'
+        tr.addEventListener('click', ev => {
+            if (ev.target.classList.contains('delAula')) {
+                const id = tr.dataset.id
+                if (!confirm('Excluir aula?')) return
+                document.dispatchEvent(new CustomEvent('admin:aula:delete', { detail: { id } }))
+                return
+            }
+
             const id = tr.dataset.id
-            if (!confirm('Excluir aula?')) return
-            document.dispatchEvent(new CustomEvent('admin:aula:delete', { detail: { id } }))
+            const item = data.find(x => (x._id || x.id) == id)
+            if (!item) return
+
+            const getVal = (v) => (v && typeof v === 'object') ? (v._id || v.id) : (v || '')
+
+            document.getElementById('aulaId').value = id
+            
+            const estudioId = getVal(item.estudio || item.estudioId)
+            document.getElementById('aulaEstudio').value = estudioId
+            
+            updateAulasSalasOptions(estudioId)
+            
+            const salaId = getVal(item.sala || item.salaId)
+            document.getElementById('aulaSala').value = salaId
+            
+            document.getElementById('aulaDia').value = item.diaSemana || ''
+            document.getElementById('aulaHora').value = item.horaInicio || ''
+            document.getElementById('aulaModalidade').value = item.modalidade || ''
+            
+            const profId = getVal(item.professor || item.professorId)
+            document.getElementById('aulaProfessor').value = profId
+
+            const ativoEl = document.getElementById('aulaAtivo')
+            if (ativoEl) ativoEl.checked = item.ativo !== false
+
+            showMessage('Pronto para editar a aula.', 'info', 3000)
         })
-    )
+    })
 }
 
 /**
@@ -93,6 +117,8 @@ export function setAulasEstudiosOptions(estudios = []) {
  */
 export function setAulasSalasCache(data = []) {
     cachedSalas = data
+    // Se já houver aulas carregadas, re-renderiza para resolver nomes de salas que dependem do cache
+    if (isExpanded && cachedData.length) renderAulasUI(cachedData);
 }
 
 /**
@@ -121,7 +147,11 @@ export function updateAulasSalasOptions(estudioId) {
     sel.innerHTML = '<option value="">-- selecione --</option>'
     if (!estudioId) return
 
-    const salas = cachedSalas.filter(s => (s.estudioId || s.estudio) == estudioId)
+    const salas = cachedSalas.filter(s => {
+        const eVal = s.estudio || s.estudioId
+        const eId = (eVal && typeof eVal === 'object') ? (eVal._id || eVal.id) : eVal
+        return eId == estudioId
+    })
     salas.forEach(s => {
         const opt = document.createElement('option')
         opt.value = s._id || s.id || ''
@@ -130,53 +160,79 @@ export function updateAulasSalasOptions(estudioId) {
     })
 }
 
-function toggleAulasPanel() {
-    const btn = document.getElementById('toggleAulasBtn')
-    isExpanded = !isExpanded
+/**
+ * Salva (cria ou atualiza) uma aula regular.
+ */
+function salvarAula() {
+    const id = document.getElementById('aulaId').value
+    const estudioId = document.getElementById('aulaEstudio').value
+    const salaId = document.getElementById('aulaSala').value
+    const diaSemana = document.getElementById('aulaDia').value
+    const horaInicio = document.getElementById('aulaHora').value
+    const modalidade = document.getElementById('aulaModalidade').value
+    const professorId = document.getElementById('aulaProfessor').value
+    const ativoEl = document.getElementById('aulaAtivo')
+    const ativo = ativoEl ? ativoEl.checked : true
 
-    toggleIds.forEach(id => {
-        const el = document.getElementById(id)
-        if (el) el.style.display = isExpanded ? '' : 'none'
-        const label = document.querySelector(`label[for="${id}"]`)
-        if (label) label.style.display = isExpanded ? '' : 'none'
-    })
+    const camposFaltantes = [];
+    if (!estudioId) camposFaltantes.push('aulaEstudio');
+    if (!salaId) camposFaltantes.push('aulaSala');
+    if (!diaSemana) camposFaltantes.push('aulaDia');
+    if (!horaInicio) camposFaltantes.push('aulaHora');
+    if (!professorId) camposFaltantes.push('aulaProfessor');
 
-    if (btn) btn.textContent = isExpanded ? '-' : '+'
-
-    if (isExpanded) {
-        document.dispatchEvent(new CustomEvent('admin:aula:fetch'))
+    if (camposFaltantes.length > 0) {
+        console.error('Campos obrigatórios para salvar aula estão faltando:', camposFaltantes);
+        showMessage('Preencha todos os campos obrigatórios (Estúdio, Sala, Dia, Hora, Professor).', 'error')
+        return
     }
+
+    const payload = {
+        id,
+        estudio: estudioId,
+        sala: salaId,
+        diaSemana,
+        horaInicio,
+        modalidade,
+        professor: professorId,
+        ativo
+    }
+
+    document.dispatchEvent(new CustomEvent('admin:aula:save', { detail: payload }))
+    showMessage('Solicitado salvar aula.', 'info', 3000)
+    clearForm()
 }
 
-// Inicialização: Injeta o botão e esconde a tabela/botões
-const table = document.getElementById('tableAulas')
-if (table) {
-    // Inicia escondido
-    toggleIds.forEach(id => {
+function clearForm() {
+    const ids = ['aulaId', 'aulaEstudio', 'aulaSala', 'aulaDia', 'aulaHora', 'aulaModalidade', 'aulaProfessor']
+    ids.forEach(id => {
         const el = document.getElementById(id)
-        if (el) el.style.display = 'none'
-        const label = document.querySelector(`label[for="${id}"]`)
-        if (label) label.style.display = 'none'
+        if (el) el.value = ''
     })
+    const ativoEl = document.getElementById('aulaAtivo')
+    if (ativoEl) ativoEl.checked = true
+    
+    updateAulasSalasOptions('')
+}
 
-    // Tenta encontrar o cabeçalho anterior (H1-H6) para adicionar o botão
-    let header = table.previousElementSibling
-    for (let i = 0; i < 3; i++) {
-        if (header && /^H[1-6]$/.test(header.tagName)) break
-        if (header) header = header.previousElementSibling
-    }
-    const target = header || table.previousElementSibling
+function toggleAulasPanel() {
+  const content = document.getElementById('aulasContent');
+  const btn = document.getElementById('toggleAulasBtn');
+  if (!content) return;
 
-    if (target) {
-        const btn = document.createElement('button')
-        btn.id = 'toggleAulasBtn'
-        btn.textContent = '+'
-        btn.style.marginLeft = '10px'
-        btn.style.cursor = 'pointer'
-        btn.addEventListener('click', toggleAulasPanel)
-        target.appendChild(btn)
-    }
+  isExpanded = !isExpanded;
+  content.style.display = isExpanded ? 'block' : 'none';
 
+  if (btn) btn.textContent = isExpanded ? '-' : '+';
+
+  if (isExpanded) {
+    document.dispatchEvent(new CustomEvent('admin:aula:fetch'));
+  }
+}
+
+// Inicialização
+const aulasTable = document.getElementById('tableAulas');
+if (aulasTable) {
     // Garante que Sala e Professor sejam selects (substitui input se necessário)
     ['aulaSala', 'aulaProfessor'].forEach(id => {
         const el = document.getElementById(id)
@@ -184,6 +240,7 @@ if (table) {
             const sel = document.createElement('select')
             sel.id = id
             sel.className = el.className
+            sel.style.display = el.style.display
             el.replaceWith(sel)
         }
     })
@@ -193,4 +250,16 @@ if (table) {
     if (selEstudio) {
         selEstudio.addEventListener('change', () => updateAulasSalasOptions(selEstudio.value))
     }
+
+    const btnSalvar = document.getElementById('salvarAulaBtn')
+    if (btnSalvar) btnSalvar.addEventListener('click', salvarAula)
+    
+    const btnCancelar = document.getElementById('cancelarAulaBtn')
+    if (btnCancelar) btnCancelar.addEventListener('click', clearForm)
+
+    const btnLimpar = document.getElementById('limparCamposBtn')
+    if (btnLimpar) btnLimpar.addEventListener('click', clearForm)
+
+    const toggleBtn = document.getElementById('toggleAulasBtn');
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleAulasPanel);
 }

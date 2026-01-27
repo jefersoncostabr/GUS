@@ -175,3 +175,45 @@ DELETE /solicitantes/solicitantes/:id
     - Descrição: Remove um registro de solicitante.
     - Retorno: Mensagem de sucesso.
 ================================================================================
+
+
+================================================================================
+LISTA DE ENDPOINTS - ADMINISTRAÇÃO
+================================================================================
+
+GET /admin/estudios
+    - Descrição: Retorna lista de estúdios cadastrados.
+    - Retorno: Array JSON.
+
+POST /admin/estudios
+    - Descrição: Cria um novo estúdio.
+
+PUT /admin/estudios/:id
+    - Descrição: Atualiza um estúdio existente.
+
+DELETE /admin/estudios/:id
+    - Descrição: Remove um estúdio.
+
+GET /admin/salas
+    - Descrição: Retorna lista de salas cadastradas.
+    - Retorno: Array JSON.
+
+POST /admin/salas
+    - Descrição: Cria uma nova sala.
+
+PUT /admin/salas/:id
+    - Descrição: Atualiza uma sala existente.
+
+DELETE /admin/salas/:id
+    - Descrição: Remove uma sala.
+
+GET /admin/aulas
+    - Descrição: Retorna lista de aulas regulares.
+    - Retorno: Array JSON.
+
+POST /admin/aulas
+    - Descrição: Cria uma nova aula regular.
+
+DELETE /admin/aulas/:id
+    - Descrição: Remove uma aula regular.
+================================================================================

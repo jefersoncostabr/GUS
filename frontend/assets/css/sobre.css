@@ -2,9 +2,20 @@
    ESTILOS DA PÁGINA SOBRE
    ================================================================ */
 
+:root {
+    --bg-body: #f4f4f4;
+    /* --bg-container: #ffffff; */
+    --bg-container: bisque;
+    /* --text-primary: #333333; */
+    --text-primary: rgb(155, 90, 11);
+    --text-secondary: rgb(155, 90, 11);
+    --border-color: rgb(155, 90, 11);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f4;
+    background-color: var(--bg-body);
     margin: 0;
     padding: 0;
 }
@@ -14,21 +25,21 @@ body {
     max-width: 900px; /* Limita a largura no desktop para leitura confortável */
     margin: 40px auto; /* Centraliza horizontalmente e dá margem no topo */
     padding: 30px;
-    background-color: white;
+    background-color: var(--bg-container);
     border-radius: 8px; /* Bordas arredondadas */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    box-shadow: 0 2px 10px var(--shadow-color); /* Sombra suave */
 }
 
 .containerSobre h1 {
-    color: #333;
-    border-bottom: 2px solid #000; /* Linha preta combinando com o menu */
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color); /* Linha preta combinando com o menu */
     padding-bottom: 10px;
     margin-bottom: 20px;
 }
 
 .containerSobre p {
     line-height: 1.6; /* Melhora a leitura do texto */
-    color: #555;
+    color: var(--text-secondary);
     margin-bottom: 15px;
     font-size: 1.1rem;
 }

@@ -48,7 +48,19 @@ router.get('/rotas-disponiveis', (req, res) => {
         { metodo: 'GET', endpoint: '/admin/motivos', descricao: 'Lista todos os motivos' },
         { metodo: 'POST', endpoint: '/admin/motivos', descricao: 'Cria um novo motivo' },
         { metodo: 'PUT', endpoint: '/admin/motivos/:id', descricao: 'Atualiza um motivo existente' },
-        { metodo: 'DELETE', endpoint: '/admin/motivos/:id', descricao: 'Remove um motivo' }
+        { metodo: 'DELETE', endpoint: '/admin/motivos/:id', descricao: 'Remove um motivo' },
+
+        // Admin - Salas
+        { metodo: 'GET', endpoint: '/admin/salas', descricao: 'Lista todas as salas' },
+        { metodo: 'POST', endpoint: '/admin/salas', descricao: 'Cria uma nova sala' },
+        { metodo: 'PUT', endpoint: '/admin/salas/:id', descricao: 'Atualiza uma sala' },
+        { metodo: 'DELETE', endpoint: '/admin/salas/:id', descricao: 'Remove uma sala' },
+
+        // Admin - Aulas Regulares
+        { metodo: 'GET', endpoint: '/admin/aulas', descricao: 'Lista todas as aulas regulares' },
+        { metodo: 'POST', endpoint: '/admin/aulas', descricao: 'Cria uma nova aula regular' },
+        { metodo: 'PUT', endpoint: '/admin/aulas/:id', descricao: 'Atualiza uma aula regular' },
+        { metodo: 'DELETE', endpoint: '/admin/aulas/:id', descricao: 'Remove uma aula regular' },
     ];
 
     res.json({

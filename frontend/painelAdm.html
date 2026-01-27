@@ -42,8 +42,8 @@
 
 
                         <div class="botoesForm">
-                            <button type="button" id="salvarEstudioBtn">Salvar</button>
-                            <button type="button" id="cancelarEstudioBtn">Cancelar</button>
+                            <button type="button" class="btnSmall" id="salvarEstudioBtn">Salvar</button>
+                            <button type="button" class="btnSmall" id="cancelarEstudioBtn">Cancelar</button>
                         </div>
                     </form>
                     <div id="tableEstudios"></div>
@@ -52,30 +52,35 @@
 
 
             <div id="salasPanel" class="adminPanel">
-                <h3>Salas</h3>
-                <form id="formSala">
-                    <div id="salasListContainer" style="margin-top:10px;"></div>
-                    <div style="margin-top:8px;"><button type="button" id="addSalaBtn" class="btnSmall">+ Sala</button></div>
-                    <div class="botoesForm">
-                        <button type="button" id="salvarSalaBtn">Salvar</button>
-                        <button type="button" id="cancelarSalaBtn">Cancelar</button>
-                    </div>
-                </form>
-                <div id="tableSalas"></div>
+                <h3>Salas <button type="button" id="toggleSalasBtn" class="btnSmall" style="margin-left: 10px;">+</button></h3>
+                <div id="salasContent" style="display: none;">
+                    <form id="formSala">
+                        <div id="salasListContainer" style="margin-top:10px;"></div>
+                        <div style="margin-top:8px;"><button type="button" id="addSalaBtn" class="btnSmall">+ Sala</button></div>
+                        <div class="botoesForm">
+                            <button type="button" id="salvarSalaBtn" class="btnSmall">Salvar</button>
+                            <button type="button" id="cancelarSalaBtn" class="btnSmall">Cancelar</button>
+                        </div>
+                    </form>
+                    <div id="tableSalas"></div>
+                </div>
             </div>
 
 
             <div id="usuariosPanel" class="adminPanel">
-                <h3>Usuários</h3>
-                <div id="tableUsuarios"></div>
-                <div style="margin-top:8px;"><button type="button" id="addUsuarioBtn" class="btnSmall">+ Usuário</button></div>
+                <h3>Usuários <button type="button" id="toggleUsuariosBtn" class="btnSmall" style="margin-left: 10px;">+</button></h3>
+                <div id="usuariosContent" style="display: none;">
+                    <div id="tableUsuarios"></div>
+                    <div style="margin-top:8px;"><button type="button" id="addUsuarioBtn" class="btnSmall">+ Usuário</button></div>
+                </div>
             </div>
 
             <div id="aulasRegularesPanel" class="adminPanel">
-                <h3>Aulas Regulares</h3>
-                <form id="formAula">
-                    <input type="hidden" id="aulaId">
-                    <div class="formularioContainer">
+                <h3>Aulas Regulares <button type="button" id="toggleAulasBtn" class="btnSmall" style="margin-left: 10px;">+</button></h3>
+                <div id="aulasContent" style="display: none;">
+                    <form id="formAula">
+                        <input type="hidden" id="aulaId">
+                        <div class="formularioContainer">
                         <div>
                             <label for="aulaEstudio">Estúdio:</label>
                             <select id="aulaEstudio" class="inputTexto">
@@ -112,14 +117,15 @@
                             <input type="text" id="aulaProfessor" class="inputTexto">
                         </div>
                     </div>
-
-                    <div class="botoesForm">
-                        <button type="button" id="salvarAulaBtn">Salvar</button>
-                        <button type="button" id="cancelarAulaBtn">Cancelar</button>
-                        <button type="button" id="excluirAulaBtn" class="btnExcluir">Excluir</button>
-                    </div>
-                </form>
-                <div id="tableAulas"></div>
+    
+                        <div class="botoesForm">
+                            <button type="button" id="salvarAulaBtn" class="btnSmall">Salvar</button>
+                            <button type="button" id="cancelarAulaBtn" class="btnSmall">Cancelar</button>
+                            <button type="button" id="limparCamposBtn" class="btnLimpar btnSmall">Limpar</button>
+                        </div>
+                    </form>
+                    <div id="tableAulas"></div>
+                </div>
             </div>
         </section>
 

@@ -168,6 +168,21 @@ async function handleSalaDelete(e) {
   } catch (err) { }
 }
 
+async function handleAulaSave(e) {
+  const payload = e.detail || {};
+  const { id } = payload;
+  try {
+    if (id) {
+      await safeFetchJson(`${baseUrl}/admin/aulas/${id}`, { method: 'PUT', body: payload });
+      showMessage('Aula atualizada.', 'success');
+    } else {
+      await safeFetchJson(`${baseUrl}/admin/aulas`, { method: 'POST', body: payload });
+      showMessage('Aula criada.', 'success');
+    }
+    await loadAulas();
+  } catch (err) { }
+}
+
 async function handleAulaDelete(e) {
   const { id } = e.detail || {};
   if (!id) { showMessage('ID ausente para exclusão de aula.', 'error'); return; }
@@ -192,6 +207,7 @@ export function initAdminDataLayer() {
   document.addEventListener('admin:sala:fetch', loadSalas);
   document.addEventListener('admin:aula:fetch', loadAulas);
   document.addEventListener('admin:aula:delete', handleAulaDelete);
+  document.addEventListener('admin:aula:save', handleAulaSave);
 
   // start session check and data load
   checkSessionAndInit();

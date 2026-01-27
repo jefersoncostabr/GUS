@@ -69,7 +69,8 @@
     font-size: 14px;
     cursor: pointer;
 }
-.actionButtons .delUser {
+
+.delElemento {
     background: #ffdddd;
     border: 1px solid #ff9999;
 }
