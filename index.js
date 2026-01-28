@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import router from './routes/routes.js';
@@ -8,6 +9,7 @@ import routesAuth from "./routes/routesAuth.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import sistemaRoutes from "./routes/sistemaRoutes.js";
 import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
+import estudio from './src/models/estudioModel.js';
 
 dotenv.config();
 
@@ -22,6 +24,10 @@ conexao.once("open", () => {
 })
 
 const app = express();
+
+// Habilita o CORS para todas as origens. Em produção, você pode querer restringir isso.
+app.use(cors());
+
 app.use(express.json());
 
 app.use(session({
@@ -37,6 +43,18 @@ app.use(session({
 
 // Configuração para servir arquivos estáticos (CSS, JS, Imagens)
 app.use(express.static('frontend'));
+
+// Rota para buscar a lista de estúdios
+app.get('/estudios', async (req, res) => {
+    try {
+        // Busca todos os documentos, retornando apenas o campo 'nome' e o '_id'
+        const estudios = await estudio.find({}, 'nome');
+        res.status(200).json(estudios);
+    } catch (error) {
+        console.error("Erro ao buscar estúdios no banco de dados:", error);
+        res.status(500).json({ error: "Erro interno do servidor." });
+    }
+});
 
 app.use(routesAuth);
 app.use('/admin', adminRoutes); // Todas as rotas de admin começarão com /admin (ex: /admin/estudios)

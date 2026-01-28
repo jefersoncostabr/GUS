@@ -27,13 +27,15 @@ export function renderUsersUI(data = []) {
         return
     }
     const html = [
-        `<table class="painelTabela"><thead><tr><th>Nome</th><th>Role</th><th>Ações</th></tr></thead><tbody>`,
+        `<table class="painelTabela"><thead><tr><th>Nome</th><th>Email</th><th>Role</th><th>Ações</th></tr></thead><tbody>`,
     ]
     data.forEach(u => {
         const nomeEsc = (u.nome || u.solicitante || '').replace(/"/g, '&quot;')
+        const emailEsc = (u.email || '').replace(/"/g, '&quot;')
         html.push(`
             <tr data-id="${u._id}">
                 <td><input class="userNome" type="text" value="${nomeEsc}"></td>
+                <td><input class="userEmail" type="email" value="${emailEsc}"></td>
                 <td>
                     <select class="roleSelect">
                         <option value="user">user</option>
@@ -44,7 +46,7 @@ export function renderUsersUI(data = []) {
                     <div class="actionButtons">
                         <button class="saveUser">Salvar</button>
                         <button class="cancelUser">Cancelar</button>
-                        <button class="delElemento">Excluir</button>
+                        <button class="delElemento delUser">Excluir</button>
                     </div>
                 </td>
             </tr>`
@@ -61,16 +63,18 @@ export function renderUsersUI(data = []) {
 
         // store originals for cancel behavior
         tr.dataset.originalNome = u ? u.nome || '' : ''
+        tr.dataset.originalEmail = u ? u.email || '' : ''
         tr.dataset.originalRole = u ? u.role || 'user' : 'user'
 
         const saveBtn = tr.querySelector('.saveUser')
         if (saveBtn)
             saveBtn.addEventListener('click', () => {
                 const nomeVal = (tr.querySelector('.userNome') || {}).value || ''
+                const emailVal = (tr.querySelector('.userEmail') || {}).value || ''
                 const roleVal = (tr.querySelector('.roleSelect') || {}).value || 'user'
                 document.dispatchEvent(
                     new CustomEvent('admin:user:update', {
-                        detail: { id, nome: nomeVal, role: roleVal },
+                        detail: { id, solicitante: nomeVal, nome: nomeVal, email: emailVal, role: roleVal },
                     })
                 )
                 showMessage('Solicitada atualização de usuário.', 'info', 3000)
@@ -80,8 +84,10 @@ export function renderUsersUI(data = []) {
         if (cancelBtn)
             cancelBtn.addEventListener('click', () => {
                 const nomeEl = tr.querySelector('.userNome')
+                const emailEl = tr.querySelector('.userEmail')
                 const roleEl = tr.querySelector('.roleSelect')
                 if (nomeEl) nomeEl.value = tr.dataset.originalNome || ''
+                if (emailEl) emailEl.value = tr.dataset.originalEmail || ''
                 if (roleEl) roleEl.value = tr.dataset.originalRole || 'user'
                 showMessage('Alterações revertidas.', 'info', 2000)
             })
@@ -147,6 +153,12 @@ if (addUserBtn)
         inputNome.placeholder = 'Nome'
         inputNome.style.width = '240px'
 
+        const inputEmail = document.createElement('input')
+        inputEmail.type = 'email'
+        inputEmail.className = 'userEmail'
+        inputEmail.placeholder = 'Email'
+        inputEmail.style.width = '200px'
+
         const inputSenha = document.createElement('input')
         inputSenha.type = 'password'
         inputSenha.className = 'userSenha'
@@ -176,6 +188,7 @@ if (addUserBtn)
         saveBtn.textContent = 'Salvar'
         saveBtn.addEventListener('click', () => {
             const nomeVal = inputNome.value || ''
+            const emailVal = inputEmail.value || ''
             const senhaVal = inputSenha.value || ''
             const estudioVal = selectEstudio.value || ''
             const roleVal = selectRole.value || 'user'
@@ -185,7 +198,7 @@ if (addUserBtn)
             }
             document.dispatchEvent(
                 new CustomEvent('admin:user:create', {
-                    detail: { nome: nomeVal, senha: senhaVal, role: roleVal, estudio: estudioVal },
+                    detail: { solicitante: nomeVal, nome: nomeVal, email: emailVal, senha: senhaVal, role: roleVal, estudio: estudioVal },
                 })
             )
             showMessage('Solicitada criação de usuário.', 'info', 3000)
@@ -198,6 +211,7 @@ if (addUserBtn)
         cancelBtn.addEventListener('click', () => container.remove())
 
         container.appendChild(inputNome)
+        container.appendChild(inputEmail)
         container.appendChild(inputSenha)
         container.appendChild(selectEstudio)
         container.appendChild(selectRole)

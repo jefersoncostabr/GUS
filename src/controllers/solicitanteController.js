@@ -80,6 +80,12 @@ export const atualizarSolicitante = async (req, res) => {
         const { id } = req.params;
         const updates = { ...req.body };
 
+        // Garante que se o frontend enviar 'nome', ele seja tratado como 'solicitante'
+        if (updates.nome && !updates.solicitante) {
+            updates.solicitante = updates.nome;
+            delete updates.nome;
+        }
+
         // Proteção: Apenas admin pode alterar o campo 'role'
         if (updates.role && req.session.user?.role !== 'admin') {
             delete updates.role;

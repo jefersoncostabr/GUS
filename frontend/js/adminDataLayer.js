@@ -87,20 +87,20 @@ async function checkSessionAndInit() {
 
 // Handlers for events
 async function handleUserCreate(e) {
-  const { nome, role, senha, estudio } = e.detail || {};
+  const { nome, email, role, senha, estudio } = e.detail || {};
   if (!nome || !senha || !estudio) { showMessage('Nome, Senha e Estúdio são obrigatórios.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes`, { method: 'POST', body: { solicitante: nome, senha, role, estudio } });
+    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes`, { method: 'POST', body: { solicitante: nome, email, senha, role, estudio } });
     showMessage('Usuário criado.', 'success');
     await loadUsers();
   } catch (err) { /* already handled */ }
 }
 
 async function handleUserUpdate(e) {
-  const { id, nome, role } = e.detail || {};
+  const { id, nome, email, role } = e.detail || {};
   if (!id) { showMessage('ID ausente para atualização.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes/${id}`, { method: 'PUT', body: { solicitante: nome, role } });
+    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes/${id}`, { method: 'PUT', body: { solicitante: nome, email, role } });
     showMessage('Usuário atualizado.', 'success');
     await loadUsers();
   } catch (err) { }

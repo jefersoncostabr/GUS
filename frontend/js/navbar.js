@@ -78,6 +78,9 @@ import { resetarNavbar } from "./resetarNavbar.js";
 
     // 4. Lógica de Usuário Logado (Copiada e adaptada do seu original)
     async function verificarUsuarioLogado() {
+        // Evita conflito com o logout automático na página de login, prevenindo erro no servidor
+        if (window.location.pathname.includes('login.html')) return;
+
         try {
             const response = await fetch(`${baseUrl}/usuario-logado`);
             const data = await response.json();

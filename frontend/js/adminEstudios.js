@@ -40,7 +40,7 @@ export function renderEstudiosUI(data = []) {
                     <td>${filiaisHtml}</td>
                     <td>
 						<button class="editEstudio btnSmall">Editar</button>
-						<button class="delElemento btnSmall">Excluir</button>
+						<button class="delEstudio btnSmall">Excluir</button>
 					</td>
                 </tr>`
             )
@@ -199,18 +199,28 @@ function createFilialItem(unidade = '', endereco = '', salas = '') {
     inputSalas.value = salas
     inputSalas.style.width = '110px'
 
-    // action buttons: Apagar
+    // action buttons: Limpar / Salvar
     const actions = document.createElement('div')
     actions.className = 'actionButtons'
 
-    const delBtn = document.createElement('button')
-    delBtn.type = 'button'
-    delBtn.className = 'delEstudio btnSmall'
-    delBtn.textContent = 'Apagar'
-    delBtn.addEventListener('click', () => wrapper.remove())
+    const limparBtn = document.createElement('button')
+    limparBtn.type = 'button'
+    limparBtn.className = 'btnSmall'
+    limparBtn.textContent = 'Limpar'
+    limparBtn.addEventListener('click', () => {
+        inputUnidade.value = ''
+        inputEndereco.value = ''
+        inputSalas.value = ''
+    })
 
-    actions.appendChild(delBtn)
+    const salvarBtn = document.createElement('button')
+    salvarBtn.type = 'button'
+    salvarBtn.className = 'btnSmall'
+    salvarBtn.textContent = 'Salvar'
+    salvarBtn.addEventListener('click', salvarEstudio)
 
+    actions.appendChild(limparBtn)
+    actions.appendChild(salvarBtn)
     wrapper.appendChild(inputUnidade)
     wrapper.appendChild(inputEndereco)
     wrapper.appendChild(inputSalas)
@@ -220,14 +230,17 @@ function createFilialItem(unidade = '', endereco = '', salas = '') {
 
 /**
  * Adiciona um novo item de filial ao container de filiais do formulário.
+ * A função foi alterada para limpar o formulário e preparar para um novo estúdio,
+ * adicionando apenas uma linha de filial.
  * @returns {void}
  */
 function addFilial() {
     const container = document.getElementById('estudioFiliaisContainer')
     if (!container) return
-    const item = createFilialItem()
+    // Limpa o formulário para um novo cadastro de estúdio.
+    clearForm()
+    const item = createFilialItem('', '', '')
     container.appendChild(item)
-    // focus the unidade input for quick entry (mimics +Sala behavior)
     const nome = item.querySelector('.estudioFilialName')
     if (nome) nome.focus()
 }

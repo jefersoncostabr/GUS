@@ -13,6 +13,7 @@ const solicitanteSchema = new mongoose.Schema({
     id: { type: mongoose.Schema.Types.ObjectId },
     solicitante: { type: String, required: true },
     estudio: { type: mongoose.Schema.Types.ObjectId, ref: 'Estudio', required: true },
+    email: { type: String },
     senha: { type: String, required: true },
     role: { type: String, required: false }
 }, { versionKey: false });

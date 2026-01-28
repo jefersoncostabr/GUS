@@ -42,7 +42,8 @@
 }
 
 /* Inputs and selects inside admin tables */
-.painelTabela input.userNome {
+.painelTabela input.userNome,
+.painelTabela input.userEmail {
     width: 100%;
     box-sizing: border-box;
     padding: 6px;

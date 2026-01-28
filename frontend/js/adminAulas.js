@@ -35,7 +35,7 @@ export function renderAulasUI(data = []) {
       <td>${a.horaInicio || ''}</td>
       <td>${a.modalidade || ''}</td>
       <td>${a.professorNome || a.professor || ''}</td>    
-      <td><button class="delElemento btnSmall">Excluir</button></td>
+      <td><button class="delElemento delAula btnSmall">Excluir</button></td>
     </tr>`)
     })
     html.push('</tbody></table>')

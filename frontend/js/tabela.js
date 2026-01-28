@@ -72,12 +72,7 @@ function preencherInputs(dados) {
 
     // Tratamento para Hora (formato HH:MM)
     if (elHora) {
-        // Se o input for numérico, pega apenas a hora (antes dos dois pontos)
-        if (elHora.type === 'number' && dados.hora && dados.hora.toString().includes(':')) {
-            elHora.value = dados.hora.split(':')[0];
-        } else {
-            elHora.value = dados.hora || '';
-        }
+        elHora.value = dados.hora || '';
     }
 
     // Tratamento para Motivo (Select ou Input)
