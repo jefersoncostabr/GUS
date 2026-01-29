@@ -122,6 +122,21 @@
                     <div id="tableAulas"></div>
                 </div>
             </div>
+
+            <!-- Relatórios -->
+            <div id="relatoriosPanel" class="adminPanel">
+                <h3>Relatórios <button type="button" id="toggleRelatoriosBtn" class="btnSmall" style="margin-left: 10px;">+</button></h3>
+                <div id="relatoriosContent" style="display: none;">
+                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                        <button type="button" id="btnRelatorioSemana" class="btnSmall">Agendamentos da Semana</button>
+                        <button type="button" id="btnRelatorioMes" class="btnSmall">Agendamentos do Mês</button>
+                        <button type="button" id="btnRelatorioUsosProf" class="btnSmall">Usos por professor</button>
+                        <button type="button" id="btnRelatorioAulas" class="btnSmall">Aulas regulares</button>
+                        <button type="button" id="btnRelatorioProfs" class="btnSmall">Professores</button>
+                    </div>
+                    <div id="relatoriosSaida" style="margin-top: 15px;"></div>
+                </div>
+            </div>
         </section>
 
         <div class="containerPainel" id="containerTabela">
@@ -134,5 +149,6 @@
     <script type="module" src="./js/adminSalas.js"></script>
     <script type="module" src="./js/adminUsers.js"></script>
     <script type="module" src="./js/adminDataLayer.js"></script>
+    <script type="module" src="./js/adminRelatorios.js"></script>
 </body>
 </html>

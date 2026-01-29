@@ -33,8 +33,23 @@ export async function fetchJson(url, options = {}) {
   const opts = Object.assign({ headers: { 'Content-Type': 'application/json' } }, options);
   if (opts.body && typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
   const res = await fetch(url, opts);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch (e) { return text; }
+  const text = await res.text(); // Lê o corpo da resposta como texto.
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    data = text; // Se não for JSON, o 'data' é o próprio texto (ex: HTML de erro)
+  }
+
+  if (!res.ok) {
+    // Se a resposta não for 2xx, lança um erro.
+    // A mensagem de erro será o JSON de erro do backend (se houver) ou uma mensagem de status.
+    const errorMessage = (data && data.error) ? data.error : `Erro HTTP: ${res.status}`;
+    throw new Error(errorMessage);
+  }
+
+  return data;
 }
 
 /**

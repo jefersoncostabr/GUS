@@ -16,8 +16,9 @@ async function safeFetchJson(url, options) {
     const res = await fetchJson(url, options);
     return res;
   } catch (err) {
-    console.error('adminDataLayer fetch error:', err);
-    showMessage('Erro de rede. Veja o console.', 'error', 5000);
+    // A mensagem de erro agora é mais útil, vinda do `throw` em `fetchJson`
+    console.error('Erro na camada de dados:', err.message);
+    showMessage(err.message, 'error', 5000);
     throw err;
   }
 }
@@ -193,6 +194,27 @@ async function handleAulaDelete(e) {
   } catch (err) { }
 }
 
+async function handleRelatorioSemana(e) {
+  const button = e.detail?.button;
+  if (button) button.textContent = 'Gerando...';
+
+  try {
+    // Esta rota precisa ser criada no backend
+    const data = await safeFetchJson(`${baseUrl}/admin/relatorios/semana`);
+    if (data && data.length > 0) {
+      console.log('Agendamentos da semana atual:', data);
+      showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+    } else {
+      console.log('Nenhum agendamento encontrado para a semana atual.');
+      showMessage('Nenhum agendamento encontrado para a semana atual.', 'info');
+    }
+  } catch (err) {
+    // safeFetchJson já mostra a mensagem de erro de rede
+  } finally {
+    if (button) { button.disabled = false; button.textContent = 'Agendamentos da Semana'; }
+  }
+}
+
 export function initAdminDataLayer() {
   // attach listeners
   document.addEventListener('admin:user:create', handleUserCreate);
@@ -208,6 +230,7 @@ export function initAdminDataLayer() {
   document.addEventListener('admin:aula:fetch', loadAulas);
   document.addEventListener('admin:aula:delete', handleAulaDelete);
   document.addEventListener('admin:aula:save', handleAulaSave);
+  document.addEventListener('admin:relatorio:semana', handleRelatorioSemana);
 
   // start session check and data load
   checkSessionAndInit();
