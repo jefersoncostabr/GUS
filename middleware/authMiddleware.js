@@ -3,6 +3,10 @@ import usoModelo from "../src/models/utilizacaomodel.js";
 // Verifica se o usuário está autenticado (sessão ativa)
 export function authMiddleware(req, res, next) {
     if (!req.session.user) {
+        // Se a requisição espera JSON ou é uma rota de API específica, retorna 401
+        if ((req.headers.accept && req.headers.accept.includes('application/json')) || req.originalUrl.includes('/rotas-disponiveis')) {
+            return res.status(401).json({ error: 'Usuário não autenticado. Faça login primeiro.' });
+        }
         return res.redirect('/login.html');
     }
     next();

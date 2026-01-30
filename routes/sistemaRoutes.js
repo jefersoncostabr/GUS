@@ -1,8 +1,9 @@
 import express from 'express';
+import { authMiddleware, verificaRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/rotas-disponiveis', (req, res) => {
+router.get('/rotas-disponiveis', authMiddleware, verificaRole, (req, res) => {
     // Detecta o protocolo (http ou https) e o host automaticamente
     // 'x-forwarded-proto' é importante para proxies como o do Render
     // Nota: Em alguns casos, o header pode vir como lista (ex: 'https, http'), pegamos o primeiro.
@@ -61,6 +62,15 @@ router.get('/rotas-disponiveis', (req, res) => {
         { metodo: 'POST', endpoint: '/admin/aulas', descricao: 'Cria uma nova aula regular' },
         { metodo: 'PUT', endpoint: '/admin/aulas/:id', descricao: 'Atualiza uma aula regular' },
         { metodo: 'DELETE', endpoint: '/admin/aulas/:id', descricao: 'Remove uma aula regular' },
+
+        // Admin - Manutenção (Limpeza de Banco de Dados)
+        { metodo: 'DELETE', endpoint: '/admin/limpar/solicitantes', descricao: 'Remove todos os solicitantes' },
+        { metodo: 'DELETE', endpoint: '/admin/limpar/usos', descricao: 'Remove todos os usos' },
+        { metodo: 'DELETE', endpoint: '/admin/limpar/estudios', descricao: 'Remove todos os estúdios' },
+        { metodo: 'DELETE', endpoint: '/admin/limpar/motivos', descricao: 'Remove todos os motivos' },
+        { metodo: 'DELETE', endpoint: '/admin/limpar/salas', descricao: 'Remove todas as salas' },
+        { metodo: 'DELETE', endpoint: '/admin/limpar/aulas', descricao: 'Remove todas as aulas regulares' },
+        { metodo: 'DELETE', endpoint: '/admin/limpar/tudo', descricao: 'LIMPA TODO O BANCO DE DADOS' },
     ];
 
     res.json({

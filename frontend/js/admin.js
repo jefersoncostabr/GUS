@@ -1,5 +1,6 @@
 // admin.js - shared helpers for admin UI
 
+
 /**
  * Base URL da API utilizada pelas funcionalidades administrativas.
  * Seleciona o host remoto quando estiver em onrender, caso contrário usa localhost:3000.

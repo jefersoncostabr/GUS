@@ -1,5 +1,6 @@
 import express from "express";
 import AdminController from "../src/controllers/adminController.js";
+import MaintenanceController from "../src/controllers/maintenanceController.js";
 // import { verificaRole } from "../middleware/authMiddleware.js"; // Descomente e ajuste o caminho se necessário
 
 const router = express.Router();
@@ -26,6 +27,15 @@ router.get("/salas", AdminController.listarSalas);
 router.post("/salas", AdminController.criarSala);
 router.put("/salas/:id", AdminController.atualizarSala);
 router.delete("/salas/:id", AdminController.deletarSala);
+
+// Rotas de Manutenção (Limpeza de Banco de Dados)
+router.delete("/limpar/solicitantes", MaintenanceController.limparSolicitantes);
+router.delete("/limpar/usos", MaintenanceController.limparUsos);
+router.delete("/limpar/estudios", MaintenanceController.limparEstudios);
+router.delete("/limpar/motivos", MaintenanceController.limparMotivos);
+router.delete("/limpar/salas", MaintenanceController.limparSalas);
+router.delete("/limpar/aulas", MaintenanceController.limparAulas);
+router.delete("/limpar/tudo", MaintenanceController.limparTudo);
 
 export default router;
 

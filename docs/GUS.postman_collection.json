@@ -1,0 +1,1053 @@
+{
+  "info": {
+    "_postman_id": "6f696ffa-2c0a-4de7-82c9-8a6b8b076a04",
+    "name": "GUS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31897178"
+  },
+  "item": [
+    {
+      "name": "Sistema",
+      "item": [
+        {
+          "name": "Rotas Disponíveis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/rotas-disponiveis",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "rotas-disponiveis"
+              ]
+            },
+            "description": "Exibe este mapa de rotas"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"solicitante\": \"admin\",\n    \"password\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Login de usuário"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/logout",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "logout"
+              ]
+            },
+            "description": "Encerra a sessão"
+          },
+          "response": []
+        },
+        {
+          "name": "Verifica sessão ativa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usuario-logado",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usuario-logado"
+              ]
+            },
+            "description": "Verifica sessão ativa"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usos (Agendamentos)",
+      "item": [
+        {
+          "name": "Teste inicial de usos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos"
+              ]
+            },
+            "description": "Rota de teste inicial de usos"
+          },
+          "response": []
+        },
+        {
+          "name": "Lista usos (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usos/usos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "usos"
+              ]
+            },
+            "description": "Lista usos (paginado)"
+          },
+          "response": []
+        },
+        {
+          "name": "Detalhes de um uso específico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usos/usos/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "usos",
+                ":id"
+              ]
+            },
+            "description": "Detalhes de um uso específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastra novo uso",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sala\": \"Sala 1\",\n    \"dia\": \"01/01/2024\",\n    \"hora\": \"10:00\",\n    \"solicitante\": \"ID_DO_SOLICITANTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/usos/usos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "usos"
+              ]
+            },
+            "description": "Cadastra novo uso"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualiza um uso existente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/usos/usos/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "usos",
+                ":id"
+              ]
+            },
+            "description": "Atualiza um uso existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove um uso",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usos/usos/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "usos",
+                ":id"
+              ]
+            },
+            "description": "Remove um uso"
+          },
+          "response": []
+        },
+        {
+          "name": "Busca ID de uso por filtros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usos/buscaid",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "buscaid"
+              ]
+            },
+            "description": "Busca ID de uso por filtros"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Solicitantes",
+      "item": [
+        {
+          "name": "Teste inicial de solicitantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/solicitantes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes"
+              ]
+            },
+            "description": "Rota de teste inicial de solicitantes"
+          },
+          "response": []
+        },
+        {
+          "name": "Lista todos os solicitantes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/solicitantes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "solicitantes"
+              ]
+            },
+            "description": "Lista todos os solicitantes"
+          },
+          "response": []
+        },
+        {
+          "name": "Busca solicitante por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/solicitantes/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "solicitantes",
+                ":id"
+              ]
+            },
+            "description": "Busca solicitante por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Busca ID de solicitante por filtros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/buscaidsolicitante",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "buscaidsolicitante"
+              ]
+            },
+            "description": "Busca ID de solicitante por filtros"
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastra solicitante",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"solicitante\": \"Novo Usuario\",\n    \"password\": \"senha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/solicitantes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "solicitantes"
+              ]
+            },
+            "description": "Cadastra solicitante"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualiza solicitante existente",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/solicitantes/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "solicitantes",
+                ":id"
+              ]
+            },
+            "description": "Atualiza solicitante existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove solicitante",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/solicitantes/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "solicitantes",
+                ":id"
+              ]
+            },
+            "description": "Remove solicitante"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Estúdios",
+          "item": [
+            {
+              "name": "Lista todos os estúdios",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/estudios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "estudios"
+                  ]
+                },
+                "description": "Lista todos os estúdios"
+              },
+              "response": []
+            },
+            {
+              "name": "Cria um novo estúdio",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nome\": \"Estúdio A\",\n    \"localizacao\": \"Térreo\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/estudios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "estudios"
+                  ]
+                },
+                "description": "Cria um novo estúdio"
+              },
+              "response": []
+            },
+            {
+              "name": "Atualiza um estúdio",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/estudios/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "estudios",
+                    ":id"
+                  ]
+                },
+                "description": "Atualiza um estúdio"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove um estúdio",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/estudios/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "estudios",
+                    ":id"
+                  ]
+                },
+                "description": "Remove um estúdio"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Motivos",
+          "item": [
+            {
+              "name": "Lista todos os motivos",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/motivos",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "motivos"
+                  ]
+                },
+                "description": "Lista todos os motivos"
+              },
+              "response": []
+            },
+            {
+              "name": "Cria um novo motivo",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"motivo\": \"Ensaio\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/motivos",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "motivos"
+                  ]
+                },
+                "description": "Cria um novo motivo"
+              },
+              "response": []
+            },
+            {
+              "name": "Atualiza um motivo existente",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/motivos/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "motivos",
+                    ":id"
+                  ]
+                },
+                "description": "Atualiza um motivo existente"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove um motivo",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/motivos/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "motivos",
+                    ":id"
+                  ]
+                },
+                "description": "Remove um motivo"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Salas",
+          "item": [
+            {
+              "name": "Lista todas as salas",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/salas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "salas"
+                  ]
+                },
+                "description": "Lista todas as salas"
+              },
+              "response": []
+            },
+            {
+              "name": "Cria uma nova sala",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/salas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "salas"
+                  ]
+                },
+                "description": "Cria uma nova sala"
+              },
+              "response": []
+            },
+            {
+              "name": "Atualiza uma sala",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/salas/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "salas",
+                    ":id"
+                  ]
+                },
+                "description": "Atualiza uma sala"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove uma sala",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/salas/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "salas",
+                    ":id"
+                  ]
+                },
+                "description": "Remove uma sala"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Aulas Regulares",
+          "item": [
+            {
+              "name": "Lista todas as aulas regulares",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/aulas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "aulas"
+                  ]
+                },
+                "description": "Lista todas as aulas regulares"
+              },
+              "response": []
+            },
+            {
+              "name": "Cria uma nova aula regular",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/aulas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "aulas"
+                  ]
+                },
+                "description": "Cria uma nova aula regular"
+              },
+              "response": []
+            },
+            {
+              "name": "Atualiza uma aula regular",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/admin/aulas/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "aulas",
+                    ":id"
+                  ]
+                },
+                "description": "Atualiza uma aula regular"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove uma aula regular",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/aulas/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "aulas",
+                    ":id"
+                  ]
+                },
+                "description": "Remove uma aula regular"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Manutenção (Limpeza de Banco de Dados)",
+          "item": [
+            {
+              "name": "Remove todos os solicitantes",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/solicitantes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "solicitantes"
+                  ]
+                },
+                "description": "Remove todos os solicitantes"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove todos os usos",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/usos",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "usos"
+                  ]
+                },
+                "description": "Remove todos os usos"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove todos os estúdios",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/estudios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "estudios"
+                  ]
+                },
+                "description": "Remove todos os estúdios"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove todos os motivos",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/motivos",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "motivos"
+                  ]
+                },
+                "description": "Remove todos os motivos"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove todas as salas",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/salas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "salas"
+                  ]
+                },
+                "description": "Remove todas as salas"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove todas as aulas regulares",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/aulas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "aulas"
+                  ]
+                },
+                "description": "Remove todas as aulas regulares"
+              },
+              "response": []
+            },
+            {
+              "name": "LIMPA TODO O BANCO DE DADOS",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/limpar/tudo",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "limpar",
+                    "tudo"
+                  ]
+                },
+                "description": "LIMPA TODO O BANCO DE DADOS"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
