@@ -28,15 +28,16 @@ export function renderAulasUI(data = []) {
             if (s) salaShow = s.nome || `Sala ${s.numero}`;
             else salaShow = sId;
         }
-        html.push(`<tr data-id="${a._id}">
-      <td>${a.estudioNome || a.estudio || ''}</td>
-      <td>${salaShow}</td>
-      <td>${a.diaSemana || ''}</td>
-      <td>${a.horaInicio || ''}</td>
-      <td>${a.modalidade || ''}</td>
-      <td>${a.professorNome || a.professor || ''}</td>    
-      <td><button class="delElemento delAula btnSmall">Excluir</button></td>
-    </tr>`)
+        html.push(
+            `<tr data-id="${a._id}">
+                <td>${a.estudioNome || a.estudio || ''}</td>
+                <td>${salaShow}</td>
+                <td>${a.diaSemana || ''}</td>
+                <td>${a.horaInicio || ''}</td>
+                <td>${a.modalidade || ''}</td>
+                <td>${a.professorNome || a.professor || ''}</td>    
+            <td><button class="delElemento delAula btnSmall">Excluir</button></td>
+            </tr>`)
     })
     html.push('</tbody></table>')
     table.innerHTML = html.join('\n')
@@ -244,6 +245,12 @@ if (aulasTable) {
             el.replaceWith(sel)
         }
     })
+
+    // Aumenta o tamanho do campo de hora
+    const elHora = document.getElementById('aulaHora')
+    if (elHora) {
+        elHora.style.width = '80px'
+    }
 
     // Listener para atualizar salas quando o estúdio muda
     const selEstudio = document.getElementById('aulaEstudio')

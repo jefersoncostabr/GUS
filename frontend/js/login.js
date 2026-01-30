@@ -1,10 +1,10 @@
 import { resetarNavbar } from "./resetarNavbar.js";
+import { API_BASE_URL } from "./config.js";
 
 // Ao carregar a página de login, fazemos uma requisição para garantir que a sessão seja encerrada no servidor
 (async function logoutAutomatico() {
     try {
-        const baseUrl = getBaseUrl();
-        await fetch(`${baseUrl}/logout`, { method: 'POST' });
+        await fetch(`${API_BASE_URL}/logout`, { method: 'POST' });
         console.log('Sessão encerrada.');
 
         resetarNavbar();
@@ -12,16 +12,6 @@ import { resetarNavbar } from "./resetarNavbar.js";
         console.error('Erro ao tentar fazer logout:', error);
     }
 })();
-
-/**
- * Determina a URL base da API verificando o hostname atual.
- * @returns {string} A URL base para as requisições (localhost ou produção).
- */
-function getBaseUrl() {
-    return window.location.hostname.includes("onrender.com")
-        ? "https://gus-q7nn.onrender.com"
-        : `http://${window.location.hostname}:3000`;
-}
 
 /**
  * Gerencia o envio do formulário de login.
@@ -43,8 +33,7 @@ async function handleLogin(event) {
     painelSaida.textContent = '';
 
     try {
-        const baseUrl = getBaseUrl();
-        const response = await fetch(`${baseUrl}/login`, {
+        const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

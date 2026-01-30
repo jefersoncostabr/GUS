@@ -1,16 +1,7 @@
 import { verFetch } from "./ver.js";
 import { limparImputs } from "./limparImputs.js";
 import { tratarDados, OPCOES_MOTIVO } from "./tratamentoDeDados.js";
-
-/**
- * Determina a URL base da API verificando o hostname atual.
- * @returns {string} A URL base para as requisições (localhost ou produção).
- */
-function getBaseUrl() {
-    return window.location.hostname.includes("onrender.com")
-        ? "https://gus-q7nn.onrender.com"
-        : `http://${window.location.hostname}:3000`;
-}
+import { API_BASE_URL } from "./config.js";
 
 /**
  * Coleta os dados do formulário e envia uma requisição POST para criar um novo uso.
@@ -36,8 +27,7 @@ async function adicionarUso() {
     }
 
     try {
-        const baseUrl = getBaseUrl();
-        const response = await fetch(`${baseUrl}/usos/usos`, {       
+        const response = await fetch(`${API_BASE_URL}/usos/usos`, {       
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

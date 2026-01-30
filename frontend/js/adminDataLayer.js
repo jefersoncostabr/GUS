@@ -3,6 +3,7 @@ import { setUsersData } from './adminUsers.js';
 import { setEstudiosData, setEstudiosOptions } from './adminEstudios.js';
 import { setSalasData } from './adminSalas.js';
 import { setAulasData, setAulasEstudiosOptions, setAulasProfessoresOptions, setAulasSalasCache } from './adminAulas.js';
+import { setRelatorioProfessoresOptions, showExportButtons } from './adminRelatorios.js';
 
 /**
  * adminDataLayer.js
@@ -30,6 +31,7 @@ async function loadUsers() {
     if (Array.isArray(data)) {
       setUsersData(data);
       setAulasProfessoresOptions(data);
+      setRelatorioProfessoresOptions(data);
     }
   } catch (e) { console.warn('Falha ao carregar usuários', e); }
 }
@@ -204,6 +206,8 @@ async function handleRelatorioSemana(e) {
     if (data && data.length > 0) {
       console.log('Agendamentos da semana atual:', data);
       showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+      // Exibe os botões de exportação ao lado do botão que foi clicado
+      showExportButtons(data, 'btnRelatorioSemana');
     } else {
       console.log('Nenhum agendamento encontrado para a semana atual.');
       showMessage('Nenhum agendamento encontrado para a semana atual.', 'info');
@@ -212,6 +216,92 @@ async function handleRelatorioSemana(e) {
     // safeFetchJson já mostra a mensagem de erro de rede
   } finally {
     if (button) { button.disabled = false; button.textContent = 'Agendamentos da Semana'; }
+  }
+}
+
+async function handleRelatorioMes(e) {
+  const button = e.detail?.button;
+  if (button) button.textContent = 'Gerando...';
+
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/relatorios/mes`);
+    if (data && data.length > 0) {
+      console.log('Agendamentos do mês atual:', data);
+      showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+      showExportButtons(data, 'btnRelatorioMes');
+    } else {
+      console.log('Nenhum agendamento encontrado para o mês atual.');
+      showMessage('Nenhum agendamento encontrado para o mês atual.', 'info');
+    }
+  } catch (err) {
+    // safeFetchJson já mostra a mensagem de erro de rede
+  } finally {
+    if (button) { button.disabled = false; button.textContent = 'Agendamentos do Mês'; }
+  }
+}
+
+async function handleRelatorioProfessor(e) {
+  const { button, id } = e.detail || {};
+  if (button) button.textContent = 'Buscando...';
+
+  try {
+    if (!id) throw new Error("ID do professor não fornecido.");
+    
+    const data = await safeFetchJson(`${baseUrl}/admin/relatorios/professor/${id}`);
+    if (data && data.length > 0) {
+      console.log(`Agendamentos do professor (ID: ${id}):`, data);
+      showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+      showExportButtons(data, 'btnIrRelatorioProf');
+    } else {
+      console.log('Nenhum agendamento encontrado para este professor.');
+      showMessage('Nenhum agendamento encontrado para este professor.', 'info');
+    }
+  } catch (err) {
+    // safeFetchJson já lida com erros de rede
+  } finally {
+    if (button) { button.disabled = false; button.textContent = 'Ir'; }
+  }
+}
+
+async function handleRelatorioAulas(e) {
+  const button = e.detail?.button;
+  if (button) button.textContent = 'Gerando...';
+
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/relatorios/aulas`);
+    if (data && data.length > 0) {
+      console.log('Relatório de Aulas Regulares:', data);
+      showMessage(`Relatório gerado. ${data.length} aulas encontradas no console.`, 'success');
+      showExportButtons(data, 'btnRelatorioAulas');
+    } else {
+      console.log('Nenhuma aula regular encontrada.');
+      showMessage('Nenhuma aula regular encontrada.', 'info');
+    }
+  } catch (err) {
+    // safeFetchJson já lida com erros de rede
+  } finally {
+    if (button) { button.disabled = false; button.textContent = 'Aulas regulares'; }
+  }
+}
+
+async function handleRelatorioProfessores(e) {
+  const button = e.detail?.button;
+  if (button) button.textContent = 'Gerando...';
+
+  try {
+    const data = await safeFetchJson(`${baseUrl}/admin/relatorios/professores`);
+    if (data && data.length > 0) {
+      console.log('Relatório de Professores:', data);
+      showMessage(`Relatório gerado. ${data.length} professores encontrados no console.`, 'success');
+      showExportButtons(data, 'btnRelatorioProfs');
+    } else {
+      console.log('Nenhum professor encontrado.');
+      showMessage('Nenhum professor encontrado.', 'info');
+    }
+  } catch (err) {
+    // safeFetchJson já lida com erros de rede
+  } finally {
+    if (button) { button.disabled = false; button.textContent = 'Professores'; }
   }
 }
 
@@ -231,6 +321,10 @@ export function initAdminDataLayer() {
   document.addEventListener('admin:aula:delete', handleAulaDelete);
   document.addEventListener('admin:aula:save', handleAulaSave);
   document.addEventListener('admin:relatorio:semana', handleRelatorioSemana);
+  document.addEventListener('admin:relatorio:mes', handleRelatorioMes);
+  document.addEventListener('admin:relatorio:professor', handleRelatorioProfessor);
+  document.addEventListener('admin:relatorio:aulas', handleRelatorioAulas);
+  document.addEventListener('admin:relatorio:professores', handleRelatorioProfessores);
 
   // start session check and data load
   checkSessionAndInit();
