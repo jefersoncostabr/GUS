@@ -31,8 +31,16 @@ app.use(cors());
 
 app.use(express.json());
 
+// Define o segredo da sessão
+const sessionSecret = process.env.SESSION_SECRET || 'segredo-padrao-dev-gus';
+
+// Alerta de segurança se estiver usando o segredo padrão
+if (!process.env.SESSION_SECRET) {
+    console.warn('\n⚠️  AVISO DE SEGURANÇA: SESSION_SECRET não detectado. Usando segredo padrão (INSEGURO para produção).\n');
+}
+
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'segredo-padrao-dev-gus', // Fallback para evitar crash se a variável faltar
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
