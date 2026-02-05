@@ -32,7 +32,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'segredo-padrao-dev-gus', // Fallback para evitar crash se a variável faltar
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
