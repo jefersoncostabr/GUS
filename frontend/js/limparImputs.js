@@ -4,10 +4,13 @@
  * Útil para preparar o formulário para uma nova entrada ou limpar filtros de pesquisa.
  */
 export function limparImputs() {
-    const inputs = ['solicitante', 'sala', 'dia', 'hora', 'motivo', 'id'];
+    // IDs dos campos a serem limpos. 'dia' foi substituído por 'date'.
+    const inputs = ['solicitante', 'sala', 'date', 'hora', 'motivo', 'id'];
 
     inputs.forEach(inputId => {
-        document.getElementById(inputId).value = '';
+        const element = document.getElementById(inputId);
+        // Verifica se o elemento existe antes de tentar limpar seu valor
+        if (element) element.value = '';
     });
 }
 

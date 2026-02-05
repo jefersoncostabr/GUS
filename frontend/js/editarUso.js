@@ -25,7 +25,7 @@ async function alterarUso(id) {
         const dadosBrutos = {
             solicitante: document.getElementById('solicitante').value,
             sala: document.getElementById('sala').value,
-            dia: document.getElementById('dia').value,
+            dia: document.getElementById('date').value,
             hora: document.getElementById('hora').value,
             motivo: document.getElementById('motivo').value
         };

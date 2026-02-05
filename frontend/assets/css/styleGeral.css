@@ -81,6 +81,12 @@ button {
     box-shadow: 0 4px 6px var(--shadow-color);
 }
 
+.btnSmall {
+    padding: 4px 8px;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
 #id {
     font-size: 10px;
     color: var(--text-primary);
@@ -91,7 +97,8 @@ button {
 }
 
 .inputNumerico,
-.inputTexto {
+.inputTexto,
+.input {
     font-size: 15px;
     border-radius: 5px;
     border-style: none;
@@ -105,6 +112,21 @@ button {
 
 .inputTexto {
     width: 120px;
+}
+
+#hora {
+    width: 65px;
+    text-align: center;       
+}
+
+/* Remove o ícone de relógio nativo do navegador */
+#hora::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+/* Remove o ícone de calendário do input de data */
+#date::-webkit-calendar-picker-indicator {
+    display: none;
 }
 
 #id {

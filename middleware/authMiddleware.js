@@ -1,14 +1,39 @@
 import usoModelo from "../src/models/utilizacaomodel.js";
 
-// Verifica se o usuário está autenticado (sessão ativa)
+/**
+ * Middleware de Autenticação (authMiddleware)(Session-Based Authentication)
+ * -----------------------------------------------------------------------------
+ * Este middleware protege as rotas, garantindo que apenas usuários logados
+ * tenham acesso.
+ *
+ * Explicação passo a passo para estudo:
+ * 1. Verifica se existe uma sessão ativa (`req.session.user`).
+ * 2. Se NÃO existir (usuário não logado):
+ *    a. Verifica se a requisição espera JSON (API) ou é uma rota específica.
+ *       - Se sim: Retorna erro 401 (Unauthorized) em JSON.
+ *       - Isso evita que o frontend tente ler HTML de login como JSON.
+ *    b. Se não (navegador comum): Redireciona para a página de login.
+ * 3. Se existir (usuário logado):
+ *    - Chama `next()` para permitir que a requisição continue para a rota.
+ */
 export function authMiddleware(req, res, next) {
+    // 1. Verificação da Sessão: Se req.session.user for undefined/null, não está logado.
     if (!req.session.user) {
-        // Se a requisição espera JSON ou é uma rota de API específica, retorna 401
+        
+        // 2. Tratamento para APIs e Requisições JSON
+        // Verifica se o header 'Accept' pede JSON ou se a URL contém '/rotas-disponiveis'
         if ((req.headers.accept && req.headers.accept.includes('application/json')) || req.originalUrl.includes('/rotas-disponiveis')) {
+            // Retorna status 401 (Não Autorizado) com mensagem JSON
             return res.status(401).json({ error: 'Usuário não autenticado. Faça login primeiro.' });
         }
+
+        // 3. Tratamento para Navegação Comum (Navegador)
+        // Redireciona o usuário para a tela de login
         return res.redirect('/login.html');
     }
+
+    // 4. Permissão de Acesso (Usuário Logado)
+    // Passa o controle para a próxima função ou rota definida
     next();
 }
 

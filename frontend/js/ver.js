@@ -28,7 +28,7 @@ export async function verFetch() {
         const rawValues = {
             solicitante: document.getElementById('solicitante').value,
             sala: document.getElementById('sala').value,
-            dia: document.getElementById('dia').value,
+        dia: document.getElementById('date').value,
             hora: document.getElementById('hora').value,
             motivo: document.getElementById('motivo').value,
         };
@@ -40,7 +40,7 @@ export async function verFetch() {
         const filters = {};
         if (inputValues.solicitante) filters.solicitante = inputValues.solicitante;
         if (inputValues.sala) filters.sala = parseInt(inputValues.sala);
-        if (inputValues.dia) filters.dia = inputValues.dia; // Envia string formatada (ex: 05/01)
+        if (inputValues.dia) filters.dia = inputValues.dia;
         
         // Formata hora para busca: se 1 ou 2 dígitos (ex: "1", "14"), converte para "01:00", "14:00"
         let horaBusca = rawValues.hora.trim();
@@ -92,7 +92,7 @@ export async function verFetchPage() {
         const rawValues = {
             solicitante: document.getElementById('solicitante').value,
             sala: document.getElementById('sala').value,
-            dia: document.getElementById('dia').value,
+            dia: document.getElementById('date').value,
             hora: document.getElementById('hora').value,
             motivo: document.getElementById('motivo').value,
         };

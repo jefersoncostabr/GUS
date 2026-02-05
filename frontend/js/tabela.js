@@ -44,8 +44,7 @@ function preencherInputs(dados) {
     // Busca elementos pelo ID para garantir o preenchimento correto
     const elSolicitante = document.getElementById('solicitante');
     const elSala = document.getElementById('sala');
-    const elDia = document.getElementById('dia');
-    const elMes = document.getElementById('mes'); // Existe apenas no Painel Geral
+    const elDate = document.getElementById('date');
     const elHora = document.getElementById('hora');
     const elMotivo = document.getElementById('motivo'); // Pode ser Select ou Input
     const elId = document.getElementById('id');
@@ -61,13 +60,17 @@ function preencherInputs(dados) {
     if (elSala) elSala.value = dados.sala || '';
     if (elId) elId.value = dados._id || '';
 
-    // Tratamento para Dia (formato DD/MM)
-    if (dados.dia && dados.dia.toString().includes('/')) {
+    // Tratamento para Dia (formato DD/MM do backend para YYYY-MM-DD do input)
+    if (elDate && dados.dia && dados.dia.includes('/')) {
         const [diaVal, mesVal] = dados.dia.split('/');
-        if (elDia) elDia.value = diaVal;
-        if (elMes) elMes.value = mesVal;
-    } else {
-        if (elDia) elDia.value = dados.dia || '';
+        // Valida se dia e mês são números antes de formatar, evitando erros com dados corrompidos
+        if (!isNaN(diaVal) && !isNaN(mesVal)) {
+            const anoAtual = new Date().getFullYear();
+            // O input type="date" espera o formato YYYY-MM-DD
+            elDate.value = `${anoAtual}-${mesVal.padStart(2, '0')}-${diaVal.padStart(2, '0')}`;
+        }
+    } else if (elDate) {
+        elDate.value = ''; // Limpa o campo se não houver data
     }
 
     // Tratamento para Hora (formato HH:MM)

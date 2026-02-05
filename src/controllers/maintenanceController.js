@@ -1,6 +1,6 @@
 import SolicitanteModelo from "../models/usuariosmodel.js";
 import UsoModelo from "../models/utilizacaomodel.js";
-import EstudioModelo from "../models/estudioModel.js";
+import EstudioModelo from "../models/estudiomodel.js";
 import MotivoModelo from "../models/motivosmodel.js";
 import SalaModelo from "../models/salaModel.js";
 import AulaModelo from "../models/aulaModel.js";

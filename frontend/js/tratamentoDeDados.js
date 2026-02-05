@@ -21,25 +21,36 @@ export function tratarDados(dados) {
     let sala = dados.sala || '';
     sala = sala.replace(/\D/g, '');
 
-    // 3. Dia: 2 dígitos + barra automática + mês corrente
-    let diaRaw = String(dados.dia || '').replace(/\D/g, ''); // Remove não dígitos
+    // 3. Dia: Tratamento para input date (YYYY-MM-DD) ou manual
     let diaFinal = '';
     
-    if (diaRaw.length > 0) {
-        // Pega os dois primeiros dígitos
-        let diaNum = parseInt(diaRaw.substring(0, 2));
+    if (dados.dia && dados.dia.includes('-')) {
+        // Formato YYYY-MM-DD (Input Date)
+        const parts = dados.dia.split('-');
+        if (parts.length === 3) {
+            const [ano, mes, dia] = parts;
+            diaFinal = `${dia}/${mes}`;
+        }
+    } else {
+        // Lógica antiga: 2 dígitos + barra automática + mês corrente
+        let diaRaw = String(dados.dia || '').replace(/\D/g, ''); // Remove não dígitos
         
-        // Validação básica de dia (1 a 31)
-        if (diaNum > 31) diaNum = 31;
-        if (diaNum < 1) diaNum = 1;
+        if (diaRaw.length > 0) {
+            // Pega os dois primeiros dígitos
+            let diaNum = parseInt(diaRaw.substring(0, 2));
+            
+            // Validação básica de dia (1 a 31)
+            if (diaNum > 31) diaNum = 31;
+            if (diaNum < 1) diaNum = 1;
 
-        const diaFormatado = String(diaNum).padStart(2, '0');
-        
-        // Pega mês corrente
-        const hoje = new Date();
-        const mesCorrente = String(hoje.getMonth() + 1).padStart(2, '0');
-        
-        diaFinal = `${diaFormatado}/${mesCorrente}`;
+            const diaFormatado = String(diaNum).padStart(2, '0');
+            
+            // Pega mês corrente
+            const hoje = new Date();
+            const mesCorrente = String(hoje.getMonth() + 1).padStart(2, '0');
+            
+            diaFinal = `${diaFormatado}/${mesCorrente}`;
+        }
     }
 
     // 4. Hora: 2 ou 4 dígitos, completa com :00, limita 0-23, minutos 00 ou 30

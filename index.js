@@ -10,7 +10,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import sistemaRoutes from "./routes/sistemaRoutes.js";
 import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
 import relatoriosRoutes from "./routes/relatoriosRoutes.js";
-import estudio from './src/models/estudioModel.js';
+import estudio from './src/models/estudiomodel.js';
 
 dotenv.config();
 

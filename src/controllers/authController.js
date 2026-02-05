@@ -28,7 +28,7 @@ async function encontraUmUsuario(nomeSolicitante) {
     }
 }
 
-export const login = async (req, res) => {
+export async function login(req, res) {
     try {
         const { solicitante, password } = req.body;
 
@@ -51,7 +51,7 @@ export const login = async (req, res) => {
         console.error('Erro no login:', err);
         res.status(500).json({ error: 'Erro no servidor' });
     }
-};
+}
 
 export const logout = (req, res) => {
     req.session.destroy(() => {

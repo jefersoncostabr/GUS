@@ -18,7 +18,7 @@
         <!-- <h1>Painel Geral</h1>    -->
         <div class="containerPainel" id="">
             <div class="containerBotoesTopo">
-                <button id="limparImputsBtn">Limpar</button>
+                <button class="btnSmall" id="limparImputsBtn">Limpar</button>
                 <div id="painelSaida" ></div>
             </div>
             <div class="formularioContainer">
@@ -27,27 +27,21 @@
                     <input class="inputTexto" type="text" id="solicitante" autocomplete="off"></label>
                 </div>
                 <div>
-                    <label for="sala">Sala:</label>
-                    <input class="inputNumerico" type="number" id="sala">
+                    <label for="estudio">Estúdio:</label>
+                    <select name="estudio" id="estudio" class="inputTexto selectMotivo"></select>
                 </div>
                 <div>
-                    <label for="dia">Dia:</label>
-                    <input class="inputNumerico" type="number" id="dia">
-                    <input class="inputNumerico" type="number" id="mes">
-                    <input class="inputNumerico inputAno" type="number" id="ano">
-                    <script>
-                        document.getElementById('mes').value = new Date().getMonth() + 1;
-                        document.getElementById('ano').value = new Date().getFullYear();
-                    </script>
+                    <label for="sala">Sala:</label>
+                    <select class="inputNumerico" id="sala"></select>
+                </div>
+                <div>
+                    <label for="date">Dia:</label>
+                    <input type="date" id="date" name="date" class="input" value="">
                 </div>
                 <div>
                     <label for="hora">Hora:</label>
-                    <input class="inputNumerico" type="number" id="hora">
+                    <input class="inputNumerico" type="time" id="hora" placeholder="HH:MM" maxlength="5">
                 </div>
-                <!-- <div>
-                    <label for="motivo">Motivo:</label>
-                    <input class="inputTexto" type="text" id="motivo">			
-                </div> -->
                 <div>
                 <label for="motivo">Motivo:</label>
                     <select class="inputTexto selectMotivo" id="motivo">
@@ -61,10 +55,10 @@
 
             </div>
 			<div class="botoesInfContainer">
-				<button id="getUsosBtn">Ver</button>				
-				<button id="adicionarUsoBtn">Adicionar</button>
-				<button id="alterarReservaBtn">Alterar</button>
-				<button id="excluirUsoBtn">Excluir</button>
+				<button class="btnSmall"  id="getUsosBtn">Ver</button>				
+				<button class="btnSmall" id="adicionarUsoBtn">Adicionar</button>
+				<button class="btnSmall" id="alterarReservaBtn">Alterar</button>
+				<button class="btnSmall" id="excluirUsoBtn">Excluir</button>
 			</div>
 
 			<!-- <p id="painelSaida"></p> -->
@@ -84,5 +78,6 @@
     <script type="module" src="./js/apagarUso.js"></script>
     <script type="module" src="./js/limparImputs.js"></script>
     <script type="module" src="./js/carregarMotivos.js"></script>
+    <script type="module" src="./js/carregarDadosUsuario.js"></script>
 </body>
 </html>
