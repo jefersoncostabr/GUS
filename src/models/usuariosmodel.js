@@ -1,27 +1,43 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
+const solicitanteSchema = new mongoose.Schema(
+    {
+        solicitante: {
+            type: String,
+            required: [true, 'O nome do solicitante é obrigatório.'],
+            unique: true,
+            trim: true
+        },
+            email: {
+            type: String,
+            required: [true, 'Email é obrigatório'],
+            unique: true,
+            lowercase: true,
+            trim: true,
+            match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Por favor, insira um email válido']
+        },
+        senha: {
+            type: String,
+            required: [true, 'A senha é obrigatória.']
+        },
+        role: {
+            type: String,
+            enum: ['user', 'admin'],
+            default: 'user'
+        },
+        // Campo para identificar o banco de dados do tenant associado a este usuário.
+        tenantDbName: {
+            type: String,
+            trim: true
+        }
+    },
+    { versionKey: false }
+);
 
 /**
- * Schema do Mongoose para a entidade Solicitante.
- * 
- * @property {mongoose.Schema.Types.ObjectId} id - Identificador opcional explícito.
- * @property {String} solicitante - Nome do solicitante (Obrigatório).
- * @property {String} estudio - Estúdio associado ao solicitante (Obrigatório).
- * @property {String} senha - Senha de acesso (Obrigatório).
- * @property {String} [role] - Papel ou função do usuário no sistema (Opcional).
+ * Retorna o modelo 'Solicitante' compilado para uma conexão específica.
+ * Este modelo pertence ao banco MASTER.
+ * @param {mongoose.Connection} connection - A instância de conexão do Mongoose (deve ser a do Master DB).
+ * @returns {mongoose.Model} O modelo Solicitante.
  */
-const solicitanteSchema = new mongoose.Schema({
-    id: { type: mongoose.Schema.Types.ObjectId },
-    solicitante: { type: String, required: true },
-    estudio: { type: mongoose.Schema.Types.ObjectId, ref: 'Estudio', required: true },
-    email: { type: String },
-    senha: { type: String, required: true },
-    role: { type: String, required: false }
-}, { versionKey: false });
-
-/**
- * Modelo Mongoose para interação com a coleção 'solicitantes'.
- * @type {mongoose.Model}
- */
-const solicitanteModelo = mongoose.model("solicitantes", solicitanteSchema, "solicitantes");
-
-export default solicitanteModelo;
+export const getSolicitanteModel = (connection) => connection.model('Solicitante', solicitanteSchema);

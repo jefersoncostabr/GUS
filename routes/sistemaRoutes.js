@@ -1,6 +1,11 @@
 import express from 'express';
 import { authMiddleware, verificaRole } from '../middleware/authMiddleware.js';
 
+// notas de middleware:
+// - authMiddleware: exige sessão ativa (aplica tenantMiddleware depois no index)
+// - verificaRole: só admins podem acessar /rotas-disponiveis
+
+
 const router = express.Router();
 
 router.get('/rotas-disponiveis', authMiddleware, verificaRole, (req, res) => {

@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+/**
+ * ESTE ARQUIVO FOI DEPRECIADO.
+ * A lógica foi consolidada em 'utilizacaomodel.js' para evitar duplicidade.
+ * Mantido apenas para compatibilidade de importação.
+ */
+import { getUtilizacaoModel } from "./utilizacaomodel.js";
 
-const usoSchema = new mongoose.Schema({
-    id: { type: mongoose.Schema.Types.ObjectId },
-    solicitante: { type: mongoose.Schema.Types.ObjectId, ref: 'solicitantes', required: true },
-    sala: { type: Number, required: true },
-    dia: { type: String, required: true },
-    hora: { type: String, required: true },
-    modalidade: { type: String },
-    professor: { type: String }
-}, { versionKey: false });
+/**
+ * Proxy para o modelo consolidado.
+ * @param {mongoose.Connection} connection - A instância de conexão do Mongoose para um tenant.
+ */
+export const getUsoRegularModel = (connection) => getUtilizacaoModel(connection);
 
-const UsoRegularModelo = mongoose.model("AulaRegular", usoSchema);
-
-export default UsoRegularModelo;
+// Compatibilidade: export default para imports que esperam default
+export default getUsoRegularModel;

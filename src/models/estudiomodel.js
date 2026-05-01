@@ -1,18 +1,39 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const esquemaComum = {
-    nome: { type: String, required: true },
-    endereco: { type: String },
-    salas: { type: Number, default: 1 }
+const estudioSchema = new mongoose.Schema(
+    {
+        nome: {
+            type: String,
+            required: [true, 'O nome do estúdio é obrigatório.'],
+            trim: true,
+            unique: true, // Impede a criação de estúdios com o mesmo nome
+            maxlength: [100, 'O nome do estúdio não pode exceder 100 caracteres.']
+        },
+        localizacao: {
+            type: String,
+            trim: true,
+            maxlength: [200, 'A localização não pode exceder 200 caracteres.']
+        },
+        ativo: {
+            type: Boolean,
+            default: true
+        }
+    },
+    { 
+        versionKey: false,
+        timestamps: true // Adiciona createdAt e updatedAt automaticamente
+    }
+);
+
+/**
+ * Retorna o modelo 'Estudio' compilado para uma conexão específica.
+ * Este modelo pertence ao banco MASTER.
+ * @param {mongoose.Connection} connection - A instância de conexão do Mongoose (deve ser a do Master DB).
+ * @returns {mongoose.Model} O modelo Estudio.
+ */
+export const getEstudioModel = (connection) => {
+    return connection.model('Estudio', estudioSchema);
 };
 
-const filialSchema = new mongoose.Schema(esquemaComum);
-
-const estudioSchema = new mongoose.Schema({
-    ...esquemaComum,
-    filiais: [filialSchema]
-}, { versionKey: false });
-
-const EstudioModelo = mongoose.model("Estudio", estudioSchema);
-
-export default EstudioModelo;
+// Compatibilidade: export default para imports que esperam default
+export default getEstudioModel;

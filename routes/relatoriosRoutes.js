@@ -2,6 +2,10 @@ import { Router } from 'express';
 import { getAgendamentosSemana, getAgendamentosMes, getUsosPorProfessor, getAulasRegulares, getTodosProfessores } from '../src/controllers/relatoriosController.js';
 import { verificaRole } from '../middleware/authMiddleware.js';
 
+// notas de middleware:
+// - todas as rotas desse arquivo exigem authMiddleware + tenantMiddleware,
+//   além de role 'admin' via verificaRole
+
 const router = Router();
 
 // Rota para o relatório de agendamentos da semana

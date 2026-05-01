@@ -17,59 +17,6 @@ function getBaseUrl() {
 }
 
 /**
- * Fetches the list of studios from the backend and populates the select dropdown.
- */
-async function carregarEstudios() {
-    const selectEstudio = document.getElementById('estudio');
-    const baseUrl = getBaseUrl();
-
-    // Adiciona feedback visual e desabilita enquanto carrega
-    selectEstudio.innerHTML = '<option value="" disabled selected>Carregando...</option>';
-    selectEstudio.disabled = true;
-
-    try {
-        // Assuming a GET /estudios endpoint exists to fetch all studios
-        const url = `${baseUrl}/estudios`;
-        // console.log(`Buscando estúdios em: ${url}`);
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const estudios = await response.json();
-
-        // Clear the placeholder option
-        selectEstudio.innerHTML = '';
-        selectEstudio.disabled = false;
-
-        if (estudios && estudios.length > 0) {
-            // Add a default, disabled option
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = 'Selecione o estúdio';
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            selectEstudio.appendChild(defaultOption);
-
-            // Populate with studios from the API
-            // Assuming the studio object has a 'nome' property which is unique.
-            estudios.forEach(estudio => {
-                const option = document.createElement('option');
-                option.value = estudio._id; // Envia o ID (esperado pelo banco) em vez do nome
-                option.textContent = estudio.nome;
-                selectEstudio.appendChild(option);
-            });
-        } else {
-            selectEstudio.innerHTML = '<option value="">Nenhum estúdio disponível</option>';
-        }
-
-    } catch (error) {
-        console.error('Erro ao carregar estúdios:', error);
-        selectEstudio.innerHTML = '<option value="">Erro ao carregar estúdios</option>';
-        selectEstudio.disabled = true;
-    }
-}
-
-/**
  * Handles the submission of the account creation form.
  * @param {Event} event The form submission event.
  */
@@ -83,11 +30,17 @@ async function handleCriarConta(event) {
     const msgDiv = document.getElementById('msg');
     const btnSubmit = form.querySelector('button.btnLogin');
 
+    // Validação: Verifica se o nome do estúdio foi preenchido.
     if (!data.estudio) {
-        msgDiv.textContent = 'Por favor, selecione um estúdio.';
+        msgDiv.textContent = 'Por favor, selecione ou crie um estúdio.';
+        msgDiv.style.color = 'red';
         return;
     }
 
+    // SEGURANÇA: Não enviar o role. O backend determinará automaticamente baseado na existência do estúdio
+    // Se for novo estúdio: role = 'admin'
+    // Se for estúdio existente: role = 'user'
+    
     const originalButtonText = btnSubmit.textContent;
     btnSubmit.textContent = 'Criando...';
     btnSubmit.disabled = true;
@@ -105,11 +58,12 @@ async function handleCriarConta(event) {
 
         if (response.ok) {
             msgDiv.style.color = 'green';
-            msgDiv.textContent = 'Conta criada com sucesso! Você será redirecionado para o login.';
+            const role = result.role || 'user';
+            msgDiv.textContent = `Conta criada com sucesso! Você é ${role === 'admin' ? 'Administrador' : 'Usuário'} do estúdio. Redirecionando para login...`;
             setTimeout(() => { window.location.href = './login.html'; }, 2500);
         } else {
             msgDiv.style.color = 'red';
-            console.error('Detalhes do erro 400:', result); // Mostra no console o motivo exato da recusa
+            console.error('Detalhes do erro:', result);
             msgDiv.textContent = result.error || 'Ocorreu um erro ao criar a conta.';
         }
     } catch (error) {
@@ -123,8 +77,6 @@ async function handleCriarConta(event) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    carregarEstudios();
-
     const criarForm = document.getElementById('criarForm');
     if (criarForm) {
         criarForm.addEventListener('submit', handleCriarConta);

@@ -1,0 +1,10 @@
+
+  Port=3000
+  
+  DB_CONNECTION_STRING="mongodb+srv://jefersonb88:OP8oV4bQ8W00229X@cluster0.io0iuxb.mongodb.net/DancaHub?retryWrites=true&w=majority&"
++ 
++ # Multi-tenant configuration
++ MONGO_URI_MASTER="mongodb+srv://jefersonb88:OP8oV4bQ8W00229X@cluster0.io0iuxb.mongodb.net/gus_master?retryWrites=true&w=majority"
++ MONGO_URI_BASE="mongodb+srv://jefersonb88:OP8oV4bQ8W00229X@cluster0.io0iuxb.mongodb.net"
+  
+  SESSION_SECRET="$2b$10$w.0sItgITFViKhQjNWXpEu3mf4HhYz/EQ4VqPOgSuHU103gomfkfS"

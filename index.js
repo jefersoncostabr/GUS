@@ -3,18 +3,24 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import path from 'path';
+import mongoose from 'mongoose';
 import router from './routes/routes.js';
-import conectaNaDatabase from './src/config/dbConnect.js';
+import { connectToMasterDb } from './src/config/connectionFactory.js';
+import sessionMiddleware from './middleware/sessionMiddleware.js';
+import tenantMiddleware from './middleware/tenantMiddleware.js';
 import routesAuth from "./routes/routesAuth.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import sistemaRoutes from "./routes/sistemaRoutes.js";
 import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
 import relatoriosRoutes from "./routes/relatoriosRoutes.js";
-import estudio from './src/models/estudiomodel.js';
+import { getEstudioModel } from './src/models/estudiomodel.js';
 
 dotenv.config();
 
-const conexao = await conectaNaDatabase();
+// Conecta ao banco de dados Master (necessário para autenticação e gerenciar tenants)
+await connectToMasterDb();
+const conexao = mongoose.connection;
 
 conexao.on("error", (erro) => {
     console.error("erro de conexão com o DB", erro);
@@ -31,7 +37,9 @@ app.use(cors());
 
 app.use(express.json());
 
-// Define o segredo da sessão
+// 1. Servir arquivos estáticos ANTES dos middlewares de autenticação/tenant
+// Usamos path.join para garantir que o caminho funcione independente de onde o terminal foi aberto
+app.use(express.static(path.join(process.cwd(), 'frontend')));
 const sessionSecret = process.env.SESSION_SECRET || 'segredo-padrao-dev-gus';
 
 // Alerta de segurança se estiver usando o segredo padrão
@@ -44,20 +52,35 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        client: conexao.getClient(), // Reaproveita a conexão já aberta do Mongoose
-        collectionName: 'sessions_gus'   // Nome da coleção onde as sessões serão salvas
+        client: conexao.getClient(), // Reaproveita a conexão já aberta do Mongoose (Banco Master)
+        collectionName: 'sessions_gus',  // Nome da coleção onde as sessões serão salvas (no banco Master)
+        touchAfter: 24 * 3600 // Evita escrever no DB em toda requisição se não houver mudança
     }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 dia
+    cookie: { 
+        maxAge: 1000 * 60 * 60 * 24, // 1 dia
+        httpOnly: true, // Proteção: não permite acesso via JavaScript
+        secure: process.env.NODE_ENV === 'production', // HTTPS only em produção
+        sameSite: 'lax' // Proteção contra CSRF
+    }
 }));
 
-// Configuração para servir arquivos estáticos (CSS, JS, Imagens)
-app.use(express.static('frontend'));
+/**
+ * Middleware de Validação de Sessão (Multi-Tenant)
+ * Valida integridade dos dados de sessão e enriquece req.session
+ * com informações necessárias para roteamento por tenant.
+ */
+app.use(sessionMiddleware);
+
+app.use(routesAuth);
+
+
 
 // Rota para buscar a lista de estúdios
 app.get('/estudios', async (req, res) => {
     try {
-        // Busca todos os documentos, retornando apenas o campo 'nome' e o '_id'
-        const estudios = await estudio.find({}, 'nome');
+        // Obtém o modelo do Estudio do banco Master
+        const Estudio = getEstudioModel(conexao);
+        const estudios = await Estudio.find({}, 'nome');
         res.status(200).json(estudios);
     } catch (error) {
         console.error("Erro ao buscar estúdios no banco de dados:", error);
@@ -65,7 +88,8 @@ app.get('/estudios', async (req, res) => {
     }
 });
 
-app.use(routesAuth);
+// Middleware de Tenant - deve vir APÓS autenticação, para as rotas que precisam
+app.use(tenantMiddleware);
 app.use('/admin', adminRoutes); // Todas as rotas de admin começarão com /admin (ex: /admin/estudios)
 app.use('/admin/relatorios', relatoriosRoutes); // Rotas específicas para relatórios
 app.use('/admin/aulas', aulaRegularRoutes); // Rotas específicas para aulas regulares

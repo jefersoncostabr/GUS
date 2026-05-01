@@ -9,6 +9,15 @@ const aulaSchema = new mongoose.Schema({
     professor: { type: mongoose.Schema.Types.ObjectId, ref: 'solicitantes' }
 }, { versionKey: false });
 
-const AulaModelo = mongoose.model("AulaRegular", aulaSchema);
+/**
+ * Retorna o modelo 'Aula' compilado para uma conexão de tenant específica.
+ * @param {mongoose.Connection} connection - A instância de conexão do Mongoose para um tenant.
+ * @returns {mongoose.Model} O modelo Aula.
+ */
+export const getAulaModel = (connection) => {
+    return connection.model('AulaRegular', aulaSchema);
+};
 
-export default AulaModelo;
+// Compatibilidade: export default para imports que esperam default
+// Nota: Para usar, deve-se passar uma conexão específica
+export default getAulaModel;

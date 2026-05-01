@@ -20,9 +20,7 @@
             <h2>Criar Conta</h2>
             <form id="criarForm">
                 <input type="text" id="username" name="solicitante" placeholder="Usuário" required>
-                <select id="estudio" name="estudio" required>
-                    <option value="" disabled selected>Selecione o estúdio</option>
-                </select>
+                <input type="text" id="estudio" name="estudio" placeholder="Nome do seu Estúdio" readonly required>
                 <input type="email" id="email" name="email" placeholder="E-mail" required>
                 <input type="password" id="password" name="senha" placeholder="Senha" required>
                 <button class="btnLogin" type="submit">Criar</button>
@@ -31,6 +29,24 @@
         </div>
     </div>
     
+    <!-- Modal de Seleção/Criação de Estúdio -->
+    <div id="estudioModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Selecione ou Crie um Estúdio</h3>
+                <button type="button" class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="estudioSearch" class="estudio-search" placeholder="Buscar ou digitar nome do estúdio...">
+                <div class="estudio-list" id="estudioList"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="modalCancelBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="./js/estudioModalManager.js"></script>
     <script type="module" src="./js/loginCriar.js"></script>
 </body>
 </html>

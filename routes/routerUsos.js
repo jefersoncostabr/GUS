@@ -1,5 +1,10 @@
 import express from "express";
-import { verificaRole, authMiddleware, verificaSolicitante, verificaDuplicidade } from "../middleware/authMiddleware.js";
+import { verificaRole, authMiddleware } from "../middleware/authMiddleware.js";
+
+// notas de middleware:
+// - todas as rotas USOS requerem authMiddleware + tenantMiddleware
+// - verificaRole usado apenas para telas administrativas
+
 import { 
     listarUsos, 
     buscarUsoPorId, 
@@ -26,13 +31,13 @@ routerUsos.get("/usos/:id", buscarUsoPorId);
 routerUsos.get('/buscaid', buscarIdUso);
 
 // http://localhost:3000/usos/usos
-routerUsos.post('/usos', verificaDuplicidade, criarUso);
+routerUsos.post('/usos', criarUso);
 
 // http://localhost:3000/usos/usos/:id
-routerUsos.put('/usos/:id', verificaSolicitante, atualizarUso);
+routerUsos.put('/usos/:id', atualizarUso);
 
 // http://localhost:3000/usos/usos/:id
-routerUsos.delete('/usos/:id', verificaSolicitante, deletarUso);
+routerUsos.delete('/usos/:id', deletarUso);
 
 export default routerUsos;
 

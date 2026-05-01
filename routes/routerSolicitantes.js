@@ -1,12 +1,18 @@
 import express from "express";
 import { authMiddleware, verificaPermissaoSolicitante } from "../middleware/authMiddleware.js";
+
+// notas de middleware:
+// - rotas de solicitantes exigem authMiddleware; tenantMiddleware injeta modelo
+// - verificaPermissaoSolicitante protege PUT /solicitantes/:id
+
 import { 
     listarSolicitantes, 
     buscarSolicitantePorId, 
     buscarIdSolicitante, 
     criarSolicitante, 
     atualizarSolicitante, 
-    deletarSolicitante 
+    deletarSolicitante,
+    listarEstudiosSimples
 } from "../src/controllers/solicitanteController.js";
 
 const routerSolicitantes = express.Router();
@@ -15,6 +21,9 @@ const routerSolicitantes = express.Router();
 routerSolicitantes.get("/", (req, res) => {
     res.status(200).send("Rota inicial solicitantes funcionando");
 });
+
+// http://localhost:3000/solicitantes/lista-simples (novo endpoint)
+routerSolicitantes.get("/lista-simples", listarEstudiosSimples);
 
 // http://localhost:3000/solicitantes/solicitantes
 routerSolicitantes.get("/solicitantes", listarSolicitantes);

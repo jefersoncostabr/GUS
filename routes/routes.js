@@ -15,13 +15,6 @@ router.get("/", (req, res) => {// http://localhost:3000
 });
 
 /**
- * Middleware para servir arquivos estáticos da pasta 'frontend'.
- * Permite acesso direto a HTML, CSS e JS do cliente.
- */
-router.use(express.static('frontend'));
-// router.use(authMiddleware, express.static('frontend/painelgeral'));
-
-/**
  * Roteadores Específicos.
  * Redireciona as requisições para os arquivos de rota correspondentes.
  */

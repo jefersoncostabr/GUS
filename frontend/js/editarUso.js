@@ -48,9 +48,9 @@ async function alterarUso(id) {
         console.log(data);
         return true;
     } catch (error) {
-        document.getElementById('painelSaida').innerText = 'Negado';
+        document.getElementById('painelMensagem').innerText = 'Negado';
         setTimeout(() => {
-            document.getElementById('painelSaida').innerText = '';
+            document.getElementById('painelMensagem').innerText = '';
         }, 5000);
         console.error(`Erro ao alterar uso: ${error.message}`);
         return false;

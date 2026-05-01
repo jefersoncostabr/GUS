@@ -9,6 +9,14 @@ const salaSchema = new mongoose.Schema({
 // Índice para evitar duplicidade de número de sala no mesmo estúdio
 salaSchema.index({ estudioId: 1, numero: 1 }, { unique: true });
 
-const SalaModelo = mongoose.model("Sala", salaSchema);
+/**
+ * Retorna o modelo 'Sala' compilado para uma conexão de tenant específica.
+ * @param {mongoose.Connection} connection - A instância de conexão do Mongoose para um tenant.
+ * @returns {mongoose.Model} O modelo Sala.
+ */
+export const getSalaModel = (connection) => {
+    return connection.model('Sala', salaSchema);
+};
 
-export default SalaModelo;
+// Compatibilidade: export default para imports que esperam default
+export default getSalaModel;

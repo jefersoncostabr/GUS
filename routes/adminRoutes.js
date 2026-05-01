@@ -2,6 +2,9 @@ import express from "express";
 import AdminController from "../src/controllers/adminController.js";
 import MaintenanceController from "../src/controllers/maintenanceController.js";
 // import { verificaRole } from "../middleware/authMiddleware.js"; // Descomente e ajuste o caminho se necessário
+// notas de middleware:
+// - todas as rotas abaixo funcionarão sob /admin/* com authMiddleware + tenantMiddleware
+
 
 const router = express.Router();
 

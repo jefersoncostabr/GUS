@@ -1,7 +1,7 @@
-import Router from 'express'
+import express from 'express'
 import { login, logout, verificarSessao } from '../src/controllers/authController.js'
 
-const routesAuth = Router()
+const routesAuth = express.Router()
 
 // Rota de Login: Recebe credenciais, verifica e cria a sessão
 routesAuth.post('/login', login)

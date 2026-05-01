@@ -62,7 +62,7 @@ export async function verFetch() {
 
         if (!result.data || result.data.length === 0) {
             console.log("Uso não encontrado");
-            const painelSaida = document.getElementById('painelSaida');
+            const painelSaida = document.getElementById('painelMensagem');
             if (painelSaida) {
                 painelSaida.innerText = 'Uso não encontrado';
                 setTimeout(() => {

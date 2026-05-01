@@ -1,3 +1,4 @@
+console.log('login.js carregado');
 import { resetarNavbar } from "./resetarNavbar.js";
 import { API_BASE_URL } from "./config.js";
 
@@ -23,7 +24,7 @@ async function handleLogin(event) {
     const form = event.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-    const painelSaida = document.getElementById('painelSaida');
+    const painelSaida = document.getElementById('painelMensagem');
 
     // Feedback visual de carregamento
     const btnSubmit = form.querySelector('button');
@@ -38,6 +39,7 @@ async function handleLogin(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
+        console.log('API_BASE_URL:', API_BASE_URL);
 
         if (response.ok) {
             // Login com sucesso: Redireciona para o Painel Geral

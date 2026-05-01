@@ -29,9 +29,9 @@ async function excluirUso(id) {
     limparImputs();
 
     if (!response.ok) {
-        document.getElementById('painelSaida').innerText = 'Negado';
+        document.getElementById('painelMensagem').innerText = 'Negado';
         setTimeout(() => {
-            document.getElementById('painelSaida').innerText = '';
+            document.getElementById('painelMensagem').innerText = '';
         }, 5000);
         throw new Error(`Erro ao excluir uso: ${response.status}`);
     }

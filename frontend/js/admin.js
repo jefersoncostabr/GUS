@@ -17,7 +17,7 @@ export const baseUrl = window.location.hostname.includes("onrender.com")
  * @param {number} [timeout=5000] - Tempo em ms até remover a mensagem (0 mantém fixa).
  */
 export function showMessage(msg, type = 'info', timeout = 5000) {
-  const el = document.getElementById('painelSaida');
+  const el = document.getElementById('painelMensagem');
   if (!el) return;
   el.textContent = msg;
   el.className = type === 'error' ? 'mensagem erro' : type === 'success' ? 'mensagem sucesso' : 'mensagem';

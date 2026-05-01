@@ -1,6 +1,13 @@
-import usoModelo from "../models/utilizacaomodel.js";
-import AulaModelo from "../models/aulaModel.js";
-import solicitanteModelo from "../models/usuariosmodel.js";
+/**
+ * Controlador de Relatórios
+ * 
+ * Refatorado para injeção de dependência:
+ * - Modelos são injetados via req.tenantModels pelo middleware de tenant
+ * - Suporta multi-tenant com isolamento automático por banco de dados
+ */
+
+import mongoose from 'mongoose';
+import { getSolicitanteModel } from '../models/usuariosmodel.js';
 
 /**
  * Busca e retorna todos os agendamentos (usos) da semana corrente.
@@ -10,6 +17,12 @@ import solicitanteModelo from "../models/usuariosmodel.js";
  */
 export const getAgendamentosSemana = async (req, res) => {
     try {
+        const Uso = req.tenantModels?.Utilizacao;
+
+        if (!Uso) {
+            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        }
+
         const hoje = new Date();
         // Ajusta para o início da semana (considerando domingo como dia 0)
         const primeiroDia = hoje.getDate() - hoje.getDay();
@@ -21,7 +34,7 @@ export const getAgendamentosSemana = async (req, res) => {
             return `${String(diaAtual.getDate()).padStart(2, '0')}/${String(diaAtual.getMonth() + 1).padStart(2, '0')}`;
         });
 
-        const agendamentos = await usoModelo.find({ dia: { $in: diasDaSemanaFormatados } })
+        const agendamentos = await Uso.find({ dia: { $in: diasDaSemanaFormatados } })
             .populate('solicitante', 'solicitante email');
 
         res.status(200).json(agendamentos);
@@ -38,8 +51,16 @@ export const getAgendamentosSemana = async (req, res) => {
  */
 export const getTodosProfessores = async (req, res) => {
     try {
+        // Solicitantes estão no Master DB
+        const Solicitante = getSolicitanteModel(mongoose.connection);
+        
+        const query = {};
+        if (req.session?.user?.tenantDbName) {
+            query.tenantDbName = req.session.user.tenantDbName;
+        }
+
         // Busca todos os usuários, excluindo o campo de senha por segurança
-        const professores = await solicitanteModelo.find({}, '-senha');
+        const professores = await Solicitante.find(query, '-senha');
         res.status(200).json(professores);
     } catch (error) {
         console.error("Erro ao buscar lista de professores:", error);
@@ -54,7 +75,13 @@ export const getTodosProfessores = async (req, res) => {
  */
 export const getAulasRegulares = async (req, res) => {
     try {
-        const aulas = await AulaModelo.find({}).populate('estudio', 'nome').populate('professor', 'solicitante');
+        const Aula = req.tenantModels?.Aula;
+
+        if (!Aula) {
+            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        }
+
+        const aulas = await Aula.find({}).populate('estudio', 'nome').populate('professor', 'solicitante');
         res.status(200).json(aulas);
     } catch (error) {
         console.error("Erro ao buscar aulas regulares:", error);
@@ -69,6 +96,12 @@ export const getAulasRegulares = async (req, res) => {
  */
 export const getAgendamentosMes = async (req, res) => {
     try {
+        const Uso = req.tenantModels?.Utilizacao;
+
+        if (!Uso) {
+            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        }
+
         const hoje = new Date();
         const mesAtual = hoje.getMonth(); // 0 a 11
         const anoAtual = hoje.getFullYear();
@@ -78,7 +111,7 @@ export const getAgendamentosMes = async (req, res) => {
             return `${String(i + 1).padStart(2, '0')}/${String(mesAtual + 1).padStart(2, '0')}`;
         });
 
-        const agendamentos = await usoModelo.find({ dia: { $in: diasDoMesFormatados } })
+        const agendamentos = await Uso.find({ dia: { $in: diasDoMesFormatados } })
             .populate('solicitante', 'solicitante email');
 
         res.status(200).json(agendamentos);
@@ -95,9 +128,15 @@ export const getAgendamentosMes = async (req, res) => {
  */
 export const getUsosPorProfessor = async (req, res) => {
     try {
+        const Uso = req.tenantModels?.Utilizacao;
+
+        if (!Uso) {
+            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        }
+
         const { id } = req.params;
         
-        const agendamentos = await usoModelo.find({ solicitante: id })
+        const agendamentos = await Uso.find({ solicitante: id })
             .populate('solicitante', 'solicitante email');
 
         res.status(200).json(agendamentos);

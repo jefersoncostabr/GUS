@@ -40,9 +40,9 @@ async function adicionarUso() {
 
     // Verifique se a resposta foi bem-sucedida
     if (!response.ok) {
-        document.getElementById('painelSaida').innerText = 'Negado ou Já existe';
+        document.getElementById('painelMensagem').innerText = 'Negado ou Já existe';
         setTimeout(() => {
-            document.getElementById('painelSaida').innerText = '';
+            document.getElementById('painelMensagem').innerText = '';
             }, 5000);
         throw new Error(`Erro na resposta ao adicionar novo uso: ${response.status}`);
     }

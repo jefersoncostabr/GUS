@@ -107,7 +107,7 @@ function salvarSala() {
         return
     }
 
-    const payload = { id: id || null, estudioId, numero, nome }
+    const payload = { id: id || null, estudio: estudioId, numero, nome }
     document.dispatchEvent(new CustomEvent('admin:sala:save', { detail: payload }))
     showMessage('Solicitado salvar sala.', 'info', 3000)
     clearForm()
