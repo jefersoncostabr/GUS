@@ -164,6 +164,17 @@ export const criarSolicitante = async (req, res) => {
             return res.status(400).json({ error: 'O nome do estúdio é obrigatório.' });
         }
 
+        // Validação de "Sanidade" do nome do estúdio
+        const nomesProibidos = ['teste', 'test', 'admin', 'desconhecido', 'asdf', '123456', 'root'];
+        const nomeLimpo = estudioName.trim().toLowerCase();
+
+        if (nomeLimpo.length < 3) {
+            return res.status(400).json({ error: 'O nome do estúdio deve ter pelo menos 3 caracteres.' });
+        }
+        if (nomesProibidos.includes(nomeLimpo) || !/[a-z]/i.test(nomeLimpo)) {
+            return res.status(400).json({ error: 'Por favor, insira um nome de estúdio válido.' });
+        }
+
         const masterConnection = mongoose.connection;
         const EstudioModel = getEstudioModel(masterConnection);
 
@@ -199,7 +210,8 @@ export const criarSolicitante = async (req, res) => {
                 // Criar registro do Estúdio no banco Master
                 const novoEstudio = new EstudioModel({ 
                     nome: estudioName,
-                    tenantDbName: tenantDbName
+                    tenantDbName: tenantDbName,
+                    quantidadeSalas: req.body.quantidadeSalas || 1 // Define 1 por padrão ou o que vier do form
                 });
                 await novoEstudio.save();
                 idDoEstudio = novoEstudio._id;

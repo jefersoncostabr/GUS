@@ -15,6 +15,23 @@ import sistemaRoutes from "./routes/sistemaRoutes.js";
 import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
 import relatoriosRoutes from "./routes/relatoriosRoutes.js";
 import { getEstudioModel } from './src/models/estudiomodel.js';
+import rateLimit from 'express-rate-limit';
+
+/**
+ * Configuração de Rate Limit (Segurança)
+ * Bloqueia spam de criação de contas/estúdios e ataques de força bruta.
+ */
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // Janela de 15 minutos
+    max: 10, // Limita a 10 requisições por IP por janela
+    message: { 
+        error: 'Muitas tentativas detectadas. Por favor, aguarde 15 minutos antes de tentar novamente.' 
+    },
+    standardHeaders: true, // Retorna info de limite nos headers RateLimit-*
+    legacyHeaders: false, // Desabilita headers X-RateLimit-*
+    // Garante que o rate limit seja aplicado apenas a métodos de escrita
+    skipSuccessfulRequests: false 
+});
 
 dotenv.config();
 
@@ -36,6 +53,10 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+// Aplica o limitador especificamente em rotas sensíveis (Login e Criação de Conta)
+app.use('/login', authLimiter);
+app.use('/solicitantes/solicitantes', authLimiter);
 
 // 1. Servir arquivos estáticos ANTES dos middlewares de autenticação/tenant
 // Usamos path.join para garantir que o caminho funcione independente de onde o terminal foi aberto

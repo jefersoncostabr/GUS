@@ -28,13 +28,6 @@ class AdminController {
     }
 
     static async criarEstudio(req, res) {
-        // Bloqueio temporário de criação de novos estúdios/tenants
-        return res.status(403).json({ 
-            error: "Opção não disponível. Contate o desenvolvedor da aplicação." 
-        });
-
-        /*
-        // Código original mantido abaixo para uso do desenvolvedor:
         try {
             const Estudio = getEstudioModel(masterConnection);
             const novoEstudio = await Estudio.create(req.body);
@@ -42,7 +35,6 @@ class AdminController {
         } catch (erro) {
             res.status(500).json({ error: `${erro.message} - falha ao cadastrar estúdio` });
         }
-        */
     }
 
     static async atualizarEstudio(req, res) {

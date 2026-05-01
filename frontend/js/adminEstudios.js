@@ -13,7 +13,7 @@ export function renderEstudiosUI(data = []) {
 
     const html = [
         `<table class="painelTabela">
-    <thead><tr><th>Nome do Estúdio</th><th>Filiais (Salas)</th><th>Ações</th></tr></thead>
+    <thead><tr><th>Nome do Estúdio</th><th>Qtd Salas</th><th>Ações</th></tr></thead>
     <tbody>`,
     ]
     if (!Array.isArray(data) || !data.length) {
@@ -22,22 +22,10 @@ export function renderEstudiosUI(data = []) {
         )
     } else {
         data.forEach(e => {
-            // render filiais list (unidade — endereco) with salas
-            let filiaisHtml = ''
-            if (Array.isArray(e.filiais) && e.filiais.length) {
-                filiaisHtml = e.filiais
-                    .map(
-                        f =>
-                            `${f.nome || f.local || f.unidade || ''}${f.endereco ? ' — ' + f.endereco : ''} (${f.salas || 0})`
-                    )
-                    .join('<br>')
-            } else if (e.localizacao) {
-                filiaisHtml = e.localizacao
-            }
             html.push(`
                 <tr data-id="${e._id}">
                     <td>${e.nome || ''}</td>
-                    <td>${filiaisHtml}</td>
+                    <td>${e.quantidadeSalas || 0}</td>
                     <td>
 						<button class="editEstudio btnSmall">Editar</button>
 						<button class="delEstudio btnSmall">Excluir</button>
@@ -56,6 +44,9 @@ export function renderEstudiosUI(data = []) {
             const item = data.find(x => (x._id || x.id) == id)
             if (!item) return
             document.getElementById('estudioId').value = id
+            const nomeField = document.getElementById('estudioNome')
+            if (nomeField) nomeField.value = item.nome || ''
+
             // Populate filiais (localizações) into inputs
             const container = document.getElementById('estudioFiliaisContainer')
             if (container) {
@@ -65,27 +56,27 @@ export function renderEstudiosUI(data = []) {
                     locs = item.filiais.map(f => ({
                         nome: f.nome || f.local || f.unidade || '',
                         endereco: f.endereco || '',
-                        salas: f.salas || 0,
+                        salas: f.salas || 0
                     }))
                 } else {
                     // legacy: parse localizacao string into nome only
                     locs = (item.localizacao || '')
                         .split(';')
-                        .map(s => ({ nome: s.trim(), endereco: '', salas: 0 }))
+                        .map(s => ({ nome: s.trim(), endereco: '' }))
                         .filter(x => x.nome)
                 }
                 if (locs.length) {
                     locs.forEach(p =>
                         container.appendChild(
-                            createFilialItem(p.nome || '', p.endereco || '', p.salas || '')
+                            createFilialItem(p.nome || '', p.endereco || '', p.salas || 0)
                         )
                     )
                 } else {
-                    container.appendChild(createFilialItem('', '', ''))
+                    container.appendChild(createFilialItem('', '', 0))
                 }
             }
             const salasField = document.getElementById('estudioSalas')
-            if (salasField) salasField.value = item.salas || ''
+            if (salasField) salasField.value = item.quantidadeSalas || ''
             showMessage('Pronto para editar o estúdio.', 'info', 3000)
         })
     })
@@ -120,26 +111,29 @@ export function setEstudiosData(data = []) {
 function salvarEstudio() {
     const idEl = document.getElementById('estudioId')
     const id = idEl ? idEl.value : ''
+    const nomeEl = document.getElementById('estudioNome')
+    const nomeInput = nomeEl ? nomeEl.value.trim() : ''
+
     const filialWrappers = Array.from(document.querySelectorAll('.filialItem'))
+    let totalSalas = 0
     const filiais = filialWrappers
         .map(w => {
             const nome = (w.querySelector('.estudioFilialName') || {}).value || ''
             const endereco = (w.querySelector('.estudioLocalAddress') || {}).value || ''
             const salas = parseInt((w.querySelector('.estudioLocalSalas') || {}).value) || 0
+            totalSalas += salas
             const local = (nome || endereco || '').trim()
             return { local, nome: nome.trim(), endereco: endereco.trim(), salas }
         })
         .filter(f => f.local)
     const local = filiais.map(f => f.local).join('; ')
 
-    if (!filiais.length) {
-        showMessage('Adicione ao menos uma filial.', 'error')
-        return
-    }
+    // Prioriza o nome do campo dedicado, senão tenta pegar da primeira filial
+    const nome = nomeInput || ((filiais.length > 0) ? (filiais[0].nome || filiais[0].local) : 'Novo Estúdio');
+    const quantidadeSalas = totalSalas
 
-    const nome = filiais[0].nome || filiais[0].local || 'Estúdio'
-    const endereco = filiais[0].endereco || ''
-    const salas = filiais[0].salas || 0
+    if (!nome) return showMessage('Informe o nome do estúdio.', 'error');
+    if (quantidadeSalas <= 0) return showMessage('Informe a quantidade de salas.', 'error');
 
     // Lógica de confirmação para alteração
     if (id) {
@@ -147,7 +141,7 @@ function salvarEstudio() {
     }
 
     // Dispatch event with payload; actual network call should be done by the data layer.
-    const payload = { id: id || null, nome, endereco, salas, filiais }
+    const payload = { id: id || null, nome, localizacao: local, quantidadeSalas, filiais }
     document.dispatchEvent(new CustomEvent('admin:estudio:save', { detail: payload }))
     showMessage('Solicitado salvar estúdio.', 'info', 3000)
     clearForm()
@@ -159,7 +153,11 @@ function salvarEstudio() {
 function clearForm() {
     const idEl = document.getElementById('estudioId')
     if (idEl) idEl.value = ''
+    const nomeField = document.getElementById('estudioNome')
+    if (nomeField) nomeField.value = ''
     const container = document.getElementById('estudioFiliaisContainer')
+    const salasField = document.getElementById('estudioSalas')
+    if (salasField) salasField.value = ''
     if (container) container.innerHTML = ''
 }
 
@@ -198,6 +196,7 @@ function createFilialItem(unidade = '', endereco = '', salas = '') {
     inputSalas.min = 0
     inputSalas.value = salas
     inputSalas.style.width = '110px'
+    inputSalas.style.marginRight = '8px'
 
     // action buttons: Limpar / Salvar
     const actions = document.createElement('div')
@@ -238,8 +237,8 @@ function addFilial() {
     const container = document.getElementById('estudioFiliaisContainer')
     if (!container) return
     // Limpa o formulário para um novo cadastro de estúdio.
-    clearForm()
-    const item = createFilialItem('', '', '')
+    // clearForm() // Não limpar o formulário inteiro, apenas adicionar uma nova linha de filial
+    const item = createFilialItem('', '', 0)
     container.appendChild(item)
     const nome = item.querySelector('.estudioFilialName')
     if (nome) nome.focus()

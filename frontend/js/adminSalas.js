@@ -34,7 +34,7 @@ export function renderSalasUI(data = []) {
                 <td>${s.estudioNome || s.estudioId || ''}</td>
                 <td>${s.numero || ''}</td>
                 <td>${s.nome || s.name || ''}</td>
-                <td><button class="btnSmall">Editar</button> <button class="delElemento btnSmall">Excluir</button></td>
+                <td><button class="editSala btnSmall">Editar</button> <button class="delSala btnSmall">Excluir</button></td>
             </tr>`
         )
     })
@@ -47,15 +47,23 @@ export function renderSalasUI(data = []) {
             const id = tr.dataset.id
             const item = data.find(x => (x._id || x.id) == id)
             if (!item) return
-            document.getElementById('salaId').value = id
-            document.getElementById('salaEstudio').value = item.estudioId || ''
+            console.log('Editando sala selecionada:', item);
+
+            // Tenta obter elementos via ID ou classe para evitar erros de 'null'
+            const elId = document.getElementById('salaId');
+            const elEstudio = document.getElementById('salaEstudio') || document.querySelector('.salaEstudioSelect');
+            const elNumero = document.getElementById('salaNumero') || document.querySelector('.salaNumeroInput');
+            const elNome = document.getElementById('salaNome') || document.querySelector('.salaNomeInput');
+
+            if (elId) elId.value = id;
+            if (elEstudio) elEstudio.value = item.estudioId || '';
+
             // Atualiza as opções do select de número baseado no estúdio selecionado
-            updateSalaNumeroOptions(
-                item.estudioId,
-                document.getElementById('salaNumero'),
-                item.numero
-            )
-            document.getElementById('salaNome').value = item.nome || item.name || ''
+            if (elEstudio && elNumero) {
+                updateSalaNumeroOptions(item.estudioId, elNumero, item.numero);
+            }
+
+            if (elNome) elNome.value = item.nome || item.name || '';
             showMessage('Pronto para editar a sala.', 'info', 3000)
         })
     )
@@ -117,14 +125,11 @@ function salvarSala() {
  * Limpa o formulário de sala.
  */
 function clearForm() {
-    const elId = document.getElementById('salaId')
-    if (elId) elId.value = ''
-    const elEst = document.getElementById('salaEstudio')
-    if (elEst) elEst.value = ''
-    const elNum = document.getElementById('salaNumero')
-    if (elNum) elNum.value = ''
-    const elNome = document.getElementById('salaNome')
-    if (elNome) elNome.value = ''
+    const ids = ['salaId', 'salaEstudio', 'salaNumero', 'salaNome'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
 }
 
 /**
@@ -148,31 +153,21 @@ if (cancelarSalaBtn) cancelarSalaBtn.addEventListener('click', clearForm)
 // Lógica para transformar o input #salaNumero em Select e vincular ao Estúdio
 const mainEstudioSel = document.getElementById('salaEstudio')
 let mainNumInput = document.getElementById('salaNumero')
-
-// Se for input, substitui por select para garantir a funcionalidade pedida
-if (mainNumInput && mainNumInput.tagName === 'INPUT') {
-    const newSel = document.createElement('select')
-    newSel.id = 'salaNumero'
-    newSel.className = mainNumInput.className
-    newSel.style.width = mainNumInput.style.width || '100px'
-    mainNumInput.replaceWith(newSel)
-    mainNumInput = newSel // atualiza referência
+if (mainNumInput) {
+    // Se for input, substitui por select para garantir a funcionalidade pedida
+    if (mainNumInput.tagName === 'INPUT') {
+        const newSel = document.createElement('select')
+        newSel.id = 'salaNumero'
+        newSel.className = mainNumInput.className
+        newSel.style.width = mainNumInput.style.width || '100px'
+        mainNumInput.replaceWith(newSel)
+        mainNumInput = newSel // atualiza referência
+    }
+    if (mainEstudioSel) {
+        mainEstudioSel.addEventListener('change', () => updateSalaNumeroOptions(mainEstudioSel.value, mainNumInput));
+        if (window.__estudiosCache) updateSalaNumeroOptions(mainEstudioSel.value, mainNumInput);
+    }
 }
-
-if (mainEstudioSel) {
-    mainEstudioSel.addEventListener('change', () => {
-        updateSalaNumeroOptions(mainEstudioSel.value, document.getElementById('salaNumero'))
-    })
-}
-
-// Se já houver estúdios em cache (recarregamento de página), popula o select inicial se necessário
-if (window.__estudiosCache && mainEstudioSel && mainEstudioSel.value) {
-    updateSalaNumeroOptions(mainEstudioSel.value, document.getElementById('salaNumero'))
-} else if (window.__estudiosCache && mainEstudioSel) {
-    // Se nada selecionado, limpa
-    updateSalaNumeroOptions('', document.getElementById('salaNumero'))
-}
-
 // Add Sala button (create empty row to be filled)
 const addSalaBtn = document.getElementById('addSalaBtn')
 if (addSalaBtn) addSalaBtn.addEventListener('click', addSala)
@@ -198,31 +193,31 @@ function createSalaItem() {
     const inputNome = document.createElement('input')
     inputNome.type = 'text'
     inputNome.className = 'salaNomeInput'
-    inputNome.placeholder = 'Nome da sala'
+    inputNome.placeholder = 'Nome (Ex: VIP, Ensaio 1)'
     inputNome.style.width = '200px'
 
     // action buttons: Alterar / Apagar
     const actions = document.createElement('div')
     actions.className = 'actionButtons'
 
-    const alterBtn = document.createElement('button')
-    alterBtn.type = 'button'
-    alterBtn.className = 'alterSala btnSmall'
-    alterBtn.textContent = 'Alterar'
-    alterBtn.addEventListener('click', () => {
-        // copy values into main form for editing
-        document.getElementById('salaId').value = wrapper.dataset.id || ''
-        const selMain = document.getElementById('salaEstudio')
-        if (selMain) selMain.value = selectEst.value || ''
-        // Atualiza opções do main e seleciona valor
-        updateSalaNumeroOptions(
-            selectEst.value,
-            document.getElementById('salaNumero'),
-            selectNumero.value
-        )
-        const elNome = document.getElementById('salaNome')
-        if (elNome) elNome.value = inputNome.value || ''
-        elNome && elNome.focus()
+    const addInlineBtn = document.createElement('button')
+    addInlineBtn.type = 'button'
+    addInlineBtn.className = 'addSalaInline btnSmall'
+    addInlineBtn.textContent = 'Adicionar'
+    addInlineBtn.style.backgroundColor = '#28a745'
+    addInlineBtn.style.color = 'white'
+    
+    addInlineBtn.addEventListener('click', () => {
+        const estudioId = selectEst.value
+        const numero = parseInt(selectNumero.value)
+        const nome = inputNome.value.trim()
+
+        if (!estudioId || !numero || !nome) {
+            return showMessage('Preencha Estúdio, Número e Nome.', 'error')
+        }
+
+        const payload = { id: wrapper.dataset.id || null, estudio: estudioId, numero, nome }
+        document.dispatchEvent(new CustomEvent('admin:sala:save', { detail: payload }))
     })
 
     const delBtn = document.createElement('button')
@@ -239,7 +234,7 @@ function createSalaItem() {
         wrapper.remove()
     })
 
-    actions.appendChild(alterBtn)
+    actions.appendChild(addInlineBtn)
     actions.appendChild(delBtn)
 
     wrapper.appendChild(selectEst)
@@ -301,7 +296,7 @@ function updateSalaNumeroOptions(estudioId, selectEl, currentVal = null) {
 
     const estudio = window.__estudiosCache.find(e => (e._id || e.id) == estudioId)
     if (estudio) {
-        const qtd = estudio.salas || 1
+        const qtd = estudio.quantidadeSalas || 1
         for (let i = 1; i <= qtd; i++) {
             const opt = document.createElement('option')
             opt.value = i

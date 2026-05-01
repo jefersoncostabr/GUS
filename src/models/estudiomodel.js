@@ -17,6 +17,11 @@ const estudioSchema = new mongoose.Schema(
         ativo: {
             type: Boolean,
             default: true
+        },
+        quantidadeSalas: { // Novo campo para a quantidade total de salas do estúdio
+            type: Number,
+            required: [true, 'A quantidade de salas é obrigatória.'],
+            default: 1
         }
     },
     { 

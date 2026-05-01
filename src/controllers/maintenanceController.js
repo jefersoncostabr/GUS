@@ -9,15 +9,16 @@
  * protegendo dados do banco Master (usuários, etc.).
  */
 
+import mongoose from 'mongoose';
+import { getSolicitanteModel } from '../models/usuariosmodel.js';
+import { getEstudioModel } from '../models/estudiomodel.js';
+
+const masterConnection = mongoose.connection;
+
 class MaintenanceController {
     static async limparSolicitantes(req, res) {
         try {
-            // Para manutenção de solicitantes globais, usa banco Master
-            const mongoose = require('mongoose');
-            const masterConnection = mongoose.connection;
-            const { getSolicitanteModel } = require('../models/usuariosmodel.js');
             const Solicitante = getSolicitanteModel(masterConnection);
-
             await Solicitante.deleteMany({});
             res.status(200).json({ message: "Todos os solicitantes foram removidos." });
         } catch (error) {
@@ -42,11 +43,7 @@ class MaintenanceController {
 
     static async limparEstudios(req, res) {
         try {
-            const mongoose = require('mongoose');
-            const masterConnection = mongoose.connection;
-            const { getEstudioModel } = require('../models/estudiomodel.js');
             const Estudio = getEstudioModel(masterConnection);
-
             await Estudio.deleteMany({});
             res.status(200).json({ message: "Todos os estúdios foram removidos." });
         } catch (error) {
