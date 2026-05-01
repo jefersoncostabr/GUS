@@ -83,7 +83,6 @@ export default async function tenantMiddleware(req, res, next) {
 
         // Compila os modelos para esta conexão específica
         req.tenantModels = {
-            Solicitante: getSolicitanteModel(tenantConnection),
             Utilizacao: getUsoRegularModel(tenantConnection),
             Sala: getSalaModel(tenantConnection),
             Aula: getAulaModel(tenantConnection),

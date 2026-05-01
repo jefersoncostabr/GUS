@@ -16,10 +16,12 @@ router.get("/", (req, res) => {// http://localhost:3000
 
 /**
  * Roteadores Específicos.
- * Redireciona as requisições para os arquivos de rota correspondentes.
+ * Redireciona as requisições para os roteadores correspondentes.
  */
 router.use("/usos", routerUsos);// http://localhost:3000/usos
-router.use("/solicitantes", routerSolicitantes);// http://localhost:3000/solicitantes
+
+// Rotas de solicitantes requerem autenticação
+router.use("/solicitantes", authMiddleware, routerSolicitantes);// http://localhost:3000/solicitantes
 
 
 export default router;

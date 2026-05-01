@@ -1,6 +1,8 @@
 import express from "express";
 import AdminController from "../src/controllers/adminController.js";
 import MaintenanceController from "../src/controllers/maintenanceController.js";
+import { listarSolicitantes, criarSolicitante, atualizarSolicitante, deletarSolicitante } from "../src/controllers/solicitanteController.js";
+import { authMiddleware, verificaPermissaoSolicitante } from "../middleware/authMiddleware.js";
 // import { verificaRole } from "../middleware/authMiddleware.js"; // Descomente e ajuste o caminho se necessário
 // notas de middleware:
 // - todas as rotas abaixo funcionarão sob /admin/* com authMiddleware + tenantMiddleware
@@ -11,6 +13,11 @@ const router = express.Router();
 // Aplica proteção para todas as rotas abaixo (apenas admin pode acessar)
 // router.use(verificaRole(["admin"])); 
 
+// Rotas de Usuários (Solicitantes) - no banco Master
+router.get("/usuarios", listarSolicitantes); // Lista usuários do tenant
+router.post("/usuarios", criarSolicitante); // Cria novo usuário
+router.put("/usuarios/:id", authMiddleware, verificaPermissaoSolicitante, atualizarSolicitante); // Atualiza usuário
+router.delete("/usuarios/:id", deletarSolicitante); // Exclui usuário
 
 // Rotas de Estúdios
 router.get("/estudios", AdminController.listarEstudios);// http://localhost:3000/admin/estudios - Lista todos os estúdios

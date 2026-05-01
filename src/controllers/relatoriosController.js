@@ -35,7 +35,11 @@ export const getAgendamentosSemana = async (req, res) => {
         });
 
         const agendamentos = await Uso.find({ dia: { $in: diasDaSemanaFormatados } })
-            .populate('solicitante', 'solicitante email');
+            .populate({
+                path: 'solicitante',
+                model: getSolicitanteModel(mongoose.connection),
+                select: 'solicitante email'
+            });
 
         res.status(200).json(agendamentos);
     } catch (error) {
@@ -55,7 +59,9 @@ export const getTodosProfessores = async (req, res) => {
         const Solicitante = getSolicitanteModel(mongoose.connection);
         
         const query = {};
-        if (req.session?.user?.tenantDbName) {
+
+        // Filtro por tenant para admins de estúdio
+        if (req.session?.user?.role === 'admin' && req.session?.user?.tenantDbName) {
             query.tenantDbName = req.session.user.tenantDbName;
         }
 
@@ -112,7 +118,11 @@ export const getAgendamentosMes = async (req, res) => {
         });
 
         const agendamentos = await Uso.find({ dia: { $in: diasDoMesFormatados } })
-            .populate('solicitante', 'solicitante email');
+            .populate({
+                path: 'solicitante',
+                model: getSolicitanteModel(mongoose.connection),
+                select: 'solicitante email'
+            });
 
         res.status(200).json(agendamentos);
     } catch (error) {
@@ -137,7 +147,11 @@ export const getUsosPorProfessor = async (req, res) => {
         const { id } = req.params;
         
         const agendamentos = await Uso.find({ solicitante: id })
-            .populate('solicitante', 'solicitante email');
+            .populate({
+                path: 'solicitante',
+                model: getSolicitanteModel(mongoose.connection),
+                select: 'solicitante email'
+            });
 
         res.status(200).json(agendamentos);
     } catch (error) {

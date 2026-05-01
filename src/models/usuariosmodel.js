@@ -29,6 +29,11 @@ const solicitanteSchema = new mongoose.Schema(
         tenantDbName: {
             type: String,
             trim: true
+        },
+        // Associação com o Estúdio (banco Master)
+        estudio: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Estudio'
         }
     },
     { versionKey: false }
@@ -40,4 +45,5 @@ const solicitanteSchema = new mongoose.Schema(
  * @param {mongoose.Connection} connection - A instância de conexão do Mongoose (deve ser a do Master DB).
  * @returns {mongoose.Model} O modelo Solicitante.
  */
-export const getSolicitanteModel = (connection) => connection.model('Solicitante', solicitanteSchema);
+export const getSolicitanteModel = (connection) => 
+    connection.models.Solicitante || connection.model('Solicitante', solicitanteSchema);

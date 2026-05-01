@@ -4,6 +4,8 @@ import { getTenantConnection } from "../config/connectionFactory.js";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
+const masterConnection = mongoose.connection;
+
 /**
  * Lista todos os estúdios com apenas nome e ID (para preenchimento do modal no frontend).
  * @param {Object} req - Express request object
@@ -11,7 +13,6 @@ import mongoose from "mongoose";
  */
 export const listarEstudiosSimples = async (req, res) => {
     try {
-        const masterConnection = mongoose.connection;
         const EstudioModel = getEstudioModel(masterConnection);
         const estudios = await EstudioModel.find({}, 'nome _id');
         res.status(200).json(estudios);
@@ -78,27 +79,27 @@ async function inicializarTenantDb(tenantConnection) {
 export const listarSolicitantes = async (req, res) => {
     try {
         // Usa o modelo do banco Master (Solicitantes são globais)
-        const SolicitanteModel = getSolicitanteModel(mongoose.connection);
+        const SolicitanteModel = getSolicitanteModel(masterConnection);
         
         const query = {};
-        if (req.session?.user?.tenantDbName) {
+        
+        // Se o usuário logado tem um tenantDbName, filtramos por ele.
+        // Se não tem (Super Admin), deixamos a query vazia para trazer todos.
+        if (req.session?.user?.role === 'admin' && req.session?.user?.tenantDbName) {
             query.tenantDbName = req.session.user.tenantDbName;
         }
 
         const listaDeSolicitantes = await SolicitanteModel.find(query);
-        if (listaDeSolicitantes.length === 0) {
-            res.status(404).json({ message: 'Nenhum solicitante encontrado' });
-        } else {
-            res.status(200).json(listaDeSolicitantes);
-        }
+        res.status(200).json(listaDeSolicitantes || []);
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao buscar solicitantes' });
+        console.error('Erro ao buscar solicitantes:', error);
+        res.status(500).json({ error: 'Erro interno ao buscar solicitantes' });
     }
 };
 
 export const buscarSolicitantePorId = async (req, res) => {
     try {
-        const SolicitanteModel = getSolicitanteModel(mongoose.connection);
+        const SolicitanteModel = getSolicitanteModel(masterConnection);
         const solicitante = await SolicitanteModel.findById(req.params.id);
         if (!solicitante) {
             res.status(404).json({ message: 'solicitante não encontrado com esse id' });
@@ -117,10 +118,13 @@ export const buscarIdSolicitante = async (req, res) => {
         return res.status(400).json({ error: 'Parâmetros obrigatórios não fornecidos' });
     }
     try {
-        const SolicitanteModel = getSolicitanteModel(mongoose.connection);
+        const SolicitanteModel = getSolicitanteModel(masterConnection);
+        // Converte para ObjectId se for uma string válida, senão usa como número (fallback)
+        const filtroEstudio = mongoose.Types.ObjectId.isValid(estudio) ? estudio : Number(estudio);
+        
         const solicitanteEncontrado = await SolicitanteModel.findOne({
             solicitante,
-            estudio: Number(estudio)
+            estudio: filtroEstudio
         });
         if (!solicitanteEncontrado) {
             return res.status(404).json({ message: 'solicitante não encontrado' });
@@ -143,10 +147,8 @@ export const criarSolicitante = async (req, res) => {
 
         let { senha, role, estudioName, estudio } = req.body;
 
-        // Lógica de compatibilidade para o formulário público de criação de conta.
-        // Se a requisição for pública (sem usuário na sessão) e o campo 'estudio' for enviado,
-        // ele deve ser tratado como o nome do novo estúdio ('estudioName').
-        if (!req.session?.user && estudio) {
+        // Unifica a entrada: usa estudioName ou estudio independente da sessão
+        if (!estudioName && estudio) {
             estudioName = estudio;
         }
 
@@ -160,28 +162,37 @@ export const criarSolicitante = async (req, res) => {
         const hashedPassword = await bcrypt.hash(senha, saltRounds);
 
         // Validação de entrada
-        if (!estudioName) {
+        if (!estudioName || (typeof estudioName === 'string' && estudioName.trim() === '')) {
             return res.status(400).json({ error: 'O nome do estúdio é obrigatório.' });
-        }
-
-        // Validação de "Sanidade" do nome do estúdio
-        const nomesProibidos = ['teste', 'test', 'admin', 'desconhecido', 'asdf', '123456', 'root'];
-        const nomeLimpo = estudioName.trim().toLowerCase();
-
-        if (nomeLimpo.length < 3) {
-            return res.status(400).json({ error: 'O nome do estúdio deve ter pelo menos 3 caracteres.' });
-        }
-        if (nomesProibidos.includes(nomeLimpo) || !/[a-z]/i.test(nomeLimpo)) {
-            return res.status(400).json({ error: 'Por favor, insira um nome de estúdio válido.' });
         }
 
         const masterConnection = mongoose.connection;
         const EstudioModel = getEstudioModel(masterConnection);
 
-        // Verificar se o estúdio já existe no banco Master (case-insensitive)
-        const estudioExistente = await EstudioModel.findOne({ 
-            nome: { $regex: new RegExp(`^${estudioName}$`, 'i') } 
-        });
+        // Busca inteligente: tenta por ID primeiro (comum no Admin), senão por Nome (comum no Registro)
+        let estudioExistente;
+        if (mongoose.Types.ObjectId.isValid(estudioName)) {
+            estudioExistente = await EstudioModel.findById(estudioName);
+        }
+
+        if (!estudioExistente) {
+            estudioExistente = await EstudioModel.findOne({ 
+                nome: { $regex: new RegExp(`^${estudioName}$`, 'i') } 
+            });
+        }
+
+        // Se não existir, valida o novo nome antes de criar o estúdio
+        if (!estudioExistente) {
+            const nomesProibidos = ['teste', 'test', 'admin', 'desconhecido', 'asdf', '123456', 'root'];
+            const nomeLimpo = String(estudioName).trim().toLowerCase();
+
+            if (nomeLimpo.length < 3) {
+                return res.status(400).json({ error: 'O nome do novo estúdio deve ter pelo menos 3 caracteres.' });
+            }
+            if (nomesProibidos.includes(nomeLimpo) || !/[a-z]/i.test(nomeLimpo)) {
+                return res.status(400).json({ error: 'Por favor, insira um nome de estúdio válido para criação.' });
+            }
+        }
 
         // Determinar o role automaticamente baseado na existência do estúdio
         let tenantDbName;
@@ -237,7 +248,6 @@ export const criarSolicitante = async (req, res) => {
 
         // Limpar campos desnecessários
         delete novoSolicitanteData.estudioName;
-        delete novoSolicitanteData.estudio; // Se for string de entrada
 
         const novoSolicitante = new SolicitanteModel(novoSolicitanteData);
         await novoSolicitante.save();
@@ -245,6 +255,12 @@ export const criarSolicitante = async (req, res) => {
         console.log(`Novo solicitante criado com sucesso: Usuário="${novoSolicitante.solicitante}" (Use exatamente assim no login), Banco="${novoSolicitante.tenantDbName}"`);
         res.status(201).json(novoSolicitante); 
     } catch (error) {
+        // Captura erros de validação do Mongoose (campos obrigatórios, formato de email, etc)
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ error: messages.join(', ') });
+        }
+
         // Tratamento de erro de duplicidade (E11000)
         if (error.code === 11000) {
             // Identifica qual campo causou o erro de duplicidade

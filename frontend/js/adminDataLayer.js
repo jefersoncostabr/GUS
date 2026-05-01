@@ -27,7 +27,7 @@ async function safeFetchJson(url, options) {
 // Loaders
 async function loadUsers() {
   try {
-    const data = await safeFetchJson(`${baseUrl}/solicitantes/solicitantes`);
+    const data = await safeFetchJson(`${baseUrl}/admin/usuarios`);
     if (Array.isArray(data)) {
       setUsersData(data);
       setAulasProfessoresOptions(data);
@@ -91,9 +91,9 @@ async function checkSessionAndInit() {
 // Handlers for events
 async function handleUserCreate(e) {
   const { nome, email, role, senha, estudio } = e.detail || {};
-  if (!nome || !senha || !estudio) { showMessage('Nome, Senha e Estúdio são obrigatórios.', 'error'); return; }
+  if (!nome || !email || !senha || !estudio) { showMessage('Nome, Email, Senha e Estúdio são obrigatórios.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes`, { method: 'POST', body: { solicitante: nome, email, senha, role, estudio } });
+    await safeFetchJson(`${baseUrl}/admin/usuarios`, { method: 'POST', body: { solicitante: nome, email, senha, role, estudio } });
     showMessage('Usuário criado.', 'success');
     await loadUsers();
   } catch (err) { /* already handled */ }
@@ -103,7 +103,7 @@ async function handleUserUpdate(e) {
   const { id, nome, email, role } = e.detail || {};
   if (!id) { showMessage('ID ausente para atualização.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes/${id}`, { method: 'PUT', body: { solicitante: nome, email, role } });
+    await safeFetchJson(`${baseUrl}/admin/usuarios/${id}`, { method: 'PUT', body: { solicitante: nome, email, role } });
     showMessage('Usuário atualizado.', 'success');
     await loadUsers();
   } catch (err) { }
@@ -113,7 +113,7 @@ async function handleUserDelete(e) {
   const { id } = e.detail || {};
   if (!id) { showMessage('ID ausente para exclusão.', 'error'); return; }
   try {
-    await safeFetchJson(`${baseUrl}/solicitantes/solicitantes/${id}`, { method: 'DELETE' });
+    await safeFetchJson(`${baseUrl}/admin/usuarios/${id}`, { method: 'DELETE' });
     showMessage('Usuário excluído.', 'success');
     await loadUsers();
   } catch (err) { }

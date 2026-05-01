@@ -6,14 +6,18 @@
  * - Suporta multi-tenant com isolamento automático por banco de dados
  */
 
+import mongoose from 'mongoose';
+import { getSolicitanteModel } from '../models/usuariosmodel.js';
+
 export const listarUsos = async (req, res) => {
     try {
         // Extrai os modelos injetados pelo tenantMiddleware
         const Uso = req.tenantModels?.Utilizacao;
-        const Solicitante = req.tenantModels?.Solicitante;
+        // Usuários sempre vêm do Master
+        const Solicitante = getSolicitanteModel(mongoose.connection);
 
-        if (!Uso || !Solicitante) {
-            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        if (!Uso) {
+            return res.status(500).json({ error: 'Modelo de Utilização não inicializado.' });
         }
 
         const { solicitante, sala, dia, hora, motivo } = req.query;
@@ -43,7 +47,10 @@ export const listarUsos = async (req, res) => {
 
         const skip = (page - 1) * limit;
         const listaDeUsos = await Uso.find(query)
-            .populate({ path: 'solicitante', model: Solicitante })
+            .populate({
+                path: 'solicitante',
+                model: Solicitante
+            })
             .skip(skip)
             .limit(limit);
 
@@ -63,13 +70,16 @@ export const listarUsos = async (req, res) => {
 export const buscarUsoPorId = async (req, res) => {
     try {
         const Uso = req.tenantModels?.Utilizacao;
-        const Solicitante = req.tenantModels?.Solicitante;
+        const Solicitante = getSolicitanteModel(mongoose.connection);
 
-        if (!Uso || !Solicitante) {
-            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        if (!Uso) {
+            return res.status(500).json({ error: 'Modelo de Utilização não inicializado.' });
         }
 
-        const uso = await Uso.findById(req.params.id).populate({ path: 'solicitante', model: Solicitante });
+        const uso = await Uso.findById(req.params.id).populate({
+            path: 'solicitante',
+            model: Solicitante
+        });
         if (!uso) {
             res.status(404).json({ message: 'Uso não encontrado com esse id' });
         } else {
@@ -87,10 +97,11 @@ export const buscarIdUso = async (req, res) => {
     }
     try {
         const Uso = req.tenantModels?.Utilizacao;
-        const Solicitante = req.tenantModels?.Solicitante;
+        // Alterado para buscar sempre no Master
+        const Solicitante = getSolicitanteModel(mongoose.connection);
 
-        if (!Uso || !Solicitante) {
-            return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+        if (!Uso) {
+            return res.status(500).json({ error: 'Modelo de Utilização não inicializado.' });
         }
 
         let idSolicitante = solicitante;
