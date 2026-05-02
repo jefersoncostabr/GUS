@@ -9,10 +9,8 @@ import {
     listarSolicitantes, 
     buscarSolicitantePorId, 
     buscarIdSolicitante, 
-    criarSolicitante, 
     atualizarSolicitante, 
-    deletarSolicitante,
-    listarEstudiosSimples
+    deletarSolicitante
 } from "../src/controllers/solicitanteController.js";
 
 const routerSolicitantes = express.Router();
@@ -22,9 +20,6 @@ routerSolicitantes.get("/", (req, res) => {
     res.status(200).send("Rota inicial solicitantes funcionando");
 });
 
-// http://localhost:3000/solicitantes/lista-simples (novo endpoint)
-routerSolicitantes.get("/lista-simples", listarEstudiosSimples);
-
 // http://localhost:3000/solicitantes/solicitantes
 routerSolicitantes.get("/solicitantes", listarSolicitantes);
 
@@ -32,9 +27,6 @@ routerSolicitantes.get("/solicitantes", listarSolicitantes);
 routerSolicitantes.get("/solicitantes/:id", buscarSolicitantePorId);
 
 routerSolicitantes.get('/buscaidsolicitante', buscarIdSolicitante);
-
-//http://localhost:3000/solicitantes/solicitantes
-routerSolicitantes.post('/solicitantes', criarSolicitante);
 
 // http://localhost:3000/solicitantes/solicitantes/:id
 routerSolicitantes.put('/solicitantes/:id', authMiddleware, verificaPermissaoSolicitante, atualizarSolicitante);

@@ -18,15 +18,25 @@ export function authMiddleware(req, res, next) {
     // 1. Verificação da Sessão: Se req.session.user for undefined/null, não está logado.
     if (!req.session.user) {
         
-        // 2. Tratamento para APIs e Requisições JSON
-        // Verifica se o header 'Accept' pede JSON ou se a URL contém '/rotas-disponiveis'
-        if ((req.headers.accept && req.headers.accept.includes('application/json')) || req.originalUrl.includes('/rotas-disponiveis')) {
-            // Retorna status 401 (Não Autorizado) com mensagem JSON
+        console.log(`[BLOQUEIO AUTH] Requisição sem sessão: ${req.method} ${req.originalUrl}`);
+
+        /**
+         * 2. Tratamento inteligente para APIs
+         * Se for um método de escrita (POST, PUT, DELETE) ou se a URL pertencer aos módulos de dados,
+         * retornamos JSON 401 em vez de redirecionar para HTML.
+         */
+        const isApiRoute = req.originalUrl.includes('/solicitantes') || 
+                           req.originalUrl.includes('/admin') || 
+                           req.originalUrl.includes('/usos');
+
+        if (req.method !== 'GET' || isApiRoute || (req.headers.accept && req.headers.accept.includes('application/json'))) {
+            console.log(` -> Resposta: 401 JSON (Correto para APIs)`);
             return res.status(401).json({ error: 'Usuário não autenticado. Faça login primeiro.' });
         }
 
         // 3. Tratamento para Navegação Comum (Navegador)
         // Redireciona o usuário para a tela de login
+        console.log(` -> Resposta: REDIRECIONAMENTO para login.html (Isso causa o SyntaxError se o front esperar JSON)`);
         return res.redirect('/login.html');
     }
 

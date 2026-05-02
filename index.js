@@ -14,6 +14,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import sistemaRoutes from "./routes/sistemaRoutes.js";
 import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
 import relatoriosRoutes from "./routes/relatoriosRoutes.js";
+import publicSolicitanteRoutes from './routes/publicSolicitanteRoutes.js';
 import { getEstudioModel } from './src/models/estudiomodel.js';
 import rateLimit from 'express-rate-limit';
 
@@ -48,6 +49,12 @@ conexao.once("open", () => {
 })
 
 const app = express();
+
+// Middleware de Debug Global: Ver as rotas entrando
+app.use((req, res, next) => {
+    console.log(`[DEBUG] Chamada: ${req.method} ${req.url}`);
+    next();
+});
 
 // Habilita o CORS para todas as origens. Em produção, você pode querer restringir isso.
 app.use(cors());
@@ -94,7 +101,8 @@ app.use(sessionMiddleware);
 
 app.use(routesAuth);
 
-
+// Rotas públicas para solicitantes (criação de conta) - devem vir ANTES das rotas protegidas
+app.use('/', publicSolicitanteRoutes);
 
 // Rota para buscar a lista de estúdios
 app.get('/estudios', async (req, res) => {

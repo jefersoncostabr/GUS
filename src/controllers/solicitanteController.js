@@ -12,6 +12,7 @@ const masterConnection = mongoose.connection;
  * @param {Object} res - Express response object
  */
 export const listarEstudiosSimples = async (req, res) => {
+    console.log("[CONTROLLER] Acessando listarEstudiosSimples (público)");
     try {
         const EstudioModel = getEstudioModel(masterConnection);
         const estudios = await EstudioModel.find({}, 'nome _id');
@@ -133,7 +134,8 @@ export const buscarIdSolicitante = async (req, res) => {
 };
 
 export const criarSolicitante = async (req, res) => {
-    console.log("Requisição para criar novo solicitante:", req.body);
+    console.log("\n[CRIAR USUÁRIO] Iniciando processo...");
+    console.log("-> Dados recebidos:", JSON.stringify(req.body));
     try {
         // Capitaliza a primeira letra do solicitante e remove espaços extras
         if (req.body.solicitante && typeof req.body.solicitante === 'string') {
@@ -179,6 +181,7 @@ export const criarSolicitante = async (req, res) => {
 
         // Se não existir, valida o novo nome antes de criar o estúdio
         if (!estudioExistente) {
+            console.log(`-> Estúdio "${estudioName}" não encontrado. Tentando criar novo estúdio...`);
             const nomesProibidos = ['teste', 'test', 'admin', 'desconhecido', 'asdf', '123456', 'root'];
             const nomeLimpo = String(estudioName).trim().toLowerCase();
 
@@ -263,7 +266,7 @@ export const criarSolicitante = async (req, res) => {
         await novoSolicitante.save();
         console.log(`Novo usuário criado: Estúdio "${estudioName}" (Tenant: "${tenantDbName}")`);
         
-        console.log(`Novo solicitante criado com sucesso: Usuário="${novoSolicitante.solicitante}" (Use exatamente assim no login), Banco="${novoSolicitante.tenantDbName}"`);
+        console.log(`[SUCESSO] Usuário: ${novoSolicitante.solicitante} | Banco: ${novoSolicitante.tenantDbName}`);
         res.status(201).json(novoSolicitante); 
     } catch (error) {
         // Captura erros de validação do Mongoose (campos obrigatórios, formato de email, etc)
