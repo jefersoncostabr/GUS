@@ -41,7 +41,9 @@ export async function getTenantConnection(tenantId) {
     const existing = tenantConnections[dbName];
     if (existing) {
         if (existing.readyState === 1) {
-            console.log(`Reutilizando conexão para o banco: ${dbName}`);
+            if (process.env.DEBUG_TENANT === 'true') {
+                console.log(`Reutilizando conexão para o banco: ${dbName}`);
+            }
             return existing;
         }
         if (existing.readyState === 2) {

@@ -37,13 +37,9 @@ function gerarTenantDbName(estudioName) {
         .replace(/\s+/g, '-') // Espaços viram hífens
         .replace(/[^a-z0-9\-]/g, ''); // Remove caracteres especiais
     
-    // Adiciona um hash curto do timestamp para garantir unicidade e tamanho reduzido
-    const shortTimestamp = Date.now().toString(36);
-
     // Trunca o slug se o nome total for muito longo para evitar exceder o limite do DB.
     // Limite do DB é ~64, mas Atlas pode ter limites menores (ex: 38 bytes).
-    // prefixo (11) + slug + _ (1) + timestamp (~9) = ~21 + slug. Deixamos 15 para o slug.
-    const maxSlugLength = 15;
+    const maxSlugLength = 25;
     if (slug.length > maxSlugLength) {
         slug = slug.substring(0, maxSlugLength);
     }
@@ -51,7 +47,7 @@ function gerarTenantDbName(estudioName) {
     // Remove hífens no final do slug que podem ter sido criados pelo truncamento
     slug = slug.replace(/-+$/, '');
 
-    return `gus_tenant_${slug}_${shortTimestamp}`;
+    return `gus_tenant_${slug}`;
 }
 
 /**
@@ -200,11 +196,25 @@ export const criarSolicitante = async (req, res) => {
         let idDoEstudio;
 
         if (estudioExistente) {
+            console.log(`✓✓✓ Estúdio "${estudioExistente.nome}" encontrado para o novo usuário. Associando ao estúdio existente.`);
+            console.log(`Detalhes do estúdio encontrado: ID=${estudioExistente._id}, tenantDbName=${estudioExistente.tenantDbName}`);
             // Cenário A: Estúdio existe
             // O novo usuário será um 'user' desse estúdio
-            tenantDbName = estudioExistente.tenantDbName || gerarTenantDbName(estudioExistente.nome);
+            
+            if (!estudioExistente.tenantDbName) {
+                console.log(`⚠⚠⚠ Estúdio "${estudioExistente.nome}" encontrado sem tenantDbName. Gerando um novo tenantDbName...`);
+                // Se o estúdio existe mas não tem banco vinculado, geramos um e SALVAMOS no estúdio
+                tenantDbName = gerarTenantDbName(estudioExistente.nome);
+                await EstudioModel.findByIdAndUpdate(estudioExistente._id, { tenantDbName });
+                console.log(`⚠ Estúdio "${estudioExistente.nome}" não possuía tenantDbName. Gerado e vinculado agora: ${tenantDbName}`);
+            } else {
+                // Se já existe, usamos exatamente o que está no banco do estúdio
+                tenantDbName = estudioExistente.tenantDbName;
+            }
+
             idDoEstudio = estudioExistente._id;
             roleAssigned = 'user';
+            estudioName = estudioExistente.nome; // Atualiza para o nome real para o log de sucesso
             console.log(`✓ Estúdio existente encontrado: ${estudioExistente.nome}`);
         } else {
             // Cenário B: Estúdio não existe
@@ -251,12 +261,17 @@ export const criarSolicitante = async (req, res) => {
 
         const novoSolicitante = new SolicitanteModel(novoSolicitanteData);
         await novoSolicitante.save();
+        console.log(`Novo usuário criado: Estúdio "${estudioName}" (Tenant: "${tenantDbName}")`);
         
         console.log(`Novo solicitante criado com sucesso: Usuário="${novoSolicitante.solicitante}" (Use exatamente assim no login), Banco="${novoSolicitante.tenantDbName}"`);
         res.status(201).json(novoSolicitante); 
     } catch (error) {
         // Captura erros de validação do Mongoose (campos obrigatórios, formato de email, etc)
         if (error.name === 'ValidationError') {
+            if (error.errors.email) {
+                console.warn(`[CADASTRO] Tentativa de criação de usuário negada por e-mail ausente ou inválido. Solicitante: ${req.body.solicitante || 'Nome não informado'}`);
+            }
+
             const messages = Object.values(error.errors).map(err => err.message);
             return res.status(400).json({ error: messages.join(', ') });
         }

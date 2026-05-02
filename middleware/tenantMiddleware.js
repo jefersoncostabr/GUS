@@ -89,7 +89,9 @@ export default async function tenantMiddleware(req, res, next) {
             Motivos: getMotivosModel(tenantConnection),
         };
 
-        console.log(`Tenant ${tenantId} conectado para requisição de ${user.solicitante}`);
+        if (process.env.DEBUG_TENANT === 'true') {
+            console.log(`Tenant ${tenantId} conectado para requisição de ${user.solicitante}`);
+        }
         next();
 
     } catch (error) {

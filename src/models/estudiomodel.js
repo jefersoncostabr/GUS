@@ -9,6 +9,11 @@ const estudioSchema = new mongoose.Schema(
             unique: true, // Impede a criação de estúdios com o mesmo nome
             maxlength: [100, 'O nome do estúdio não pode exceder 100 caracteres.']
         },
+        tenantDbName: {
+            type: String,
+            trim: true,
+            unique: true // Cada estúdio deve ter seu próprio banco exclusivo
+        },
         localizacao: {
             type: String,
             trim: true,
