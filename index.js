@@ -50,12 +50,6 @@ conexao.once("open", () => {
 
 const app = express();
 
-// Middleware de Debug Global: Ver as rotas entrando
-app.use((req, res, next) => {
-    console.log(`[DEBUG] Chamada: ${req.method} ${req.url}`);
-    next();
-});
-
 // Habilita o CORS para todas as origens. Em produção, você pode querer restringir isso.
 app.use(cors());
 

@@ -104,7 +104,7 @@ function atualizarSalasDisponiveis() {
     // Preenche o select de salas com as opções filtradas
     salasDoEstudio.forEach(sala => {
         const option = document.createElement('option');
-s        option.value = sala.numero; 
+        option.value = sala.numero; 
         option.textContent = sala.nome ? `${sala.nome} (Sala ${sala.numero})` : `Sala ${sala.numero}`;
         selectSala.appendChild(option);
     });
