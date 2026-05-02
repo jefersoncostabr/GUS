@@ -44,7 +44,7 @@ async function carregarEstudios() {
         const estudios = await response.json();
 
         // Limpa opções existentes e adiciona uma padrão
-        selectEstudio.innerHTML = '<option value="">Selecione o Estúdio</option>';
+        selectEstudio.innerHTML = '<option value="">Selecione</option>';
 
         estudios.forEach(estudio => {
             const option = document.createElement('option');
@@ -87,7 +87,7 @@ function atualizarSalasDisponiveis() {
     if (!selectSala) return;
 
     // Limpa as opções de sala e adiciona uma opção padrão
-    selectSala.innerHTML = '<option value="">Selecione a Sala</option>';
+    selectSala.innerHTML = '<option value="">Selecione</option>';
 
     if (!estudioId) {
         return; // Se nenhum estúdio for selecionado, deixa o select de sala vazio (com a opção padrão)
@@ -107,6 +107,21 @@ function atualizarSalasDisponiveis() {
         option.value = sala.numero; 
         option.textContent = sala.nome ? `${sala.nome} (Sala ${sala.numero})` : `Sala ${sala.numero}`;
         selectSala.appendChild(option);
+    });
+}
+
+// Lógica para completar minutos automaticamente ao sair do campo de hora
+const horaField = document.getElementById('hora');
+if (horaField) {
+    horaField.addEventListener('blur', function() {
+        let valor = this.value.trim();
+        // Se o usuário digitou apenas números (1 ou 2 dígitos), ex: "9" ou "14"
+        if (valor && !valor.includes(':')) {
+            if (valor.length <= 2) {
+                const hora = valor.padStart(2, '0');
+                this.value = `${hora}:00`;
+            }
+        }
     });
 }
 

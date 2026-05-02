@@ -6,9 +6,10 @@ if (selectMotivo) {
     // Limpa as opções existentes (hardcoded)
     selectMotivo.innerHTML = '';
 
-    // Adiciona uma opção vazia inicial (opcional, mas recomendada para UX)
+    // Adiciona a opção "Selecione" inicial
     const optionVazia = document.createElement('option');
     optionVazia.value = '';
+    optionVazia.textContent = 'Selecione';
     selectMotivo.appendChild(optionVazia);
 
     OPCOES_MOTIVO.forEach(motivo => {

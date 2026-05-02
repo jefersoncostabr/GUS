@@ -28,11 +28,15 @@
                 </div>
                 <div>
                     <label for="estudio">Estúdio:</label>
-                    <select name="estudio" id="estudio" class="inputTexto selectMotivo"></select>
+                    <select name="estudio" id="estudio" class="inputTexto selectMotivo">
+                        <option value="">Selecione</option>
+                    </select>
                 </div>
                 <div>
                     <label for="sala">Sala:</label>
-                    <select class="inputNumerico" id="sala"></select>
+                    <select class="inputNumerico" id="sala" style="min-width: 120px;">
+                        <option value="">Selecione</option>
+                    </select>
                 </div>
                 <div>
                     <label for="date">Dia:</label>
@@ -45,6 +49,7 @@
                 <div>
                 <label for="motivo">Motivo:</label>
                     <select class="inputTexto selectMotivo" id="motivo">
+                        <option value="">Selecione</option>
                         <!-- Opções carregadas dinamicamente via carregarMotivos.js -->
                     </select>
                 </div>
