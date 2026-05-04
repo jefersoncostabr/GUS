@@ -1,0 +1,44 @@
+:root {
+    --bg-body: ivory;
+    --bg-panel: bisque;
+    --text-primary: rgb(155, 90, 11);
+    --text-light: #fff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    background-color: var(--bg-body);
+}
+
+.h1Login {
+    color: var(--text-primary);
+}
+
+#main {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Força o container a respeitar a largura da tela */
+    min-height: 100vh;
+}
+
+button {
+    cursor: pointer;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: var(--text-primary);
+    /* Sombra */
+    box-shadow: 0 4px 6px var(--shadow-color);
+}

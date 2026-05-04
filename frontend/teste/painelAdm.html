@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Adm</title>
+
+    <link rel="stylesheet" href="./styleGeral.css">
+    <link rel="stylesheet" href="./painelAdm.css">
+
+</head>
+<body>   
+    <main id="main">
+        <p id="painelMensagem" class="mensagem" aria-live="polite"></p>
+    
+        <!-- === Área administrativa === -->
+        <section id="adminArea" aria-label="Área administrativa">
+
+            <div id="estudiosPanel" class="adminPanel">
+                <h3>Estúdios <button type="button" id="toggleEstudiosBtn" class="btnSmall">+</button></h3>
+                <div id="estudiosContent">
+                    <form id="formEstudio">
+
+                        <input type="hidden" id="estudioId">
+
+                        <div>
+                            <legend>Filiais / Unidades</legend>
+                            <div id="estudioFiliaisContainer">
+                                <div class="filialItem">
+
+                                </div>
+                            </div>
+                            <button type="button" id="addFilialBtn" class="btnSmall">+ Filial</button>
+                        </div>
+
+                    </form>
+                    <div id="tableEstudios"></div>
+                </div>
+            </div>
+
+
+            <div id="salasPanel" class="adminPanel">
+                <h3>Salas <button type="button" id="toggleSalasBtn" class="btnSmall">+</button></h3>
+                <div id="salasContent">
+                    <form id="formSala">
+                        <div id="salasListContainer"></div>
+                        <div class="add-btn-container"><button type="button" id="addSalaBtn" class="btnSmall">+ Sala</button></div>
+                        <div class="botoesForm">
+                            <button type="button" id="salvarSalaBtn" class="btnSmall">Salvar</button>
+                            <button type="button" id="cancelarSalaBtn" class="btnSmall">Cancelar</button>
+                        </div>
+                    </form>
+                    <div id="tableSalas"></div>
+                </div>
+            </div>
+
+
+            <div id="usuariosPanel" class="adminPanel">
+                <h3>Usuários <button type="button" id="toggleUsuariosBtn" class="btnSmall">+</button></h3>
+                <div id="usuariosContent">
+                    <div id="tableUsuarios"></div>
+                    <div class="add-btn-container"><button type="button" id="addUsuarioBtn" class="btnSmall">+ Usuário</button></div>
+                </div>
+            </div>
+
+            <div id="aulasRegularesPanel" class="adminPanel">
+                <h3>Aulas Regulares <button type="button" id="toggleAulasBtn" class="btnSmall">+</button></h3>
+                <div id="aulasContent">
+                    <form id="formAula">
+                        <input type="hidden" id="aulaId">
+                        <div class="formularioContainer">
+                        <div>
+                            <label for="aulaEstudio">Estúdio:</label>
+                            <select id="aulaEstudio" class="inputTexto">
+                                <option value="">-- selecione --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="aulaSala">Sala:</label>
+                            <input type="text" id="aulaSala" class="inputTexto" placeholder="Sala">
+                        </div>
+                        <div>
+                            <label for="aulaDia">Dia:</label>
+                            <select id="aulaDia" class="inputTexto">
+                                <option value="">-- selecione --</option>
+                                <option value="segunda">Segunda-feira</option>
+                                <option value="terca">Terça-feira</option>
+                                <option value="quarta">Quarta-feira</option>
+                                <option value="quinta">Quinta-feira</option>
+                                <option value="sexta">Sexta-feira</option>
+                                <option value="sabado">Sábado</option>
+                                <option value="domingo">Domingo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="aulaHora">Hora:</label>
+                            <input type="time" id="aulaHora" class="inputNumerico">
+                        </div>
+                        <div>
+                            <label for="aulaModalidade">Modalidade:</label>
+                            <input type="text" id="aulaModalidade" class="inputTexto" placeholder="Ex: Yoga">
+                        </div>
+                        <div>
+                            <label for="aulaProfessor">Professor:</label>
+                            <input type="text" id="aulaProfessor" class="inputTexto">
+                        </div>
+                    </div>
+    
+                        <div class="botoesForm">
+                            <button type="button" id="salvarAulaBtn" class="btnSmall">Salvar</button>
+                            <button type="button" id="cancelarAulaBtn" class="btnSmall">Cancelar</button>
+                            <button type="button" id="limparCamposBtn" class="btnLimpar btnSmall">Limpar</button>
+                        </div>
+                    </form>
+                    <div id="tableAulas"></div>
+                </div>
+            </div>
+
+            <!-- Relatórios -->
+            <div id="relatoriosPanel" class="adminPanel">
+                <h3>Relatórios <button type="button" id="toggleRelatoriosBtn" class="btnSmall">+</button></h3>
+                <div id="relatoriosContent">
+                    <div class="report-actions">
+                        <button type="button" id="btnRelatorioSemana" class="btnSmall">Agendamentos da Semana</button>
+                        <button type="button" id="btnRelatorioMes" class="btnSmall">Agendamentos do Mês</button>
+                        <button type="button" id="btnRelatorioUsosProf" class="btnSmall">Usos por professor</button>
+                        <div id="containerRelatorioProf">
+                            <select id="selRelatorioProf" class="inputTexto"></select>
+                            <button type="button" id="btnIrRelatorioProf" class="btnSmall">Ir</button>
+                        </div>
+                        <button type="button" id="btnRelatorioAulas" class="btnSmall">Aulas regulares</button>
+                        <button type="button" id="btnRelatorioProfs" class="btnSmall">Professores</button>
+                    </div>
+                    <div id="relatoriosSaida"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="containerPainel" id="containerTabela">
+        </div>
+    </main>
+    
+
+    <script type="module" src="./adminUsers.js"></script>
+    <script type="module" src="./mockUsers.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+/* Styles specific to painelAdm.html */
+.adminPanel {
+    margin-top: 20px;
+    padding: 12px;    
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    /* min-width: 0; */
+}
+
+#adminArea {
+    width: 100%;
+    overflow-x:hidden;
+}
+
+/* Espaçamento dos botões de abrir/fechar nos títulos */
+.adminPanel h3 button {
+    margin-left: 10px;
+}
+
+/* Containers expansíveis - Escondidos por padrão */
+#estudiosContent,
+#salasContent,
+#usuariosContent,
+#aulasContent,
+#relatoriosContent,
+#containerRelatorioProf {
+    display: none;
+    /* overflow-x: auto;
+    max-width: 100%; */
+    padding: 0 20px 0 20px;
+}
+
+.painelTabela {
+    width: 100%;
+    min-width: 700px; /* Força a tabela a manter uma largura mínima para ativar o scroll */
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.painelTabela th,
+.painelTabela td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap; /* Impede que o texto dentro das células quebre linha */
+}
+
+/* Inputs and selects inside admin tables */
+.painelTabela input.userNome,
+.painelTabela input.userEmail {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* Layout da seção de Relatórios */
+.report-actions {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#containerRelatorioProf {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#selRelatorioProf {
+    width: auto;
+    display: inline-block;
+}
+
+#relatoriosSaida {
+    margin-top: 15px;
+}
+
+/* Utilitários de espaçamento e containers de botões */
+#salasListContainer,
+.add-btn-container {
+    margin-top: 8px;
+}
+
+.roleSelect,
+.estudioSelect {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: white;
+}
+
+.actionButtons button {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+.saveUser {
+    background-color: #28a745;
+    color: white;
+}
+
+.saveUser:hover {
+    background-color: #218838;
+}
+
+.cancelUser {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancelUser:hover {
+    background-color: #5a6268;
+}
+
+.delElemento {
+    background: #ffdddd;
+    border: 1px solid #ff9999;
+    color: #c00;
+}
+
+.filialItem {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: nowrap; /* Mantém todos os campos de "Novo Usuário" em uma única linha */
+    gap: 8px;
+    align-items: center;
+}
+
+.filialItem > * {
+    flex-shrink: 0; /* Impede que os inputs/selects diminuam de tamanho em telas pequenas */
+}
+
+.filialItem input[type='number'] {
+    width: 110px;
+    box-sizing: border-box;
+    padding: 6px;
+    border: 1px solid #ccc; /* borda similar aos demais inputs */
+    border-radius: 4px;
+}
+
+/* Larguras específicas para o formulário de novo usuário */
+.filialItem .userNome {
+    width: 240px;
+}
+.filialItem .userEmail {
+    width: 200px;
+}
+.filialItem .userSenha {
+    width: 120px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.filialItem .estudioSelect {
+    width: 140px;
+}
+
+.btnSmall {
+    padding: 4px 8px;
+    font-size: 14px;
+    border-radius: 6px;
+}

@@ -8,6 +8,7 @@
 
 import mongoose from 'mongoose';
 import { getSolicitanteModel } from '../models/usuariosmodel.js';
+import { getEstudioModel } from '../models/estudiomodel.js';
 
 /**
  * Busca e retorna todos os agendamentos (usos) da semana corrente.
@@ -82,13 +83,33 @@ export const getTodosProfessores = async (req, res) => {
 export const getAulasRegulares = async (req, res) => {
     try {
         const Aula = req.tenantModels?.Aula;
+        const Sala = req.tenantModels?.Sala;
 
-        if (!Aula) {
+        if (!Aula || !Sala) {
             return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
         }
 
-        const aulas = await Aula.find({}).populate('estudio', 'nome').populate('professor', 'solicitante');
-        res.status(200).json(aulas);
+        const Solicitante = getSolicitanteModel(mongoose.connection);
+        const Estudio = getEstudioModel(mongoose.connection);
+
+        // Busca aulas e salas em paralelo para maior performance
+        const [aulas, salas] = await Promise.all([
+            Aula.find({})
+                .populate({ path: 'estudio', model: Estudio, select: 'nome' })
+                .populate({ path: 'professor', model: Solicitante, select: 'solicitante' })
+                .lean(),
+            Sala.find({}, 'numero').lean()
+        ]);
+
+        // Mapeia IDs de sala para seus respectivos números
+        const salaMap = new Map(salas.map(s => [s._id.toString(), s.numero]));
+
+        const aulasFormatadas = aulas.map(a => ({
+            ...a,
+            sala: a.sala ? (salaMap.get(a.sala.toString()) || a.sala) : 'N/A'
+        }));
+            
+        res.status(200).json(aulasFormatadas);
     } catch (error) {
         console.error("Erro ao buscar aulas regulares:", error);
         res.status(500).json({ error: 'Erro interno ao processar relatório.' });

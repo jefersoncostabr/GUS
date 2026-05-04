@@ -1,5 +1,3 @@
-import { showMessage } from './admin.js'
-
 let cachedData = []
 let isExpanded = false
 
@@ -77,7 +75,6 @@ export function renderUsersUI(data = []) {
                         detail: { id, solicitante: nomeVal, nome: nomeVal, email: emailVal, role: roleVal },
                     })
                 )
-                showMessage('Solicitada atualização de usuário.', 'info', 3000)
             })
 
         const cancelBtn = tr.querySelector('.cancelUser')
@@ -89,7 +86,6 @@ export function renderUsersUI(data = []) {
                 if (nomeEl) nomeEl.value = tr.dataset.originalNome || ''
                 if (emailEl) emailEl.value = tr.dataset.originalEmail || ''
                 if (roleEl) roleEl.value = tr.dataset.originalRole || 'user'
-                showMessage('Alterações revertidas.', 'info', 2000)
             })
 
         const delBtn = tr.querySelector('.delUser')
@@ -97,7 +93,6 @@ export function renderUsersUI(data = []) {
             delBtn.addEventListener('click', ev => {
                 if (!confirm('Excluir usuário?')) return
                 document.dispatchEvent(new CustomEvent('admin:user:delete', { detail: { id } }))
-                showMessage('Solicitada exclusão de usuário.', 'info', 3000)
             })
     })
 }
@@ -121,13 +116,7 @@ function toggleUsersPanel() {
     if (!content) return
 
     isExpanded = !isExpanded
-    content.style.display = isExpanded ? 'block' : 'none'
-
-    // Adiciona rolagem lateral para evitar que o conteúdo seja cortado em telas pequenas
-    if (isExpanded) {
-        content.style.overflowX = 'auto'
-        content.style.maxWidth = '100%'
-    }
+    content.style.display = isExpanded ? 'block' : 'none';
 
     if (btn) btn.textContent = isExpanded ? '-' : '+'
 
@@ -150,30 +139,25 @@ if (addUserBtn)
         const table = document.getElementById('tableUsuarios')
         if (!table) return
         const container = document.createElement('div')
-        container.style.marginTop = '8px'
         container.className = 'filialItem'
 
         const inputNome = document.createElement('input')
         inputNome.type = 'text'
         inputNome.className = 'userNome'
         inputNome.placeholder = 'Nome'
-        inputNome.style.width = '240px'
 
         const inputEmail = document.createElement('input')
         inputEmail.type = 'email'
         inputEmail.className = 'userEmail'
         inputEmail.placeholder = 'Email'
-        inputEmail.style.width = '200px'
 
         const inputSenha = document.createElement('input')
         inputSenha.type = 'password'
         inputSenha.className = 'userSenha'
         inputSenha.placeholder = 'Senha'
-        inputSenha.style.width = '120px'
 
         const selectEstudio = document.createElement('select')
         selectEstudio.className = 'estudioSelect'
-        selectEstudio.style.width = '140px'
         selectEstudio.innerHTML = '<option value="">-- Estúdio --</option>'
         if (window.__estudiosCache && Array.isArray(window.__estudiosCache)) {
             window.__estudiosCache.forEach(e => {
@@ -199,7 +183,6 @@ if (addUserBtn)
             const estudioVal = selectEstudio.value || ''
             const roleVal = selectRole.value || 'user'
             if (!estudioVal) {
-                showMessage('Estúdio é obrigatório.', 'error')
                 return
             }
             document.dispatchEvent(
@@ -207,7 +190,6 @@ if (addUserBtn)
                     detail: { solicitante: nomeVal, nome: nomeVal, email: emailVal, senha: senhaVal, role: roleVal, estudio: estudioVal },
                 })
             )
-            showMessage('Solicitada criação de usuário.', 'info', 3000)
             container.remove()
         })
 
@@ -228,21 +210,3 @@ if (addUserBtn)
         container.appendChild(actions)
         table.insertAdjacentElement('afterend', container)
     })
-
-/**
- * NOTE: network actions removed from this module.
- * Consumers should listen to the following events and perform API calls:
- * - 'admin:user:update' detail: { id, nome, role }
- * - 'admin:user:delete' detail: { id }
- */
-
-/**
- * Deprecated: update/delete network functions were removed to keep this module UI-only.
- */
-
-/**
- * Nota: a inicialização relacionada à sessão/rotas foi removida.
- * Este módulo é responsável apenas por renderizar a UI. Para usar:
- * - Chame `setUsersData(array)` com os dados carregados pela camada de dados.
- * - Escute eventos `admin:user:update` e `admin:user:delete` para executar chamadas de API.
- */

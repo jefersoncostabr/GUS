@@ -236,15 +236,22 @@ class AdminController {
     static async listarAulas(req, res) {
         try {
             const Aula = req.tenantModels?.Aula;
+            const Sala = req.tenantModels?.Sala;
             const Estudio = getEstudioModel(masterConnection);
             const Solicitante = getSolicitanteModel(masterConnection);
 
-            if (!Aula) {
+            if (!Aula || !Sala) {
                 return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
             }
 
-            // 1. Busca todas as aulas do tenant
-            const aulas = await Aula.find({}).lean();
+            // 1. Busca todas as aulas e salas do tenant
+            const [aulas, salas] = await Promise.all([
+                Aula.find({}).lean(),
+                Sala.find({}, 'numero').lean()
+            ]);
+
+            // Cria um mapa para associar o ID da sala ao seu número
+            const salaMap = new Map(salas.map(s => [s._id.toString(), s.numero]));
 
             // 2. Extrai IDs de estúdios e professores (Master DB)
             const estudioIds = [...new Set(aulas.map(a => a.estudio).filter(id => id))];
@@ -263,7 +270,7 @@ class AdminController {
                 _id: a._id,
                 estudioNome: a.estudio ? (estudioMap.get(a.estudio.toString()) || 'N/A') : 'N/A',
                 estudioId: a.estudio,
-                sala: a.sala,
+                sala: a.sala ? (salaMap.get(a.sala.toString()) || a.sala) : 'N/A',
                 diaSemana: a.diaSemana,
                 horaInicio: a.horaInicio,
                 modalidade: a.modalidade,

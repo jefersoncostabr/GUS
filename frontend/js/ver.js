@@ -1,6 +1,7 @@
 import { criaTabela, getDados } from "./tabela.js";
 import { currentPage, itemsPorPagina, setOnPageChange, setTotalPages, setPage, criarElementospaginacaoTab } from "./paginacao.js";
 import { tratarDados } from "./tratamentoDeDados.js";
+import { normalizarListaAulas } from "./normalizador.js";
 
 /**
  * Remove o conteúdo atual da tabela do DOM para preparar nova renderização.
@@ -125,8 +126,52 @@ export async function verFetchPage() {
         console.error("Não deu certo. Erro:", error);
     }
 }
-document.getElementById('getUsosBtn').addEventListener('click', verFetch);
 
+/**
+ * Busca e exibe as Aulas Regulares (Usos Fixos)
+ */
+export async function verAulasFixasFetch() {
+    try {
+        document.getElementById('containerTabela').style.display = 'block';
+        const painelSaida = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+
+        // Endpoint de aulas (usando o que já existe no seu admin)
+        const response = await fetch('/admin/relatorios/aulas');
+        
+        if (!response.ok) throw new Error('Erro ao buscar aulas fixas');
+        
+        const aulasOriginais = await response.json();
+        
+        // Normaliza os dados para o formato da tabela
+        const dadosNormalizados = normalizarListaAulas(aulasOriginais);
+
+        if (dadosNormalizados.length === 0) {
+            if (painelSaida) painelSaida.innerText = 'Nenhuma aula regular encontrada';
+            limparTabela();
+            return;
+        }
+
+        limparTabela();
+        
+        // Encapsula em um objeto compatível com criaTabela
+        const result = {
+            data: dadosNormalizados,
+            totalPages: 1 // Aulas fixas geralmente não paginam no frontend
+        };
+
+        criaTabela(result);
+        if (painelSaida) painelSaida.innerText = ''; // Limpa mensagens anteriores
+
+        setTotalPages(1);
+        criarElementospaginacaoTab();
+
+    } catch (error) {
+        console.error("Erro ao carregar aulas fixas:", error);
+    }
+}
+
+document.getElementById('getUsosBtn').addEventListener('click', verFetch);
+document.getElementById('btnMostrarAulasRegulares')?.addEventListener('click', verAulasFixasFetch);
 /*
 ================================================================================
 DOCUMENTAÇÃO DO ARQUIVO: ver.js
