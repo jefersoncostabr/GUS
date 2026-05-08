@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
-import MongoStore from 'connect-mongo';
 import path from 'path';
 import mongoose from 'mongoose';
 import router from './routes/routes.js';
@@ -69,15 +68,24 @@ if (!process.env.SESSION_SECRET) {
     console.warn('\n⚠️  AVISO DE SEGURANÇA: SESSION_SECRET não detectado. Usando segredo padrão (INSEGURO para produção).\n');
 }
 
+// Configuração condicional do Store da Sessão
+// Em ambiente de teste, o connect-mongo causa erros de inicialização no Jest ESM.
+// Se 'store' for undefined, o express-session usa automaticamente o MemoryStore (ideal para testes).
+let sessionStore;
+if (process.env.NODE_ENV !== 'test') {
+    const { default: MongoStore } = await import('connect-mongo');
+    sessionStore = MongoStore.create({
+        client: conexao.getClient(), // Reaproveita a conexão já aberta do Mongoose (Banco Master)
+        collectionName: 'sessions_gus',  // Nome da coleção onde as sessões serão salvas (no banco Master)
+        touchAfter: 24 * 3600 // Evita escrever no DB em toda requisição se não houver mudança
+    });
+}
+
 app.use(session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-        client: conexao.getClient(), // Reaproveita a conexão já aberta do Mongoose (Banco Master)
-        collectionName: 'sessions_gus',  // Nome da coleção onde as sessões serão salvas (no banco Master)
-        touchAfter: 24 * 3600 // Evita escrever no DB em toda requisição se não houver mudança
-    }),
+    store: sessionStore,
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 1 dia
         httpOnly: true, // Proteção: não permite acesso via JavaScript
@@ -121,15 +129,20 @@ app.use('/', router);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+// Só inicia o servidor se não estivermos em ambiente de teste
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Servidor rodando na porta ${PORT}`);
 
-    // Implementação de teste: Verifica a URL base no backend
-   const baseUrl = process.env.NODE_ENV === 'production'
-      ? "https://gus-q7nn.onrender.com"
-      : `http://localhost:${PORT}/painelgeral.html`;
-   console.log("Resultado do teste de URL:", baseUrl);
-});
+        // Implementação de teste: Verifica a URL base no backend
+       const baseUrl = process.env.NODE_ENV === 'production'
+          ? "https://gus-q7nn.onrender.com"
+          : `http://localhost:${PORT}/painelgeral.html`;
+       console.log("Resultado do teste de URL:", baseUrl);
+    });
+}
+
+export default app;
 
 
 
