@@ -10,25 +10,28 @@
     <link rel="stylesheet" href="./assets/css/loginStyle.css">
     <link rel="stylesheet" href="./assets/css/responsividade.css">
     <link rel="stylesheet" href="./assets/css/navbar.css">
-    
+
 </head>
-<body>       
-    <!-- Menu navegação inicio -->    
+<body>
     <script type="module" src="./js/navbar.js"></script>
 
-    <div class="mainLogin">
-        <div class="login-box">
-            <h2>Criar Conta</h2>
-            <form id="criarForm">
-                <input type="text" id="username" name="solicitante" placeholder="Usuário" required>
-                <input type="text" id="estudio" name="estudio" placeholder="Nome do seu Estúdio" readonly required>
-                <input type="email" id="email" name="email" placeholder="E-mail" required>
-                <input type="password" id="password" name="senha" placeholder="Senha" required>
-                <button class="btnLogin" type="submit">Criar</button>
+    <main id="main">
+        <div class="containerPainel" style="max-width: 520px; width: 92%; margin-top: 25px;">
+            <h1 class="h1Login">Criar Conta</h1>
+
+            <form id="criarForm" style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px;">
+                <input class="inputTexto" style="width: 320px;" type="text" id="username" name="solicitante" placeholder="Usuário" required>
+                <input class="inputTexto" style="width: 320px;" type="text" id="estudio" name="estudio" placeholder="Nome do seu Estúdio" readonly required>
+                <input class="inputTexto" style="width: 320px;" type="email" id="email" name="email" placeholder="E-mail" required>
+                <input class="inputTexto" style="width: 320px;" type="password" id="password" name="senha" placeholder="Senha" required>
+                <button type="submit" style="width: 220px;">Criar</button>
             </form>
-        <div class="msg" id="msg"></div>
+
+            <p id="msg" style="margin-top: 14px; min-height: 24px; font-size: 16px; text-align: center;"></p>
+
+            <a href="./login.html" style="margin-top: 14px; color: #6b3f06; text-align: center;">Já tenho conta — Fazer login</a>
         </div>
-    </div>
+    </main>
     
     <!-- Modal de Seleção/Criação de Estúdio -->
     <div id="estudioModal" class="modal-overlay">

@@ -34,6 +34,14 @@ const solicitanteSchema = new mongoose.Schema(
         estudio: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Estudio'
+        },
+        passwordResetToken: {
+            type: String,
+            select: false
+        },
+        passwordResetExpires: {
+            type: Date,
+            select: false
         }
     },
     { versionKey: false }

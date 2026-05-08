@@ -1,7 +1,20 @@
 import express from 'express'
-import { login, logout, verificarSessao } from '../src/controllers/authController.js'
+import rateLimit from 'express-rate-limit'
+import {
+   login,
+   logout,
+   verificarSessao,
+   solicitarRecuperacao,
+   resetarSenha
+} from '../src/controllers/authController.js'
 
 const routesAuth = express.Router()
+
+const recuperacaoLimiter = rateLimit({
+   windowMs: 15 * 60 * 1000,
+   max: 5,
+   message: { error: 'Muitas tentativas. Aguarde 15 minutos.' }
+})
 
 // Rota de Login: Recebe credenciais, verifica e cria a sessão
 routesAuth.post('/login', login)
@@ -11,6 +24,10 @@ routesAuth.post('/logout', logout)
 
 // Rota para o frontend verificar quem está logado
 routesAuth.get('/usuario-logado', verificarSessao);
+
+// Rotas publicas de recuperacao de senha
+routesAuth.post('/esqueci-senha', recuperacaoLimiter, solicitarRecuperacao)
+routesAuth.post('/resetar-senha', recuperacaoLimiter, resetarSenha)
 
 export default routesAuth
 

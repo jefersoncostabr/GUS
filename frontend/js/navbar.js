@@ -17,7 +17,7 @@ import { resetarNavbar } from "./resetarNavbar.js";
         "/painelAdm.html": "Adm",
         "/sobre.html": "Sobre",
         "/loginCriar.html": "Criar Conta",
-        "/login.html": "Sair" // Alterado para lógica de logout visual
+        "/login.html": "Login" // Alterado para lógica de logout visual
     };
 
     // 3. Função para criar o HTML da Navbar
@@ -111,14 +111,14 @@ import { resetarNavbar } from "./resetarNavbar.js";
             } 
             else {
                 // Se não logado, garante que o visual seja resetado
-                // Se não tem usuário, o botão deve ser "Entrar"
-                if (loginLink) loginLink.textContent = "Entrar";
+                // Se não tem usuário, o botão deve ser "Login"
+                if (loginLink) loginLink.textContent = "Login";
                 resetarNavbar();
             }
         } catch (error) {
             console.error('Erro ao verificar sessão:', error);
             const loginLink = document.querySelector('a[href*="login.html"]');
-            if (loginLink) loginLink.textContent = "Entrar";
+            if (loginLink) loginLink.textContent = "Login";
             resetarNavbar();
         }
     }

@@ -7,13 +7,13 @@
 ## 1. Visão Geral do Fluxo
 
 ```
-[Usuário] → esqueci-senha.html → POST /auth/esqueci-senha
+[Usuário] → esqueci-senha.html → POST /esqueci-senha
                                         ↓
                                Gera token → salva HASH no Master DB
                                         ↓
                                Envia e-mail com link único
                                         ↓
-[Usuário] → resetar-senha.html?token=XXX → POST /auth/resetar-senha
+[Usuário] → resetar-senha.html?token=XXX → POST /resetar-senha
                                         ↓
                                Valida token → atualiza senha → invalida token
 ```
@@ -27,7 +27,7 @@
 | `crypto` | ✅ Nativa do Node.js | Gerar token aleatório e hashear antes de salvar no banco |
 | `bcrypt` | ✅ Já instalada | Hash da nova senha |
 | `express-rate-limit` | ✅ Já instalada | Limitar tentativas na rota de recuperação |
-| `resend` | ❌ **Precisa instalar** | Envio do e-mail com o link de recuperação |
+| `resend` | ✅ Já instalada | Envio do e-mail com o link de recuperação |
 
 ### Instalar Resend
 
@@ -47,10 +47,24 @@ RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
 EMAIL_FROM="GUS Sistema <noreply@seudominio.com>"
 
 # URL base do frontend (para montar o link no e-mail)
+# Dev: http://localhost:3000
+# Prod (Render): https://seu-app.onrender.com
 APP_URL=http://localhost:3000
 ```
 
 > **Dica de desenvolvimento:** Em desenvolvimento, use `onboarding@resend.dev` como remetente — funciona sem domínio verificado, mas só envia para o e-mail da sua conta Resend. Em produção, verifique seu domínio no painel do [Resend](https://resend.com) e troque o remetente. Plano gratuito: **3.000 e-mails/mês, 100/dia**.
+
+---
+
+## Status Atual (Checkpoint)
+
+- [x] Resend instalado (`npm install resend`)
+- [x] `.env` configurado (`RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL`)
+- [x] **Passo 1** concluído no código (`passwordResetToken` e `passwordResetExpires` em `src/models/usuariosmodel.js`)
+- [x] Passo 2 — Criar `src/services/emailService.js`
+- [x] Passo 3 — Implementar `solicitarRecuperacao` e `resetarSenha` no `authController`
+- [x] Passo 4 — Adicionar rotas públicas em `routes/routesAuth.js`
+- [x] Passo 5 — Criar páginas frontend (`esqueci-senha.html` e `resetar-senha.html`)
 
 ---
 
