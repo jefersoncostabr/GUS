@@ -29,6 +29,7 @@ import { resetarNavbar } from "./resetarNavbar.js";
         // HTML Interno
         navContainer.innerHTML = `
             <div class="painelInfoUser">
+                <img src="./assets/icones/favicon.png" alt="Logo" style="height:24px;width:24px;object-fit:contain;margin-right:6px;vertical-align:middle;">
                 <span id="painelNomeHmaburger" style="font-style: italic; color: gray;">Visitante</span>
                 <span id="painelRoleHamburger"></span>
             </div>

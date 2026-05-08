@@ -48,9 +48,9 @@ export function authMiddleware(req, res, next) {
 // Verifica se o usuário tem permissão de administrador
 export async function verificaRole(req, res, next) {
     const { role: userRole } = req.session.user;
-    const role = 'admin';
+    const rolesPermitidas = ['admin', 'adm'];
 
-    if (userRole !== role) {
+    if (!rolesPermitidas.includes(userRole)) {
         console.log('Você não tem permissão para acessar');
         return res.status(403).json({ error: 'Você não tem permissão para acessar esta rota' });
     }

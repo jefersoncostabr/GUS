@@ -1,7 +1,7 @@
 document.getElementById('containerTabela').style.display = 'none';
 
 // Pega dados paginados do servidor
-export async function getDados(page = 1, limit = 5, filters = {}) {
+export async function getDados(page = 1, limit = 6, filters = {}) {
     try {
         const baseUrl = window.location.hostname.includes("onrender.com")
             ? "https://gus-q7nn.onrender.com"
@@ -49,6 +49,29 @@ function preencherInputs(dados) {
     const elMotivo = document.getElementById('motivo'); // Pode ser Select ou Input
     const elId = document.getElementById('id');
 
+    const converterDiaParaInput = (valorDia) => {
+        if (!valorDia || typeof valorDia !== 'string') return '';
+
+        // Já está no formato YYYY-MM-DD — usa direto.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(valorDia)) return valorDia;
+
+        // Formatos com barra: D/M/AA, D/M/AAAA, DD/MM/AA, DD/MM/AAAA
+        if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(valorDia)) {
+            const [diaRaw, mesRaw, anoRaw] = valorDia.split('/');
+            const dia = diaRaw.padStart(2, '0');
+            const mes = mesRaw.padStart(2, '0');
+            const ano = anoRaw.length === 2 ? `20${anoRaw}` : anoRaw;
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        // Formato ISO com hora (ex: "2026-05-07T00:00:00.000Z")
+        if (/^\d{4}-\d{2}-\d{2}T/.test(valorDia)) {
+            return valorDia.slice(0, 10);
+        }
+
+        return '';
+    };
+
     // Preenchimento básico
     if (elSolicitante) {
         if (dados.solicitante && typeof dados.solicitante === 'object' && dados.solicitante.solicitante) {
@@ -57,20 +80,44 @@ function preencherInputs(dados) {
             elSolicitante.value = dados.solicitante || '';
         }
     }
-    if (elSala) elSala.value = dados.sala || '';
+
+    // Preenche estúdio (lookup via cache global de salas) e depois a sala
+    const salaValor = dados.sala != null ? String(dados.sala) : '';
+    if (salaValor) {
+        const elEstudio = document.getElementById('estudio');
+        const todasAsSalas = window.__todasAsSalas || [];
+        const salaEncontrada = todasAsSalas.find((s) => String(s.numero) === salaValor);
+
+        if (salaEncontrada && elEstudio) {
+            const eVal = salaEncontrada.estudio || salaEncontrada.estudioId;
+            const estudioId = (eVal && typeof eVal === 'object') ? String(eVal._id || eVal.id) : String(eVal || '');
+            if (estudioId && elEstudio.value !== estudioId) {
+                elEstudio.value = estudioId;
+                // Recarrega as opções de sala para o estúdio selecionado
+                if (typeof window.__atualizarSalasDisponiveis === 'function') {
+                    window.__atualizarSalasDisponiveis();
+                }
+            }
+        }
+
+        if (elSala) {
+            const temOpcao = Array.from(elSala.options).some((o) => o.value === salaValor);
+            if (!temOpcao) {
+                const novaOpcao = document.createElement('option');
+                novaOpcao.value = salaValor;
+                novaOpcao.textContent = `Sala ${salaValor}`;
+                elSala.appendChild(novaOpcao);
+            }
+            elSala.value = salaValor;
+        }
+    } else if (elSala) {
+        elSala.value = '';
+    }
+
     if (elId) elId.value = dados._id || '';
 
-    // Tratamento para Dia (formato DD/MM do backend para YYYY-MM-DD do input)
-    if (elDate && dados.dia && dados.dia.includes('/')) {
-        const [diaVal, mesVal] = dados.dia.split('/');
-        // Valida se dia e mês são números antes de formatar, evitando erros com dados corrompidos
-        if (!isNaN(diaVal) && !isNaN(mesVal)) {
-            const anoAtual = new Date().getFullYear();
-            // O input type="date" espera o formato YYYY-MM-DD
-            elDate.value = `${anoAtual}-${mesVal.padStart(2, '0')}-${diaVal.padStart(2, '0')}`;
-        }
-    } else if (elDate) {
-        elDate.value = ''; // Limpa o campo se não houver data
+    if (elDate) {
+        elDate.value = converterDiaParaInput(dados.dia);
     }
 
     // Tratamento para Hora (formato HH:MM)
@@ -97,6 +144,29 @@ function atribuirClick(celula, dados) {
   celula.addEventListener('click', () => {
     preencherInputs(dados);
   });
+}
+
+function formatarDiaParaTabela(valorDia) {
+        if (!valorDia || typeof valorDia !== 'string') return valorDia || '---';
+
+        // Formato ISO: YYYY-MM-DD -> DD/MM/AA
+        if (/^\d{4}-\d{2}-\d{2}$/.test(valorDia)) {
+                const [ano, mes, dia] = valorDia.split('-');
+                return `${dia}/${mes}/${ano.slice(-2)}`;
+        }
+
+        // Formato com barras: DD/MM/YYYY -> DD/MM/AA (mantém DD/MM/AA como está)
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(valorDia)) {
+                const [dia, mes, ano] = valorDia.split('/');
+                return `${dia}/${mes}/${ano.slice(-2)}`;
+        }
+
+        if (/^\d{2}\/\d{2}\/\d{2}$/.test(valorDia)) {
+                return valorDia;
+        }
+
+        // Para outros formatos (ex: "segunda" em aulas fixas), mantém original.
+        return valorDia;
 }
 
 function renderTabelaComPaginacao(data) {
@@ -126,7 +196,7 @@ function renderTabelaComPaginacao(data) {
         atribuirClick(celulaSolicitante, dado);
 
         linha.insertCell().textContent = dado.sala;
-        linha.insertCell().textContent = dado.dia;
+        linha.insertCell().textContent = formatarDiaParaTabela(dado.dia);
         linha.insertCell().textContent = dado.hora;
         linha.insertCell().textContent = dado.motivo;
     });

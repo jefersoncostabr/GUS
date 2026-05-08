@@ -3,17 +3,47 @@ import { limparImputs } from "./limparImputs.js";
 import { tratarDados, OPCOES_MOTIVO } from "./tratamentoDeDados.js";
 import { API_BASE_URL } from "./config.js";
 
+function exibirMensagemPainel(mensagem, tempoMs = 10000) {
+    const painelMensagem = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+    if (!painelMensagem) return;
+
+    painelMensagem.innerText = mensagem;
+
+    if (tempoMs > 0) {
+        setTimeout(() => {
+            painelMensagem.innerText = '';
+        }, tempoMs);
+    }
+}
+
+function normalizarHoraEntrada(valorHora) {
+    const horaTexto = String(valorHora || '').trim();
+
+    // Aceita formatos como "19", "7" e "19:" como hora cheia.
+    if (/^\d{1,2}:?$/.test(horaTexto)) {
+        const horaNumerica = horaTexto.replace(':', '');
+        return `${horaNumerica}:00`;
+    }
+
+    return horaTexto;
+}
+
 /**
  * Coleta os dados do formulário e envia uma requisição POST para criar um novo uso.
  * Aplica tratamento de dados e validação de motivo antes do envio.
  */
 async function adicionarUso() {
+    const horaNormalizada = normalizarHoraEntrada(document.getElementById('hora').value);
+
+    // Reflete a normalização no input para o usuário visualizar o formato final.
+    document.getElementById('hora').value = horaNormalizada;
+
     // Coleta dados brutos
     const dadosBrutos = {
         solicitante: document.getElementById('solicitante').value,
         sala: document.getElementById('sala').value,
         dia: document.getElementById('date').value,
-        hora: document.getElementById('hora').value,
+        hora: horaNormalizada,
         motivo: document.getElementById('motivo').value
     };
     
@@ -26,6 +56,11 @@ async function adicionarUso() {
         return;
     }
 
+    if (!novoUso.sala || !novoUso.dia || !novoUso.hora) {
+        exibirMensagemPainel('Preencha sala, dia e hora. Exemplo de hora: 19 ou 19:00.');
+        return;
+    }
+
     try {
         const response = await fetch(`${API_BASE_URL}/usos/usos`, {       
             method: 'POST',
@@ -35,21 +70,40 @@ async function adicionarUso() {
         body: JSON.stringify(novoUso),
         
     });
-        limparImputs();
-        verFetch()
 
     // Verifique se a resposta foi bem-sucedida
     if (!response.ok) {
-        document.getElementById('painelMensagem').innerText = 'Negado ou Já existe';
-        setTimeout(() => {
-            document.getElementById('painelMensagem').innerText = '';
-            }, 5000);
-        throw new Error(`Erro na resposta ao adicionar novo uso: ${response.status}`);
+        let mensagemApi = '';
+
+        try {
+            const erroResposta = await response.json();
+            mensagemApi = erroResposta?.message || erroResposta?.error || '';
+        } catch (_) {
+            mensagemApi = '';
+        }
+
+        if (response.status === 409) {
+            const mensagemConflito = mensagemApi || 'JÁ EXISTE agendamento para esta sala, dia e horário.';
+            const nomeUsuario = dadosBrutos.solicitante || 'nome do usuário';
+            exibirMensagemPainel(`${mensagemConflito}\nAgendado por: "${nomeUsuario}"`);
+        } else if (response.status === 400) {
+            exibirMensagemPainel(mensagemApi || 'Dados inválidos. Verifique os campos obrigatórios.');
+        } else {
+            exibirMensagemPainel(mensagemApi || `Não foi possível adicionar o uso (HTTP ${response.status}).`);
+        }
+
+        throw new Error(`Erro na resposta ao adicionar novo uso: ${response.status} - ${mensagemApi || 'sem detalhe da API'}`);
     }
         // Obtenha os dados da resposta
         const data = await response.json();
         console.log(data);
+        exibirMensagemPainel('Uso adicionado com sucesso.', 6000);
+        limparImputs();
+        verFetch();
     } catch (error) {
+        if (error.name === 'TypeError') {
+            exibirMensagemPainel('Falha de conexão com o servidor. Tente novamente.');
+        }
         console.error(`Erro ao adicionar novo uso: ${error.message}`);
     }
 }

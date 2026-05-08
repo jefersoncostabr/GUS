@@ -271,7 +271,12 @@ async function handleRelatorioAulas(e) {
     const data = await safeFetchJson(`${baseUrl}/admin/relatorios/aulas`);
     if (data && data.length > 0) {
       console.log('Relatório de Aulas Regulares:', data);
-      showMessage(`Relatório gerado. ${data.length} aulas encontradas no console.`, 'success');
+      
+      // Atualiza a interface de gerenciamento de aulas com os dados do relatório
+      // Isso faz com que as aulas sejam exibidas na tabela administrativa imediatamente
+      setAulasData(data);
+
+      showMessage(`Relatório gerado. ${data.length} aulas carregadas na lista abaixo.`, 'success');
       showExportButtons(data, 'btnRelatorioAulas');
     } else {
       console.log('Nenhuma aula regular encontrada.');

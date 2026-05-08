@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="./assets/icones/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Geral</title>
 
@@ -19,8 +20,8 @@
         <div class="containerPainel" id="">
             <div class="containerBotoesTopo">
                 <button class="btnSmall" id="limparImputsBtn">Limpar</button>
-                <div id="painelSaida"></div>
             </div>
+            <div id="painelSaida"></div>
             <div class="formularioContainer">
                 <div>
                     <label for="solicitante">Solicitante:</label>
@@ -44,7 +45,7 @@
                 </div>
                 <div>
                     <label for="hora">Hora:</label>
-                    <input class="inputNumerico" type="time" id="hora" placeholder="HH:MM" maxlength="5">
+                    <input class="inputNumerico" type="text" id="hora" placeholder="HH:MM" maxlength="5">
                 </div>
                 <div>
                 <label for="motivo">Motivo:</label>
@@ -69,7 +70,10 @@
             <!-- <p id="painelMensagem"></p> -->
 		</div>
         <div class="containerPainel" id="containerTabela">
-            <button class="btnSmall" id="btnMostrarAulasRegulares">Aulas Fixas</button>				
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                <button class="btnSmall" id="btnMostrarAulasRegulares">Aulas Fixas</button>
+                <span id="filtrosAtivos" style="font-size:0.70em;color:#555;"></span>
+            </div>
             <div id="tableInner"></div>
             <div id="containerPaginacao"></div>
         </div>

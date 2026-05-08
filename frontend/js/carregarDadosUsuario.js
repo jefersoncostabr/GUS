@@ -3,6 +3,8 @@
  * @returns {string} A URL base.
  */
 let todasAsSalas = [];
+// Expõe globalmente para que tabela.js possa consultar sem importação circular
+window.__todasAsSalas = todasAsSalas;
 
 function getBaseUrl() {
     return window.location.hostname.includes("onrender.com")
@@ -69,9 +71,11 @@ async function carregarTodasAsSalas() {
             throw new Error('Falha ao carregar lista de salas.');
         }
         todasAsSalas = await response.json();
+        window.__todasAsSalas = todasAsSalas; // mantém referência global atualizada
     } catch (error) {
         console.error('Erro ao carregar todas as salas:', error.message);
-        todasAsSalas = []; // Garante que o array esteja vazio em caso de erro
+        todasAsSalas = [];
+        window.__todasAsSalas = [];
     }
 }
 
@@ -130,6 +134,9 @@ const solicitanteField = document.getElementById('solicitante');
 if (solicitanteField) {
     solicitanteField.addEventListener('click', carregarDadosUsuario);
 }
+
+// Expõe atualizarSalasDisponiveis globalmente para que tabela.js possa acionar
+window.__atualizarSalasDisponiveis = atualizarSalasDisponiveis;
 
 // Adiciona o listener para o evento de mudança no select de estúdio.
 const estudioSelect = document.getElementById('estudio');

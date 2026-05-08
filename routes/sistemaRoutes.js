@@ -31,6 +31,7 @@ router.get('/rotas-disponiveis', authMiddleware, verificaRole, (req, res) => {
         { metodo: 'GET', endpoint: '/usos/usos', descricao: 'Lista usos (paginado)' },
         { metodo: 'GET', endpoint: '/usos/usos/:id', descricao: 'Detalhes de um uso específico' },
         { metodo: 'POST', endpoint: '/usos/usos', descricao: 'Cadastra novo uso' },
+        { metodo: 'POST', endpoint: '/usos/usos/gerar-teste', descricao: 'Cria 10 usos de teste sem conflito (admin/adm)' },
         { metodo: 'PUT', endpoint: '/usos/usos/:id', descricao: 'Atualiza um uso existente' },
         { metodo: 'DELETE', endpoint: '/usos/usos/:id', descricao: 'Remove um uso' },
         { metodo: 'GET', endpoint: '/usos/buscaid', descricao: 'Busca ID de uso por filtros' },

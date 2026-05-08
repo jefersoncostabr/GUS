@@ -126,6 +126,18 @@ POST /usos/usos
     - Middleware: verificaDuplicidade.
     - Retorno: Objeto criado.
 
+POST /usos/usos/gerar-teste
+    - Descrição: Cria 10 usos de teste no banco do tenant autenticado, com hora cheia.
+    - Segurança: requer autenticação + role `admin` (aceita `adm` por compatibilidade).
+    - Regras:
+        - Cria exatamente 10 registros.
+        - Não repete combinação sala+dia+hora.
+        - Se `estudioId` for informado, usa apenas salas desse estúdio.
+    - Body JSON (opcional):
+        - `estudioId`: ID do estúdio para restringir as salas.
+    - Retorno: JSON com `totalCriado` e a lista `itens`.
+    - header: Content-Type: application/json.
+
 PUT /usos/usos/:id
     - Descrição: Atualiza um uso existente.
     - Middleware: verificaSolicitante (apenas o dono pode editar).
@@ -135,6 +147,46 @@ DELETE /usos/usos/:id
     - Descrição: Remove um registro de uso.
     - Middleware: verificaSolicitante (apenas o dono pode remover).
     - Retorno: Mensagem de sucesso.
+
+### Exemplo de requisição no Postman (gerar 10 usos)
+
+1. Método e URL:
+     - `POST http://localhost:3000/usos/usos/gerar-teste`
+
+2. Autenticação:
+     - Faça login antes na rota `POST /login`.
+     - Reutilize o cookie de sessão (`connect.sid`) no Postman.
+
+3. Headers:
+     - `Content-Type: application/json`
+
+4. Body (raw JSON):
+
+```json
+{
+    "estudioId": "665f3b95f7f0f3e9a1c23456"
+}
+```
+
+5. Resposta esperada (201):
+
+```json
+{
+    "message": "10 usos de teste criados com sucesso.",
+    "totalCriado": 10,
+    "estudioId": "665f3b95f7f0f3e9a1c23456",
+    "itens": [
+        {
+            "_id": "...",
+            "solicitante": "...",
+            "sala": "1",
+            "dia": "2026-05-08",
+            "hora": "08:00",
+            "motivo": "Gravação"
+        }
+    ]
+}
+```
 ================================================================================
 
 

@@ -59,13 +59,15 @@ h1 {
 }
 
 #painelSaida {
-    margin-top: 20px;
+    margin-top: 8px;
+    margin-bottom: 14px;
+    min-height: 22px;
     font-size: 20px;
     color: var(--text-primary);
 }
 
 .containerBotoesTopo {
-    margin-bottom: 20px;
+    margin-bottom: 6px;
     display: flex;
     gap: 10px;
 }
@@ -85,6 +87,24 @@ button {
     padding: 4px 8px;
     font-size: 14px;
     border-radius: 6px;
+}
+
+#adicionarUsoBtn {
+    background-color: #1f8f4f;
+    color: #ffffff;
+}
+
+#adicionarUsoBtn:hover {
+    background-color: #187340;
+}
+
+#excluirUsoBtn {
+    background-color: #c83a3a;
+    color: #ffffff;
+}
+
+#excluirUsoBtn:hover {
+    background-color: #a92f2f;
 }
 
 #id {
@@ -116,7 +136,7 @@ button {
 
 #hora {
     width: 65px;
-    text-align: center;       
+    text-align: center;
 }
 
 /* Remove o ícone de relógio nativo do navegador */

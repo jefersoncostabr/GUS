@@ -5,6 +5,20 @@
 /* --- CONTROLES DE PAGINAÇÃO --- */
 /* Para telas pequenas (celulares) com largura de até 600px */
 @media (max-width: 600px) {
+    .containerTabBotoes {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin: 10px auto !important;
+        gap: 8px;
+    }
+
+    #btnVoltarTab,
+    #paginaInfo {
+        margin-right: 0 !important;
+    }
+
     /* Reduz o tamanho dos botões de paginação */
     .btnVoltarTab,
     .btnAvancarTab {

@@ -3,7 +3,7 @@ table {
     background-color: transparent;
     /* border: 2px solid black; */
     text-align: center;
-    font-size: .8rem;
+    font-size: 0.8rem;
 }
 
 th,
@@ -19,6 +19,10 @@ th {
 
 .containerTabBotoes {
     gap: 10px;
+}
+
+#tableInner {
+    margin-top: 12px;
 }
 
 td:nth-child(1) {

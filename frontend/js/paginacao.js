@@ -1,5 +1,5 @@
 export let currentPage = 1;
-export const itemsPorPagina = 5; // default page size
+export const itemsPorPagina = 6; // default page size
 export let totalPages = 1;
 
 let onPageChange = null; // callback a ser registrado por ver.js

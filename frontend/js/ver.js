@@ -3,6 +3,43 @@ import { currentPage, itemsPorPagina, setOnPageChange, setTotalPages, setPage, c
 import { tratarDados } from "./tratamentoDeDados.js";
 import { normalizarListaAulas } from "./normalizador.js";
 
+let mostrandoAulasFixas = false;
+let dadosAulasFixasCached = []; // cache para paginação client-side das aulas fixas
+let filtrosBuscaAtual = {}; // mantém os filtros aplicados na última busca (botão Ver)
+
+/**
+ * Atualiza o span #filtrosAtivos com um resumo legível dos filtros ativos.
+ */
+function atualizarFiltrosLabel() {
+    const el = document.getElementById('filtrosAtivos');
+    if (!el) return;
+
+    const partes = [];
+
+    const solicitante = document.getElementById('solicitante')?.value.trim();
+    if (solicitante) partes.push(solicitante);
+
+    const estudioSel = document.getElementById('estudio');
+    if (estudioSel && estudioSel.value) partes.push(estudioSel.options[estudioSel.selectedIndex]?.text || estudioSel.value);
+
+    const salaSel = document.getElementById('sala');
+    if (salaSel && salaSel.value) partes.push(salaSel.options[salaSel.selectedIndex]?.text || salaSel.value);
+
+    const dia = document.getElementById('date')?.value;
+    if (dia) {
+        const [y, m, d] = dia.split('-');
+        partes.push(`${d}/${m}/${y}`);
+    }
+
+    const hora = document.getElementById('hora')?.value.trim();
+    if (hora) partes.push(hora);
+
+    const motivoSel = document.getElementById('motivo');
+    if (motivoSel && motivoSel.value) partes.push(motivoSel.options[motivoSel.selectedIndex]?.text || motivoSel.value);
+
+    el.textContent = partes.length ? partes.join(' | ') : '';
+}
+
 /**
  * Remove o conteúdo atual da tabela do DOM para preparar nova renderização.
  * Limpa apenas a área da tabela (não remove os controles de paginação).
@@ -21,6 +58,11 @@ function limparTabela() {
  */
 export async function verFetch() {
     try {
+        mostrandoAulasFixas = false;
+        dadosAulasFixasCached = [];
+        atualizarVisualBotaoToggle(false);
+        atualizarFiltrosLabel();
+
         document.getElementById('containerTabela').style.display = 'block';
 
         // Reseta para a primeira página ao fazer uma nova busca
@@ -52,6 +94,9 @@ export async function verFetch() {
         if (horaBusca) filters.hora = horaBusca;
 
         if (rawValues.motivo) filters.motivo = rawValues.motivo.trim();
+
+        // Congela os filtros da busca atual para paginação consistente
+        filtrosBuscaAtual = { ...filters };
 
         // Registra callback de troca de página para recarregar dados
         setOnPageChange(async () => {
@@ -90,32 +135,7 @@ export async function verFetch() {
  */
 export async function verFetchPage() {
     try {
-        const rawValues = {
-            solicitante: document.getElementById('solicitante').value,
-            sala: document.getElementById('sala').value,
-            dia: document.getElementById('date').value,
-            hora: document.getElementById('hora').value,
-            motivo: document.getElementById('motivo').value,
-        };
-
-        const inputValues = tratarDados(rawValues);
-
-        const filters = {};
-        if (inputValues.solicitante) filters.solicitante = inputValues.solicitante;
-        if (inputValues.sala) filters.sala = parseInt(inputValues.sala);
-        if (inputValues.dia) filters.dia = inputValues.dia;
-        
-        // Formata hora para busca: se 1 ou 2 dígitos (ex: "1", "14"), converte para "01:00", "14:00"
-        let horaBuscaPage = rawValues.hora.trim();
-        const horaNumerosPage = horaBuscaPage.replace(/\D/g, '');
-        if (horaNumerosPage.length > 0 && horaNumerosPage.length <= 2) {
-            horaBuscaPage = horaNumerosPage.padStart(2, '0') + ':00';
-        }
-        if (horaBuscaPage) filters.hora = horaBuscaPage;
-
-        if (rawValues.motivo) filters.motivo = rawValues.motivo.trim();
-
-        const result = await getDados(currentPage, itemsPorPagina, filters);
+        const result = await getDados(currentPage, itemsPorPagina, filtrosBuscaAtual);
         limparTabela();
         criaTabela(result);
         setTotalPages(result.totalPages || 1);
@@ -132,41 +152,104 @@ export async function verFetchPage() {
  */
 export async function verAulasFixasFetch() {
     try {
+        // Lógica de Toggle: Se já estiver mostrando, volta para a visão padrão
+        if (mostrandoAulasFixas) {
+            mostrandoAulasFixas = false;
+            dadosAulasFixasCached = [];
+            return verFetch();
+        }
+
         document.getElementById('containerTabela').style.display = 'block';
-        const painelSaida = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+        const container = document.getElementById('containerTabela');
+        container.style.display = 'block';
+        container.style.marginTop = '20px'; // Adiciona o espaçamento
 
-        // Endpoint de aulas (usando o que já existe no seu admin)
-        const response = await fetch('/admin/relatorios/aulas');
-        
-        if (!response.ok) throw new Error('Erro ao buscar aulas fixas');
-        
-        const aulasOriginais = await response.json();
-        
-        // Normaliza os dados para o formato da tabela
-        const dadosNormalizados = normalizarListaAulas(aulasOriginais);
+        const painelSaida = document.getElementById('painelMensagem') || document.getElementById('painelSaida');
 
-        if (dadosNormalizados.length === 0) {
-            if (painelSaida) painelSaida.innerText = 'Nenhuma aula regular encontrada';
+        // Obtém os filtros atuais da tela para buscar também os agendamentos pontuais (Usos)
+        const rawValues = {
+            solicitante: document.getElementById('solicitante').value,
+            sala: document.getElementById('sala').value,
+            dia: document.getElementById('date').value,
+            hora: document.getElementById('hora').value,
+            motivo: document.getElementById('motivo').value,
+        };
+        const inputValues = tratarDados(rawValues);
+        const filters = {};
+        if (inputValues.solicitante) filters.solicitante = inputValues.solicitante;
+        if (inputValues.sala) filters.sala = parseInt(inputValues.sala);
+        if (inputValues.dia) filters.dia = inputValues.dia;
+
+        // Busca Aulas Regulares e Usos (Agendamentos) em paralelo para exibir juntos
+        const [respAulas, resultUsos] = await Promise.all([
+            fetch('/admin/relatorios/aulas'),
+            getDados(1, 100, filters) // Busca os agendamentos que batem com o filtro atual
+        ]);
+        
+        if (!respAulas.ok) throw new Error('Erro ao buscar aulas fixas');
+        
+        const aulasOriginais = await respAulas.json();
+        const usosExistentes = resultUsos.data || [];
+        
+        // Normaliza as aulas fixas para o formato da tabela (compatível com a estrutura de Usos)
+        const aulasNormalizadas = normalizarListaAulas(aulasOriginais);
+
+        // Combina os dois tipos de dados para exibição conjunta
+        const dadosCombinados = [...usosExistentes, ...aulasNormalizadas];
+
+        if (dadosCombinados.length === 0) {
+            if (painelSaida) painelSaida.innerText = 'Nenhum registro (agendamento ou aula fixa) encontrado';
             limparTabela();
             return;
         }
 
-        limparTabela();
-        
-        // Encapsula em um objeto compatível com criaTabela
-        const result = {
-            data: dadosNormalizados,
-            totalPages: 1 // Aulas fixas geralmente não paginam no frontend
-        };
+        // Armazena no cache para paginação client-side
+        dadosAulasFixasCached = dadosCombinados;
+        mostrandoAulasFixas = true;
+        atualizarVisualBotaoToggle(true);
 
-        criaTabela(result);
+        // Reseta para a primeira página
+        setPage(1);
+
+        const totalPags = Math.ceil(dadosCombinados.length / itemsPorPagina);
+
+        // Registra callback de troca de página para recarregar a fatia correta
+        setOnPageChange(() => {
+            const inicio = (currentPage - 1) * itemsPorPagina;
+            const fatia = dadosAulasFixasCached.slice(inicio, inicio + itemsPorPagina);
+            limparTabela();
+            criaTabela({ data: fatia, totalPages: Math.ceil(dadosAulasFixasCached.length / itemsPorPagina) });
+            criarElementospaginacaoTab();
+        });
+
+        // Renderiza a primeira página
+        const fatiaInicial = dadosCombinados.slice(0, itemsPorPagina);
+        limparTabela();
+        criaTabela({ data: fatiaInicial, totalPages: totalPags });
+
         if (painelSaida) painelSaida.innerText = ''; // Limpa mensagens anteriores
 
-        setTotalPages(1);
+        setTotalPages(totalPags);
         criarElementospaginacaoTab();
 
     } catch (error) {
         console.error("Erro ao carregar aulas fixas:", error);
+    }
+}
+
+/**
+ * Altera visualmente o botão de aulas fixas para indicar se o filtro está ativo.
+ */
+function atualizarVisualBotaoToggle(ativo) {
+    const btn = document.getElementById('btnMostrarAulasRegulares');
+    if (!btn) return;
+
+    if (ativo) {
+        btn.style.filter = "brightness(0.9)";
+        btn.innerText = "Ocultar Aulas Fixas";
+    } else {
+        btn.style.filter = "";
+        btn.innerText = "Aulas Fixas";
     }
 }
 

@@ -10,6 +10,7 @@ import {
     buscarUsoPorId, 
     buscarIdUso, 
     criarUso, 
+    criarDezUsosTeste,
     atualizarUso, 
     deletarUso 
 } from "../src/controllers/usoController.js";
@@ -32,6 +33,9 @@ routerUsos.get('/buscaid', buscarIdUso);
 
 // http://localhost:3000/usos/usos
 routerUsos.post('/usos', criarUso);
+
+// http://localhost:3000/usos/usos/gerar-teste
+routerUsos.post('/usos/gerar-teste', authMiddleware, verificaRole, criarDezUsosTeste);
 
 // http://localhost:3000/usos/usos/:id
 routerUsos.put('/usos/:id', atualizarUso);
