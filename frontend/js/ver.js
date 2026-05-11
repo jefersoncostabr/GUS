@@ -6,6 +6,7 @@ import { normalizarListaAulas } from "./normalizador.js";
 let mostrandoAulasFixas = false;
 let dadosAulasFixasCached = []; // cache para paginação client-side das aulas fixas
 let filtrosBuscaAtual = {}; // mantém os filtros aplicados na última busca (botão Ver)
+let filtrosFrontend = {}; // filtros a serem aplicados localmente (client-side)
 
 /**
  * Atualiza o span #filtrosAtivos com um resumo legível dos filtros ativos.
@@ -41,6 +42,55 @@ function atualizarFiltrosLabel() {
 }
 
 /**
+ * Filtra localmente um array de dados de acordo com os filtros do frontend.
+ * @param {Array} dados - Array com os dados a filtrar
+ * @param {Object} filtros - Objeto com filtros { solicitante, sala, dia, hora, motivo }
+ * @returns {Array} Array filtrado
+ */
+function filtrarDadosLocalmente(dados, filtros) {
+    if (!dados || dados.length === 0 || Object.keys(filtros).length === 0) {
+        return dados;
+    }
+
+    return dados.filter(item => {
+        // Filtro por solicitante
+        if (filtros.solicitante && item.solicitante) {
+            if (!item.solicitante.toLowerCase().includes(filtros.solicitante.toLowerCase())) {
+                return false;
+            }
+        }
+
+        // Filtro por sala (comparação numérica)
+        if (filtros.sala !== undefined && item.sala !== filtros.sala) {
+            return false;
+        }
+
+        // Filtro por dia (para usos é DD/MM/AA, para aulas é nome do dia)
+        if (filtros.dia && item.dia) {
+            if (!item.dia.toString().includes(filtros.dia.toString())) {
+                return false;
+            }
+        }
+
+        // Filtro por hora
+        if (filtros.hora && item.hora) {
+            if (!item.hora.includes(filtros.hora)) {
+                return false;
+            }
+        }
+
+        // Filtro por motivo
+        if (filtros.motivo && item.motivo) {
+            if (!item.motivo.toLowerCase().includes(filtros.motivo.toLowerCase())) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
+/**
  * Remove o conteúdo atual da tabela do DOM para preparar nova renderização.
  * Limpa apenas a área da tabela (não remove os controles de paginação).
  */
@@ -71,7 +121,7 @@ export async function verFetch() {
         const rawValues = {
             solicitante: document.getElementById('solicitante').value,
             sala: document.getElementById('sala').value,
-        dia: document.getElementById('date').value,
+            dia: document.getElementById('date').value,
             hora: document.getElementById('hora').value,
             motivo: document.getElementById('motivo').value,
         };
@@ -79,38 +129,83 @@ export async function verFetch() {
         // Trata os dados antes de filtrar (ex: formata hora 14 para 14:00)
         const inputValues = tratarDados(rawValues);
 
-        // Constrói filtros para enviar ao servidor (converte números quando aplicável)
-        const filters = {};
-        if (inputValues.solicitante) filters.solicitante = inputValues.solicitante;
-        if (inputValues.sala) filters.sala = parseInt(inputValues.sala);
-        if (inputValues.dia) filters.dia = inputValues.dia;
-        
-        // Formata hora para busca: se 1 ou 2 dígitos (ex: "1", "14"), converte para "01:00", "14:00"
-        let horaBusca = rawValues.hora.trim();
-        const horaNumeros = horaBusca.replace(/\D/g, '');
-        if (horaNumeros.length > 0 && horaNumeros.length <= 2) {
-            horaBusca = horaNumeros.padStart(2, '0') + ':00';
-        }
-        if (horaBusca) filters.hora = horaBusca;
+        // Detecta se há algum filtro preenchido
+        const temFiltros = Object.values(rawValues).some(v => v && v.toString().trim() !== '');
+        console.log('temFiltros:', temFiltros, 'rawValues:', rawValues);
 
-        if (rawValues.motivo) filters.motivo = rawValues.motivo.trim();
+        // Se houver filtros, guardar para filtragem local
+        if (temFiltros) {
+            // Limpar exibição de filtros
+            const el = document.getElementById('filtrosAtivos');
+            if (el) el.textContent = '';
+            console.log('Filtros detectados, limpando #filtrosAtivos');
+
+            filtrosFrontend = {};
+            if (inputValues.solicitante) filtrosFrontend.solicitante = inputValues.solicitante;
+            if (inputValues.sala) filtrosFrontend.sala = parseInt(inputValues.sala);
+            if (inputValues.dia) filtrosFrontend.dia = inputValues.dia;
+            
+            let horaBusca = rawValues.hora.trim();
+            const horaNumeros = horaBusca.replace(/\D/g, '');
+            if (horaNumeros.length > 0 && horaNumeros.length <= 2) {
+                horaBusca = horaNumeros.padStart(2, '0') + ':00';
+            }
+            if (horaBusca) filtrosFrontend.hora = horaBusca;
+
+            if (rawValues.motivo) filtrosFrontend.motivo = rawValues.motivo.trim();
+            console.log('filtrosFrontend:', filtrosFrontend);
+        } else {
+            filtrosFrontend = {};
+        }
 
         // Congela os filtros da busca atual para paginação consistente
-        filtrosBuscaAtual = { ...filters };
+        filtrosBuscaAtual = temFiltros ? {} : {}; // Se tem filtros, não usar no servidor
 
         // Registra callback de troca de página para recarregar dados
         setOnPageChange(async () => {
             await verFetchPage();
         });
 
-        // Carrega a primeira página
-        const result = await getDados(currentPage, itemsPorPagina, filters);
+        // Carrega a primeira página de usos + aulas regulares em paralelo
+        // Se tem filtros do frontend, não enviar para servidor, trazer TODOS e filtrar localmente
+        const filtersParaServidor = temFiltros ? {} : (Object.keys(filtrosFrontend).length === 0 ? {} : filtrosFrontend);
+        
+        const [resultUsos, respAulas] = await Promise.all([
+            getDados(currentPage, itemsPorPagina, filtersParaServidor),
+            fetch('/admin/relatorios/aulas').catch(() => ({ ok: false }))
+        ]);
 
-        if (!result.data || result.data.length === 0) {
-            console.log("Uso não encontrado");
+        const usosData = resultUsos.data || [];
+        let aulasData = [];
+        
+        if (respAulas.ok) {
+            try {
+                const aulasOriginais = await respAulas.json();
+                aulasData = normalizarListaAulas(aulasOriginais);
+            } catch (e) {
+                console.error('Erro ao processar aulas:', e);
+            }
+        }
+
+        // Combina usos e aulas
+        let dadosCombinados = [...usosData, ...aulasData];
+
+        // Se há filtros do frontend, aplicar filtragem local
+        if (temFiltros) {
+            dadosCombinados = filtrarDadosLocalmente(dadosCombinados, filtrosFrontend);
+            // Quando há filtros, não exibe a tabela
+            limparTabela();
+            criaTabela({ data: [], page: resultUsos.page, limit: resultUsos.limit, totalItems: 0, totalPages: 1 });
+            setTotalPages(1);
+            criarElementospaginacaoTab();
+            return { data: [], ...resultUsos };
+        }
+
+        if (!dadosCombinados || dadosCombinados.length === 0) {
+            console.log("Nenhum registro encontrado");
             const painelSaida = document.getElementById('painelMensagem');
             if (painelSaida) {
-                painelSaida.innerText = 'Uso não encontrado';
+                painelSaida.innerText = 'Nenhum registro encontrado';
                 setTimeout(() => {
                     painelSaida.innerText = '';
                 }, 5000);
@@ -118,11 +213,11 @@ export async function verFetch() {
         }
 
         limparTabela();
-        criaTabela(result);
-        setTotalPages(result.totalPages || 1);
+        criaTabela({ data: dadosCombinados, page: resultUsos.page, limit: resultUsos.limit, totalItems: dadosCombinados.length, totalPages: resultUsos.totalPages });
+        setTotalPages(resultUsos.totalPages || 1);
         criarElementospaginacaoTab();
 
-        return result;
+        return { data: dadosCombinados, ...resultUsos };
     } catch (error) {
         console.error("Não deu certo. Erro:", error);
     }
@@ -135,13 +230,32 @@ export async function verFetch() {
  */
 export async function verFetchPage() {
     try {
-        const result = await getDados(currentPage, itemsPorPagina, filtrosBuscaAtual);
+        const resultUsos = await getDados(currentPage, itemsPorPagina, filtrosBuscaAtual);
+        let aulasData = [];
+        
+        try {
+            const respAulas = await fetch('/admin/relatorios/aulas');
+            if (respAulas.ok) {
+                const aulasOriginais = await respAulas.json();
+                aulasData = normalizarListaAulas(aulasOriginais);
+            }
+        } catch (e) {
+            console.error('Erro ao buscar aulas:', e);
+        }
+
+        let dadosCombinados = [...(resultUsos.data || []), ...aulasData];
+
+        // Se há filtros do frontend, aplicar filtragem local
+        if (Object.keys(filtrosFrontend).length > 0) {
+            dadosCombinados = filtrarDadosLocalmente(dadosCombinados, filtrosFrontend);
+        }
+
         limparTabela();
-        criaTabela(result);
-        setTotalPages(result.totalPages || 1);
+        criaTabela({ data: dadosCombinados, ...resultUsos });
+        setTotalPages(resultUsos.totalPages || 1);
         // recria os controles de paginação a cada mudança de página
         criarElementospaginacaoTab();
-        return result;
+        return { data: dadosCombinados, ...resultUsos };
     } catch (error) {
         console.error("Não deu certo. Erro:", error);
     }

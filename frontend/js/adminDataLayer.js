@@ -210,7 +210,7 @@ async function handleRelatorioSemana(e) {
       showExportButtons(data, 'btnRelatorioSemana');
     } else {
       console.log('Nenhum agendamento encontrado para a semana atual.');
-      showMessage('Nenhum agendamento encontrado para a semana atual.', 'info');
+      showMessage('Nenhum agendamento encontrado para a semana atual.', 'info', 10000);
     }
   } catch (err) {
     // safeFetchJson já mostra a mensagem de erro de rede
@@ -231,7 +231,7 @@ async function handleRelatorioMes(e) {
       showExportButtons(data, 'btnRelatorioMes');
     } else {
       console.log('Nenhum agendamento encontrado para o mês atual.');
-      showMessage('Nenhum agendamento encontrado para o mês atual.', 'info');
+      showMessage('Nenhum agendamento encontrado para o mês atual.', 'info', 10000);
     }
   } catch (err) {
     // safeFetchJson já mostra a mensagem de erro de rede
@@ -254,7 +254,7 @@ async function handleRelatorioProfessor(e) {
       showExportButtons(data, 'btnIrRelatorioProf');
     } else {
       console.log('Nenhum agendamento encontrado para este professor.');
-      showMessage('Nenhum agendamento encontrado para este professor.', 'info');
+      showMessage('Nenhum agendamento encontrado para este professor.', 'info', 10000);
     }
   } catch (err) {
     // safeFetchJson já lida com erros de rede
@@ -280,7 +280,7 @@ async function handleRelatorioAulas(e) {
       showExportButtons(data, 'btnRelatorioAulas');
     } else {
       console.log('Nenhuma aula regular encontrada.');
-      showMessage('Nenhuma aula regular encontrada.', 'info');
+      showMessage('Nenhuma aula regular encontrada.', 'info', 10000);
     }
   } catch (err) {
     // safeFetchJson já lida com erros de rede
@@ -301,7 +301,7 @@ async function handleRelatorioProfessores(e) {
       showExportButtons(data, 'btnRelatorioProfs');
     } else {
       console.log('Nenhum professor encontrado.');
-      showMessage('Nenhum professor encontrado.', 'info');
+      showMessage('Nenhum professor encontrado.', 'info', 10000);
     }
   } catch (err) {
     // safeFetchJson já lida com erros de rede

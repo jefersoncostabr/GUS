@@ -92,8 +92,16 @@ async function pegarIdEAlterar() {
     const id = await pegarIdUnico();
     const sucesso = await alterarUso(id);
     if (sucesso) {
+        // Limpar painel de mensagens
+        const painelMsg = document.getElementById('painelMensagem') || document.getElementById('painelSaida');
+        if (painelMsg) {
+            painelMsg.innerText = '';
+        }
+        
         limparImputs();
-        window.location.reload();
+        
+        // Recarregar tabela sem fazer refresh da página
+        await verFetch();
     }
 }
 

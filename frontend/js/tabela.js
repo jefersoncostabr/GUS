@@ -179,8 +179,21 @@ function destacarUltimoCriado(tabela) {
     sessionStorage.removeItem('ultimoUsoCriadoId');
 }
 
-function formatarDiaParaTabela(valorDia) {
+function formatarDiaParaTabela(valorDia, isAulaFixa = false) {
         if (!valorDia || typeof valorDia !== 'string') return valorDia || '---';
+
+        if (isAulaFixa) {
+                const diasSemana = {
+                    'segunda': 'Segunda',
+                    'terca': 'Terça',
+                    'quarta': 'Quarta',
+                    'quinta': 'Quinta',
+                    'sexta': 'Sexta',
+                    'sabado': 'Sábado',
+                    'domingo': 'Domingo'
+                };
+                return diasSemana[valorDia.toLowerCase()] || valorDia;
+        }
 
         // Formato ISO: YYYY-MM-DD -> DD/MM/AA
         if (/^\d{4}-\d{2}-\d{2}$/.test(valorDia)) {
@@ -232,7 +245,7 @@ function renderTabelaComPaginacao(data) {
         atribuirClick(linha, dado);
 
         linha.insertCell().textContent = dado.sala;
-        linha.insertCell().textContent = formatarDiaParaTabela(dado.dia);
+        linha.insertCell().textContent = formatarDiaParaTabela(dado.dia, dado.isAulaFixa);
         linha.insertCell().textContent = dado.hora;
         linha.insertCell().textContent = dado.motivo;
     });
