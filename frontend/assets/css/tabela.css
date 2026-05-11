@@ -30,6 +30,16 @@ td:nth-child(1) {
     /* font-size: 1.4rem; */
 }
 
+tr.linha-destaque td {
+    color: var(--text-primary) !important;
+    background-color: rgba(90, 44, 160, 0.14) !important;
+    font-weight: 700 !important;
+}
+
+tr.linha-destaque td:nth-child(1) {
+    color: var(--text-primary) !important;
+}
+
 @media (max-width: 393px) {
 }
 

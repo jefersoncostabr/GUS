@@ -62,7 +62,7 @@ export function renderEstudiosUI(data = []) {
                     // legacy: parse localizacao string into nome only
                     locs = (item.localizacao || '')
                         .split(';')
-                        .map(s => ({ nome: s.trim(), endereco: '' }))
+                        .map(s => ({ nome: s.trim(), endereco: '', salas: item.quantidadeSalas || 0 }))
                         .filter(x => x.nome)
                 }
                 if (locs.length) {

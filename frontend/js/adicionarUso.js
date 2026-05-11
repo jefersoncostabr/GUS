@@ -113,9 +113,7 @@ async function adicionarUso() {
         }
 
         if (response.status === 409) {
-            const mensagemConflito = mensagemApi || 'JÁ EXISTE agendamento para esta sala, dia e horário.';
-            const nomeUsuario = dadosBrutos.solicitante || 'nome do usuário';
-            exibirMensagemPainel(`${mensagemConflito}\nAgendado por: "${nomeUsuario}"`);
+            exibirMensagemPainel('Conflito: Sala Ocupada');
         } else if (response.status === 400) {
             exibirMensagemPainel(mensagemApi || 'Dados inválidos. Verifique os campos obrigatórios.');
         } else {
@@ -126,6 +124,9 @@ async function adicionarUso() {
     }
         // Obtenha os dados da resposta
         const data = await response.json();
+        if (data && data._id) {
+            sessionStorage.setItem('ultimoUsoCriadoId', data._id);
+        }
         console.log('Resposta completa da API ao criar uso:', data);
         exibirMensagemPainel('Uso adicionado com sucesso.', 6000);
         limparImputs();

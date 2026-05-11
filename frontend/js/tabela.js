@@ -150,8 +150,33 @@ function preencherInputs(dados) {
 function atribuirClick(elemento, dados) {
     elemento.addEventListener('click', () => {
         console.log('Registro completo selecionado na tabela:', dados);
+        destacarLinhaSelecionada(elemento);
         preencherInputs(dados);
     });
+}
+
+function destacarLinhaSelecionada(linhaSelecionada) {
+    const tabelaAtual = document.querySelector('#tableInner table');
+    if (!tabelaAtual) return;
+
+    tabelaAtual.querySelectorAll('tr').forEach((linha) => {
+        linha.classList.remove('linha-destaque');
+    });
+
+    if (linhaSelecionada) {
+        linhaSelecionada.classList.add('linha-destaque');
+    }
+}
+
+function destacarUltimoCriado(tabela) {
+    const ultimoId = sessionStorage.getItem('ultimoUsoCriadoId');
+    if (!ultimoId) return;
+
+    const linhaDestino = tabela.querySelector(`tbody tr[data-id="${ultimoId}"]`);
+    if (!linhaDestino) return;
+
+    destacarLinhaSelecionada(linhaDestino);
+    sessionStorage.removeItem('ultimoUsoCriadoId');
 }
 
 function formatarDiaParaTabela(valorDia) {
@@ -194,6 +219,9 @@ function renderTabelaComPaginacao(data) {
     // Criar linhas da tabela
     data.forEach((dado) => {
         const linha = tabela.insertRow();
+        if (dado && dado._id) {
+            linha.dataset.id = dado._id;
+        }
         const celulaSolicitante = linha.insertCell();
         
         if (dado.solicitante && typeof dado.solicitante === 'object' && dado.solicitante.solicitante) {
@@ -211,6 +239,8 @@ function renderTabelaComPaginacao(data) {
 
     // Adicionar tabela ao documento
     containerTabela.appendChild(tabela);
+
+    destacarUltimoCriado(tabela);
 }
 
 // Cria a tabela c dados

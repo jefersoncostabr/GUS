@@ -78,6 +78,7 @@ export const listarUsos = async (req, res) => {
 
         const skip = (page - 1) * limit;
         const listaDeUsos = await Uso.find(query)
+            .sort({ _id: -1 })
             .populate({
                 path: 'solicitante',
                 model: Solicitante

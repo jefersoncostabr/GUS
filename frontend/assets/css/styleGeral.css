@@ -254,6 +254,12 @@ label {
     color: var(--text-primary);
 }
 
+#paginaInfo {
+    margin-right: 10px;
+    color: var(--text-primary);
+    font: inherit;
+}
+
 .botoesInfContainer {
     /* display: flex; */
     /* gap: 10px; */
