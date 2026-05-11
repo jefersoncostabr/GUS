@@ -120,7 +120,7 @@ app.get('/estudios', async (req, res) => {
 });
 
 // Middleware de Tenant - deve vir APÓS autenticação, para as rotas que precisam
-app.use(tenantMiddleware);
+app.use(['/admin', '/usos', '/solicitantes'], tenantMiddleware);
 app.use('/admin', adminRoutes); // Todas as rotas de admin começarão com /admin (ex: /admin/estudios)
 app.use('/admin/relatorios', relatoriosRoutes); // Rotas específicas para relatórios
 app.use('/admin/aulas', aulaRegularRoutes); // Rotas específicas para aulas regulares

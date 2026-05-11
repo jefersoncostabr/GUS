@@ -29,10 +29,14 @@ async function excluirUso(id) {
     limparImputs();
 
     if (!response.ok) {
-        document.getElementById('painelMensagem').innerText = 'Negado';
-        setTimeout(() => {
-            document.getElementById('painelMensagem').innerText = '';
-        }, 5000);
+        const painelMsg = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+        const msg = response.status === 403
+            ? 'Acesso pendente de aprovação'
+            : 'Negado';
+        if (painelMsg) {
+            painelMsg.innerText = msg;
+            setTimeout(() => { painelMsg.innerText = ''; }, 7000);
+        }
         throw new Error(`Erro ao excluir uso: ${response.status}`);
     }
 

@@ -38,6 +38,7 @@ export function renderUsersUI(data = []) {
                 <td><input class="userEmail" type="email" value="${emailEsc}"></td>
                 <td>
                     <select class="roleSelect">
+                        <option value="pendente">pendente</option>
                         <option value="user">user</option>
                         <option value="admin">admin</option>
                     </select>

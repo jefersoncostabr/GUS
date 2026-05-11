@@ -5,12 +5,11 @@
 export function resetarNavbar() {
     const nomeEl = document.getElementById('painelNomeHmaburger');
     const roleEl = document.getElementById('painelRoleHamburger');
+    const infoUserEl = document.querySelector('.painelInfoUser');
 
     if (nomeEl) {
         nomeEl.textContent = 'Visitante';
-        nomeEl.style.color = 'gray';
-        nomeEl.style.fontWeight = 'normal';
-        nomeEl.style.fontStyle = 'italic';
     }
     if (roleEl) roleEl.textContent = '';
+    if (infoUserEl) infoUserEl.classList.remove('logado');
 }

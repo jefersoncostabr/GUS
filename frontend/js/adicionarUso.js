@@ -28,6 +28,27 @@ function normalizarHoraEntrada(valorHora) {
     return horaTexto;
 }
 
+function normalizarDiaParaEnvio(valorDia) {
+    const diaTexto = String(valorDia || '').trim();
+
+    if (/^\d{2}\/\d{2}\/\d{2}$/.test(diaTexto)) {
+        return diaTexto;
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(diaTexto)) {
+        const [ano, mes, dia] = diaTexto.split('-');
+        return `${dia}/${mes}/${ano.slice(-2)}`;
+    }
+
+    const partes = diaTexto.split('/').map((parte) => parte.trim());
+    if (partes.length === 3 && partes[0] && partes[1] && partes[2]) {
+        const [dia, mes, ano] = partes;
+        return `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${ano.slice(-2).padStart(2, '0')}`;
+    }
+
+    return diaTexto;
+}
+
 /**
  * Coleta os dados do formulário e envia uma requisição POST para criar um novo uso.
  * Aplica tratamento de dados e validação de motivo antes do envio.
@@ -49,6 +70,10 @@ async function adicionarUso() {
     
     // Aplica tratamento e validação
     const novoUso = tratarDados(dadosBrutos);
+    novoUso.dia = normalizarDiaParaEnvio(novoUso.dia || dadosBrutos.dia);
+
+    console.log('Dados brutos para criação:', dadosBrutos);
+    console.log('Dados tratados para envio:', novoUso);
 
     // Validação extra para Motivo Obrigatório
     if (!novoUso.motivo) {
@@ -82,6 +107,11 @@ async function adicionarUso() {
             mensagemApi = '';
         }
 
+        if (response.status === 403) {
+            exibirMensagemPainel('Acesso pendente de aprovação');
+            throw new Error('Acesso negado: usuário pendente');
+        }
+
         if (response.status === 409) {
             const mensagemConflito = mensagemApi || 'JÁ EXISTE agendamento para esta sala, dia e horário.';
             const nomeUsuario = dadosBrutos.solicitante || 'nome do usuário';
@@ -96,7 +126,7 @@ async function adicionarUso() {
     }
         // Obtenha os dados da resposta
         const data = await response.json();
-        console.log(data);
+        console.log('Resposta completa da API ao criar uso:', data);
         exibirMensagemPainel('Uso adicionado com sucesso.', 6000);
         limparImputs();
         verFetch();

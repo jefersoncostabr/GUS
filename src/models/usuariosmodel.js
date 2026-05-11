@@ -22,7 +22,7 @@ const solicitanteSchema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ['user', 'admin'],
+            enum: ['user', 'admin', 'pendente'],
             default: 'user'
         },
         // Campo para identificar o banco de dados do tenant associado a este usuário.

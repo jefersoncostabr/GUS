@@ -9,27 +9,27 @@
     <link rel="stylesheet" href="./assets/css/styleGeral.css">
     <link rel="stylesheet" href="./assets/css/loginStyle.css">
     <link rel="stylesheet" href="./assets/css/responsividade.css">
-    <link rel="stylesheet" href="./assets/css/navbar.css">
 
 </head>
 <body>
+    <link rel="stylesheet" href="./assets/css/navbar.css">
     <script type="module" src="./js/navbar.js"></script>
 
     <main id="main">
-        <div class="containerPainel" style="max-width: 520px; width: 92%; margin-top: 25px;">
+        <div class="containerPainel authPanel">
             <h1 class="h1Login">Criar Conta</h1>
 
-            <form id="criarForm" style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px;">
-                <input class="inputTexto" style="width: 320px;" type="text" id="username" name="solicitante" placeholder="Usuário" required>
-                <input class="inputTexto" style="width: 320px;" type="text" id="estudio" name="estudio" placeholder="Nome do seu Estúdio" readonly required>
-                <input class="inputTexto" style="width: 320px;" type="email" id="email" name="email" placeholder="E-mail" required>
-                <input class="inputTexto" style="width: 320px;" type="password" id="password" name="senha" placeholder="Senha" required>
-                <button type="submit" style="width: 220px;">Criar</button>
+            <form id="criarForm" class="authForm">
+                <input class="inputTexto authInput" type="text" id="username" name="solicitante" placeholder="Usuário" required>
+                <input class="inputTexto authInput" type="text" id="estudio" name="estudio" placeholder="Nome do seu Estúdio" readonly required>
+                <input class="inputTexto authInput" type="email" id="email" name="email" placeholder="E-mail" required>
+                <input class="inputTexto authInput" type="password" id="password" name="senha" placeholder="Senha" required>
+                <button type="submit" class="authBtn">Criar</button>
             </form>
 
-            <p id="msg" style="margin-top: 14px; min-height: 24px; font-size: 16px; text-align: center;"></p>
+            <p id="msg" class="authMessage"></p>
 
-            <a href="./login.html" style="margin-top: 14px; color: #6b3f06; text-align: center;">Já tenho conta — Fazer login</a>
+            <a class="authLink" href="./login.html">Já tenho conta — Fazer login</a>
         </div>
     </main>
     

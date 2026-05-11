@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="./assets/icones/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aguardando Aprovação - GUS</title>
+
+    <link rel="stylesheet" href="./assets/css/styleGeral.css">
+    <link rel="stylesheet" href="./assets/css/loginStyle.css">
+    <link rel="stylesheet" href="./assets/css/responsividade.css">
+
+    <style>
+        .containerAviso {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            gap: 18px;
+            text-align: center;
+            padding: 24px;
+        }
+        .iconeAviso {
+            font-size: 64px;
+            line-height: 1;
+        }
+        .containerAviso h1 {
+            font-size: 1.6rem;
+            color: #6b3f06;
+            margin: 0;
+        }
+        .containerAviso p {
+            max-width: 480px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #444;
+            margin: 0;
+        }
+        .containerAviso .btnLogout {
+            margin-top: 12px;
+            padding: 10px 32px;
+            background-color: #6b3f06;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .containerAviso .btnLogout:hover {
+            background-color: #8b5010;
+        }
+    </style>
+</head>
+<body>
+    <link rel="stylesheet" href="./assets/css/navbar.css">
+    <script type="module" src="./js/navbar.js"></script>
+
+    <main>
+        <div class="containerAviso">
+            <div class="iconeAviso">⏳</div>
+
+            <h1>Cadastro Aguardando Aprovação</h1>
+
+            <p>
+                Seu cadastro foi criado com sucesso! Porém, o acesso ao sistema depende
+                da aprovação do <strong>administrador do seu estúdio</strong>.
+            </p>
+            <p>
+                Assim que o administrador liberar o seu acesso, você poderá entrar normalmente
+                pelo <a href="./login.html">login</a>.
+            </p>
+            <p id="msgUsuario" class="userHint"></p>
+
+            <button class="btnLogout" id="btnLogout">Sair</button>
+        </div>
+    </main>
+
+    <script type="module">
+        import { API_BASE_URL } from './js/config.js';
+
+        // Exibe nome do usuário logado, se disponível
+        (async () => {
+            try {
+                const res = await fetch(`${API_BASE_URL}/usuario-logado`);
+                if (res.ok) {
+                    const dados = await res.json();
+                    const msgEl = document.getElementById('msgUsuario');
+                    if (msgEl && dados.solicitante) {
+                        msgEl.textContent = `Usuário: ${dados.solicitante}`;
+                    }
+                    // Se o admin já aprovou, redireciona automaticamente
+                    if (dados.role && dados.role !== 'pendente') {
+                        window.location.href = './painelGeral.html';
+                    }
+                }
+            } catch (e) { /* silencioso */ }
+        })();
+
+        // Logout
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+            try {
+                await fetch(`${API_BASE_URL}/logout`, { method: 'POST' });
+            } catch (e) { /* silencioso */ }
+            window.location.href = './login.html';
+        });
+    </script>
+</body>
+</html>

@@ -21,6 +21,13 @@ export async function getDados(page = 1, limit = 6, filters = {}) {
         const response = await fetch(`${baseUrl}/usos/usos?${params.toString()}`);
         
         if (!response.ok) {
+            if (response.status === 403) {
+                const painelMensagem = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+                if (painelMensagem) {
+                    painelMensagem.textContent = 'Acesso pendente de aprovação';
+                }
+                return { data: [], page: 1, limit, totalItems: 0, totalPages: 1 };
+            }
             const errorMsg = await response.text();
             throw new Error(`Servidor retornou erro ${response.status}: ${errorMsg}`);
         }
@@ -140,10 +147,11 @@ function preencherInputs(dados) {
 }
 
 // Função para atribuir click ao elemento
-function atribuirClick(celula, dados) {
-  celula.addEventListener('click', () => {
-    preencherInputs(dados);
-  });
+function atribuirClick(elemento, dados) {
+    elemento.addEventListener('click', () => {
+        console.log('Registro completo selecionado na tabela:', dados);
+        preencherInputs(dados);
+    });
 }
 
 function formatarDiaParaTabela(valorDia) {
@@ -193,7 +201,7 @@ function renderTabelaComPaginacao(data) {
         } else {
             celulaSolicitante.textContent = dado.solicitante || '---';
         }
-        atribuirClick(celulaSolicitante, dado);
+        atribuirClick(linha, dado);
 
         linha.insertCell().textContent = dado.sala;
         linha.insertCell().textContent = formatarDiaParaTabela(dado.dia);

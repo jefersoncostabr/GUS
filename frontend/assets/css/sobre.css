@@ -3,21 +3,35 @@
    ================================================================ */
 
 :root {
-    --bg-body: #f4f4f4;
-    /* --bg-container: #ffffff; */
-    --bg-container: bisque;
-    /* --text-primary: #333333; */
-    --text-primary: rgb(155, 90, 11);
-    --text-secondary: rgb(155, 90, 11);
-    --border-color: rgb(155, 90, 11);
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --bg-body: ivory;
+    --bg-gradient-1: #ff006e;
+    --bg-gradient-2: #00e5ff;
+    --bg-gradient-size: 240%;
+    --bg-gradient-duration: 18s;
+    --bg-container: #f2e9ff;
+    --text-primary: #5a2ca0;
+    --text-secondary: #4b1f8a;
+    --border-color: #8a5dff;
+    --shadow-color: rgba(70, 24, 130, 0.2);
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-body);
+    background-image: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+    background-size: var(--bg-gradient-size) var(--bg-gradient-size);
+    animation: bgDiagonalSlide var(--bg-gradient-duration) ease-in-out infinite alternate;
     margin: 0;
     padding: 0;
+}
+
+@keyframes bgDiagonalSlide {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
 }
 
 /* Container principal para centralizar o conteúdo e dar respiro */
@@ -26,13 +40,14 @@ body {
     margin: 40px auto; /* Centraliza horizontalmente e dá margem no topo */
     padding: 30px;
     background-color: var(--bg-container);
-    border-radius: 8px; /* Bordas arredondadas */
-    box-shadow: 0 2px 10px var(--shadow-color); /* Sombra suave */
+    border-radius: 12px; /* Bordas arredondadas */
+    border: 1px solid #d9c8ff;
+    box-shadow: 0 10px 26px var(--shadow-color); /* Sombra suave */
 }
 
 .containerSobre h1 {
     color: var(--text-primary);
-    border-bottom: 2px solid var(--border-color); /* Linha preta combinando com o menu */
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 10px;
     margin-bottom: 20px;
 }
@@ -42,6 +57,13 @@ body {
     color: var(--text-secondary);
     margin-bottom: 15px;
     font-size: 1.1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body {
+        animation: none;
+        background-position: 50% 50%;
+    }
 }
 
 /* --- AJUSTES MOBILE --- */

@@ -3,15 +3,15 @@ import AdminController from "../src/controllers/adminController.js";
 import MaintenanceController from "../src/controllers/maintenanceController.js";
 import { listarSolicitantes, criarSolicitante, atualizarSolicitante, deletarSolicitante } from "../src/controllers/solicitanteController.js";
 import { authMiddleware, verificaPermissaoSolicitante } from "../middleware/authMiddleware.js";
-// import { verificaRole } from "../middleware/authMiddleware.js"; // Descomente e ajuste o caminho se necessário
+import { verificaRole } from "../middleware/authMiddleware.js";
+
 // notas de middleware:
 // - todas as rotas abaixo funcionarão sob /admin/* com authMiddleware + tenantMiddleware
-
 
 const router = express.Router();
 
 // Aplica proteção para todas as rotas abaixo (apenas admin pode acessar)
-// router.use(verificaRole(["admin"])); 
+router.use(authMiddleware, verificaRole); 
 
 // Rotas de Usuários (Solicitantes) - no banco Master
 router.get("/usuarios", listarSolicitantes); // Lista usuários do tenant

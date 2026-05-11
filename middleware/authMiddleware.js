@@ -80,6 +80,16 @@ export async function verificaPermissaoSolicitante(req, res, next) {
     }
 }
 
+// Bloqueia usuários com role 'pendente' (cadastro aguardando aprovação do admin)
+export function verificaPendente(req, res, next) {
+    if (req.session?.user?.role === 'pendente') {
+        return res.status(403).json({
+            error: 'Acesso pendente de aprovação do administrador do estúdio.'
+        });
+    }
+    next();
+}
+
 //verifica duplicidade do uso para evitar o registro do mesmo uso
 // ⚠️ IMPORTANTE: verificaDuplicidade foi removida deste arquivo
 // Movida para dentro do controller, após tenantMiddleware ter injetado os modelos

@@ -11,7 +11,7 @@ import { getSolicitanteModel } from '../models/usuariosmodel.js';
 
 /**
  * Normaliza qualquer formato de data recebido para DD/MM/AA.
- * Aceita: YYYY-MM-DD, DD/MM/AAAA, D/M/AAAA, DD/MM/AA, ISO com hora.
+ * Aceita: YYYY-MM-DD, DD/MM/AAAA, D/M/AAAA, DD/MM/AA, DD/MM, ISO com hora.
  */
 function normalizarDia(valorDia) {
     if (!valorDia || typeof valorDia !== 'string') return valorDia;
@@ -27,11 +27,16 @@ function normalizarDia(valorDia) {
     else if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(valorDia)) {
         [dia, mes, ano] = valorDia.split('/');
     }
+    // Formato sem ano: DD/MM ou D/M
+    else if (/^\d{1,2}\/\d{1,2}$/.test(valorDia)) {
+        [dia, mes] = valorDia.split('/');
+        ano = String(new Date().getFullYear()).slice(-2);
+    }
     else {
         return valorDia; // formato desconhecido — devolve sem alterar
     }
 
-    const aaaa = ano.length === 4 ? ano.slice(-2) : ano.padStart(2, '0');
+    const aaaa = String(ano).length === 4 ? String(ano).slice(-2) : String(ano).padStart(2, '0');
     return `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${aaaa}`;
 }
 
@@ -168,14 +173,20 @@ export const criarUso = async (req, res) => {
         if (!solicitanteId || !sala || !dia || !hora || !motivo) {
             return res.status(400).json({ message: 'Todos os campos devem ser preenchidos.' });
         }
+
+        const diaNormalizado = normalizarDia(dia);
+        console.log('[criarUso] body recebido:', req.body);
+        console.log('[criarUso] dia normalizado:', diaNormalizado);
+
         const novoUso = new Uso({
             solicitante: solicitanteId,
             sala,
-            dia: normalizarDia(dia),
+            dia: diaNormalizado,
             hora,
             motivo
         });
         await novoUso.save();
+        console.log('[criarUso] uso salvo:', novoUso);
         res.status(201).json(novoUso);
     } catch (error) {
         if (error.code === 11000) {
@@ -196,6 +207,9 @@ export const atualizarUso = async (req, res) => {
         // Filtra apenas os campos permitidos para edição.
         // Isso evita o erro de tentar salvar o NOME (string) no campo SOLICITANTE (ObjectId).
         const { sala, dia, hora, motivo } = req.body;
+
+        console.log('[atualizarUso] body recebido:', req.body);
+        console.log('[atualizarUso] dia normalizado:', normalizarDia(dia));
 
         const uso = await Uso.findByIdAndUpdate(req.params.id, { sala, dia: normalizarDia(dia), hora, motivo }, { new: true, runValidators: true });
         if (!uso) {
@@ -289,7 +303,7 @@ export const criarDezUsosTeste = async (req, res) => {
         for (let offsetDia = 0; offsetDia < 60 && novosUsos.length < totalDesejado; offsetDia += 1) {
             const data = new Date(hoje);
             data.setDate(hoje.getDate() + offsetDia);
-            const dia = formatarDia(data);
+            const dia = normalizarDia(formatarDia(data));
 
             for (const sala of salas) {
                 for (const hora of horasCheias) {

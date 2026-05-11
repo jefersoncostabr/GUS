@@ -42,8 +42,15 @@ async function handleLogin(event) {
         console.log('API_BASE_URL:', API_BASE_URL);
 
         if (response.ok) {
-            // Login com sucesso: Redireciona para o Painel Geral
-            window.location.href = './painelGeral.html';
+            // Login com sucesso: verifica o role antes de redirecionar
+            let dados = {};
+            try { dados = await response.json(); } catch (e) { /* ignora */ }
+
+            if (dados.role === 'pendente') {
+                window.location.href = './aguardando.html';
+            } else {
+                window.location.href = './painelGeral.html';
+            }
         } else {
             // Erro: Exibe mensagem (ex: Senha incorreta)
             let errorMessage = 'Usuário ou senha incorretos.';

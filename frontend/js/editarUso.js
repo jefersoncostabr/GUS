@@ -42,6 +42,14 @@ async function alterarUso(id) {
     });
 
     if (!response.ok) {
+        const painelMsg = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+        const msg = response.status === 403
+            ? 'Acesso pendente de aprovação'
+            : 'Negado';
+        if (painelMsg) {
+            painelMsg.innerText = msg;
+            setTimeout(() => { painelMsg.innerText = ''; }, 7000);
+        }
         throw new Error(`Erro ao alterar uso: ${response.status}`);
     }
         const data = await response.json();

@@ -1,9 +1,19 @@
 :root {
     --bg-body: ivory;
-    --bg-panel: bisque;
-    --text-primary: rgb(155, 90, 11);
+    /* Cores anteriores (suaves): #fff6dc e #f1dcc4 */
+    --bg-gradient-1: #ff006e;
+    --bg-gradient-2: #00e5ff;
+    --bg-gradient-size: 240%;
+    --bg-gradient-duration: 18s;
+    --bg-panel: #f2e9ff;
+    --text-primary: #5a2ca0;
     --text-light: #fff;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-color: rgba(70, 24, 130, 0.2);
+    --btn-shine-angle: -18deg;
+    --btn-shine-duration: 0.72s;
+    --btn-press-scale: 0.96;
+    --btn-press-duration: 80ms;
+    --btn-press-shadow: 0 2px 3px var(--shadow-color);
 }
 
 * {
@@ -16,6 +26,18 @@ body {
     justify-content: center;
     flex-direction: column;
     background-color: var(--bg-body);
+    background-image: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+    background-size: var(--bg-gradient-size) var(--bg-gradient-size);
+    animation: bgDiagonalSlide var(--bg-gradient-duration) ease-in-out infinite alternate;
+}
+
+@keyframes bgDiagonalSlide {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
 }
 
 iframe {
@@ -58,12 +80,28 @@ h1 {
     min-height: 100vh;
 }
 
+.mainComEspacoNavbar {
+    padding-top: 18px;
+}
+
 #painelSaida {
     margin-top: 8px;
     margin-bottom: 14px;
     min-height: 22px;
     font-size: 20px;
     color: var(--text-primary);
+}
+
+#solicitante {
+    font-weight: 700;
+    color: #4b1f8a;
+    background-color: #f8f3ff;
+    border: 1px solid #d9c8ff;
+}
+
+#solicitante:focus {
+    outline: 2px solid #8a5dff;
+    outline-offset: 1px;
 }
 
 .containerBotoesTopo {
@@ -79,8 +117,64 @@ button {
     padding: 10px 15px;
     font-size: 20px;
     color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     /* Sombra */
     box-shadow: 0 4px 6px var(--shadow-color);
+    transition:
+        transform var(--btn-press-duration) cubic-bezier(0.2, 0.7, 0.3, 1),
+        box-shadow var(--btn-press-duration) cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+button:active {
+    transform: scale(var(--btn-press-scale));
+    box-shadow: var(--btn-press-shadow);
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: -40%;
+    width: 42%;
+    height: 170%;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-220%) skewX(var(--btn-shine-angle));
+    background: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.7) 42%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(0, 0, 0, 0.26) 58%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    transition:
+        opacity 0.16s linear,
+        transform var(--btn-shine-duration) ease;
+}
+
+button:hover::after,
+button:focus-visible::after {
+    opacity: 1;
+    transform: translateX(580%) skewX(var(--btn-shine-angle));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body {
+        animation: none;
+        background-position: 50% 50%;
+    }
+    button {
+        transition: none;
+    }
+    button:active {
+        transform: none;
+    }
+    button::after {
+        transition: none;
+    }
 }
 
 .btnSmall {
@@ -164,6 +258,71 @@ label {
     /* display: flex; */
     /* gap: 10px; */
     margin-top: 20px;
+}
+
+.authLink {
+    margin-top: 14px;
+    text-align: center;
+    color: #4b1f8a;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition:
+        color 0.18s ease,
+        background-color 0.18s ease;
+}
+
+.authLink:hover,
+.authLink:focus-visible {
+    color: #ffffff;
+    background-color: #6d3dc8;
+    outline: none;
+}
+
+.authPanel {
+    max-width: 520px;
+    width: 92%;
+    margin-top: 25px;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.authInput {
+    width: 320px;
+}
+
+.authBtn {
+    width: 220px;
+}
+
+.authMessage {
+    margin-top: 14px;
+    min-height: 24px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.authMessageError {
+    color: #b42318;
+}
+
+.authIntro {
+    font-size: 18px;
+    color: #4b1f8a;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.userHint {
+    font-size: 0.9rem;
+    color: #7b699f;
 }
 
 @media (max-width: 618px) {

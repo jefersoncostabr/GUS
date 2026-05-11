@@ -1,6 +1,6 @@
 import express from 'express';
 import routerUsos from './routerUsos.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import { authMiddleware, verificaPendente } from '../middleware/authMiddleware.js';
 import routerSolicitantes from './routerSolicitantes.js';
 
 const router = express.Router();
@@ -18,10 +18,10 @@ router.get("/", (req, res) => {// http://localhost:3000
  * Roteadores Específicos.
  * Redireciona as requisições para os roteadores correspondentes.
  */
-router.use("/usos", routerUsos);// http://localhost:3000/usos
+router.use("/usos", verificaPendente, routerUsos);// http://localhost:3000/usos
 
 // Rotas de solicitantes requerem autenticação
-router.use("/solicitantes", authMiddleware, routerSolicitantes);// http://localhost:3000/solicitantes
+router.use("/solicitantes", authMiddleware, verificaPendente, routerSolicitantes);// http://localhost:3000/solicitantes
 
 
 export default router;

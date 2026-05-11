@@ -30,8 +30,8 @@ import { resetarNavbar } from "./resetarNavbar.js";
         navContainer.innerHTML = `
             <div class="painelInfoUser">
                 <img src="./assets/icones/favicon.png" alt="Logo" style="height:24px;width:24px;object-fit:contain;margin-right:6px;vertical-align:middle;">
-                <span id="painelNomeHmaburger" style="font-style: italic; color: gray;">Visitante</span>
-                <span id="painelRoleHamburger"></span>
+                <span id="painelNomeHmaburger" class="nomeUsuarioNavbar">Visitante</span>
+                <span id="painelRoleHamburger" class="roleUsuarioNavbar"></span>
             </div>
             
             <div class="menuHamburger" id="idMenuHamburger">
@@ -89,6 +89,7 @@ import { resetarNavbar } from "./resetarNavbar.js";
 
             const nomeEl = document.getElementById('painelNomeHmaburger');
             const roleEl = document.getElementById('painelRoleHamburger');
+            const infoUserEl = document.querySelector('.painelInfoUser');
 
             // Busca o link de login/logout para alterar o texto dinamicamente
             const loginLink = document.querySelector('a[href*="login.html"]');
@@ -97,15 +98,11 @@ import { resetarNavbar } from "./resetarNavbar.js";
                 // Usuário Logado
                 if (nomeEl) {
                     nomeEl.textContent = primeiraMaiúscula(data.solicitante);
-                    nomeEl.style.color = 'blue';
-                    nomeEl.style.fontWeight = 'bold';
-                    nomeEl.style.fontStyle = 'normal';
                 }
                 if (roleEl) {
                     roleEl.textContent = primeiraMaiúscula(data.role);
-                    roleEl.style.color = 'blue';
-                    roleEl.style.fontWeight = 'bold';
                 }
+                if (infoUserEl) infoUserEl.classList.add('logado');
                 // Se tem usuário, o botão deve ser "Sair"
                 if (loginLink) loginLink.textContent = "Sair";
             } 

@@ -8,28 +8,28 @@
 
     <link rel="stylesheet" href="./assets/css/styleGeral.css">
     <link rel="stylesheet" href="./assets/css/responsividade.css">
-    <link rel="stylesheet" href="./assets/css/navbar.css">
 </head>
 <body>
+    <link rel="stylesheet" href="./assets/css/navbar.css">
     <script type="module" src="./js/navbar.js"></script>
     <script type="module" src="./js/resetarSenha.js"></script>
 
     <main id="main">
-        <div class="containerPainel" style="max-width: 520px; width: 92%; margin-top: 25px;">
+        <div class="containerPainel authPanel">
             <h1 class="h1Login">Redefinir Senha</h1>
-            <p style="font-size: 18px; color: #6b3f06; margin-top: 10px; text-align: center;">
+            <p class="authIntro">
                 Digite sua nova senha para concluir a recuperacao.
             </p>
 
-            <form id="resetarSenhaForm" style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px;">
-                <input class="inputTexto" style="width: 320px;" type="password" name="novaSenha" id="novaSenha" placeholder="Nova senha" required minlength="6">
-                <input class="inputTexto" style="width: 320px;" type="password" name="confirmarSenha" id="confirmarSenha" placeholder="Confirmar nova senha" required minlength="6">
-                <button type="submit" style="width: 220px;">Redefinir Senha</button>
+            <form id="resetarSenhaForm" class="authForm">
+                <input class="inputTexto authInput" type="password" name="novaSenha" id="novaSenha" placeholder="Nova senha" required minlength="6">
+                <input class="inputTexto authInput" type="password" name="confirmarSenha" id="confirmarSenha" placeholder="Confirmar nova senha" required minlength="6">
+                <button type="submit" class="authBtn">Redefinir Senha</button>
             </form>
 
-            <p id="painelMensagem" style="margin-top: 14px; min-height: 24px; font-size: 16px; text-align: center;"></p>
+            <p id="painelMensagem" class="authMessage"></p>
 
-            <a href="./login.html" style="margin-top: 14px; color: #6b3f06; text-align: center;">Voltar para o login</a>
+            <a class="authLink" href="./login.html">Voltar para o login</a>
         </div>
     </main>
 </body>

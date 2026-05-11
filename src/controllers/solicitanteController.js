@@ -216,7 +216,9 @@ export const criarSolicitante = async (req, res) => {
             }
 
             idDoEstudio = estudioExistente._id;
-            roleAssigned = 'user';
+            // Registro público (sem sessão): usuário entra como 'pendente' até aprovação do admin
+            // Criação pelo admin (com sessão): usa o role especificado ou 'user' como padrão
+            roleAssigned = req.session?.user ? (role || 'user') : 'pendente';
             estudioName = estudioExistente.nome; // Atualiza para o nome real para o log de sucesso
             console.log(`✓ Estúdio existente encontrado: ${estudioExistente.nome}`);
         } else {

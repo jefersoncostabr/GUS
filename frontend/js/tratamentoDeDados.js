@@ -29,7 +29,8 @@ export function tratarDados(dados) {
         const parts = dados.dia.split('-');
         if (parts.length === 3) {
             const [ano, mes, dia] = parts;
-            diaFinal = `${dia}/${mes}`;
+            const anoCurto = ano.slice(-2);
+            diaFinal = `${dia}/${mes}/${anoCurto}`;
         }
     } else {
         // Lógica antiga: 2 dígitos + barra automática + mês corrente
@@ -48,8 +49,9 @@ export function tratarDados(dados) {
             // Pega mês corrente
             const hoje = new Date();
             const mesCorrente = String(hoje.getMonth() + 1).padStart(2, '0');
+            const anoCurto = String(hoje.getFullYear()).slice(-2);
             
-            diaFinal = `${diaFormatado}/${mesCorrente}`;
+            diaFinal = `${diaFormatado}/${mesCorrente}/${anoCurto}`;
         }
     }
 

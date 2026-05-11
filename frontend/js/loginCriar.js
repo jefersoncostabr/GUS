@@ -28,7 +28,7 @@ async function handleCriarConta(event) {
     const data = Object.fromEntries(formData.entries());
     
     const msgDiv = document.getElementById('msg');
-    const btnSubmit = form.querySelector('button.btnLogin');
+    const btnSubmit = form.querySelector('button[type="submit"]');
 
     // Validação: Verifica se o nome do estúdio foi preenchido.
     if (!data.estudio) {
