@@ -17,7 +17,9 @@ function getBaseUrl() {
  */
 async function carregarDadosUsuario() {
     try {
-        const response = await fetch(`${getBaseUrl()}/usuario-logado`);
+        const response = await fetch(`${getBaseUrl()}/usuario-logado`, {
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error('Usuário não logado ou sessão expirada.');
         }
@@ -66,7 +68,9 @@ async function carregarEstudios() {
  */
 async function carregarTodasAsSalas() {
     try {
-        const response = await fetch(`${getBaseUrl()}/admin/salas`);
+        const response = await fetch(`${getBaseUrl()}/admin/salas`, {
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error('Falha ao carregar lista de salas.');
         }

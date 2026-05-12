@@ -5,7 +5,10 @@ import { API_BASE_URL } from "./config.js";
 // Ao carregar a página de login, fazemos uma requisição para garantir que a sessão seja encerrada no servidor
 (async function logoutAutomatico() {
     try {
-        await fetch(`${API_BASE_URL}/logout`, { method: 'POST' });
+        await fetch(`${API_BASE_URL}/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
         console.log('Sessão encerrada.');
 
         resetarNavbar();
@@ -37,6 +40,7 @@ async function handleLogin(event) {
         const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(data)
         });
         console.log('API_BASE_URL:', API_BASE_URL);

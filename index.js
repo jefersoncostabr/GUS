@@ -48,9 +48,18 @@ conexao.once("open", () => {
 })
 
 const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Necessário em plataformas com proxy reverso (ex.: Render) para cookies secure funcionarem.
+if (isProduction) {
+    app.set('trust proxy', 1);
+}
 
 // Habilita o CORS para todas as origens. Em produção, você pode querer restringir isso.
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
 app.use(express.json());
 
@@ -86,10 +95,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
+    proxy: isProduction,
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24, // 1 dia
         httpOnly: true, // Proteção: não permite acesso via JavaScript
-        secure: process.env.NODE_ENV === 'production', // HTTPS only em produção
+        secure: isProduction, // HTTPS only em produção
         sameSite: 'lax' // Proteção contra CSRF
     }
 }));

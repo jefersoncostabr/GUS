@@ -31,7 +31,7 @@ export function showMessage(msg, type = 'info', timeout = 5000) {
  * @returns {Promise<any>} - Resultado parseado (JSON) ou texto.
  */
 export async function fetchJson(url, options = {}) {
-  const opts = Object.assign({ headers: { 'Content-Type': 'application/json' } }, options);
+  const opts = Object.assign({ headers: { 'Content-Type': 'application/json' }, credentials: 'include' }, options);
   if (opts.body && typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
   const res = await fetch(url, opts);
   const text = await res.text(); // Lê o corpo da resposta como texto.
