@@ -45,11 +45,26 @@ body {
     box-shadow: 0 10px 26px var(--shadow-color); /* Sombra suave */
 }
 
-.containerSobre h1 {
-    color: var(--text-primary);
+.sobreHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 10px;
     margin-bottom: 20px;
+}
+
+.sobreLogo {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.containerSobre h1 {
+    color: var(--text-primary);
+    margin: 0;
 }
 
 .containerSobre p {

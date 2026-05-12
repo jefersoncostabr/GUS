@@ -21,6 +21,49 @@ th {
     gap: 10px;
 }
 
+.tabelaTopBar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.filtrosAtivos {
+    font-size: 0.7em;
+    color: #555;
+}
+
+.tabelaLoadingIndicator {
+    margin-left: auto;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #1b4f72;
+    white-space: nowrap;
+}
+
+.tabelaLoadingIndicator.is-visible {
+    display: inline-flex;
+}
+
+.tabelaLoadingSpinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(27, 79, 114, 0.25);
+    border-top-color: #1b4f72;
+    border-radius: 50%;
+    animation: tabelaSpin 0.9s linear infinite;
+}
+
+@keyframes tabelaSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 #tableInner {
     margin-top: 12px;
 }
@@ -47,6 +90,10 @@ tr.linha-destaque td:nth-child(1) {
 @media (max-width: 618px) {
     table {
         font-size: 0.7rem;
+    }
+
+    .tabelaLoadingIndicator {
+        font-size: 0.72rem;
     }
 }
 

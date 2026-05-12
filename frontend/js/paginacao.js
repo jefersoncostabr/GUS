@@ -42,8 +42,8 @@ function updatePaginaInfo() {
         const isMobile = window.innerWidth < 600;
         infoEl.textContent = isMobile ? `${currentPage}/${totalPages}` : `Página ${currentPage} / ${totalPages}`;
     }
-    if (btnPrev) btnPrev.disabled = currentPage <= 1;
-    if (btnNext) btnNext.disabled = currentPage >= totalPages;
+    if (btnPrev) btnPrev.disabled = false;
+    if (btnNext) btnNext.disabled = false;
 }
 
 /**
@@ -102,22 +102,19 @@ export function criarElementospaginacaoTab() {
  * Retrocede uma página (se possível) e aciona o callback de mudança.
  */
 export async function voltarPaginacao() {
-    if (currentPage > 1) {
-        currentPage--;
-        updatePaginaInfo();
-        if (onPageChange) onPageChange();
-    }
+    currentPage = currentPage > 1 ? currentPage - 1 : totalPages;
+    updatePaginaInfo();
+    if (onPageChange) onPageChange();
 }
 
 /**
- * Avança uma página (se possível) e aciona o callback de mudança.
+ * Avança uma página e aciona o callback de mudança.
+ * Ao ultrapassar a última página, volta para a primeira.
  */
 export async function avancarPaginacao() {
-    if (currentPage < totalPages) {
-        currentPage++;
-        updatePaginaInfo();
-        if (onPageChange) onPageChange();
-    }
+    currentPage = currentPage < totalPages ? currentPage + 1 : 1;
+    updatePaginaInfo();
+    if (onPageChange) onPageChange();
 }
 
 /*

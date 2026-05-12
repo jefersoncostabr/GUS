@@ -8,6 +8,14 @@ let dadosAulasFixasCached = []; // cache para paginação client-side das aulas 
 let filtrosBuscaAtual = {}; // mantém os filtros aplicados na última busca (botão Ver)
 let filtrosFrontend = {}; // filtros a serem aplicados localmente (client-side)
 
+function setTabelaLoading(carregando) {
+    const indicador = document.getElementById('tabelaLoadingIndicator');
+    if (!indicador) return;
+
+    indicador.classList.toggle('is-visible', carregando);
+    indicador.setAttribute('aria-hidden', carregando ? 'false' : 'true');
+}
+
 /**
  * Atualiza o span #filtrosAtivos com um resumo legível dos filtros ativos.
  */
@@ -107,6 +115,7 @@ function limparTabela() {
  * @returns {Promise<Object>} O objeto JSON retornado pelo servidor contendo dados e metadados.
  */
 export async function verFetch() {
+    setTabelaLoading(true);
     try {
         mostrandoAulasFixas = false;
         dadosAulasFixasCached = [];
@@ -220,6 +229,8 @@ export async function verFetch() {
         return { data: dadosCombinados, ...resultUsos };
     } catch (error) {
         console.error("Não deu certo. Erro:", error);
+    } finally {
+        setTabelaLoading(false);
     }
 }
 
@@ -229,6 +240,7 @@ export async function verFetch() {
  * @returns {Promise<Object>} O objeto JSON retornado pelo servidor.
  */
 export async function verFetchPage() {
+    setTabelaLoading(true);
     try {
         const resultUsos = await getDados(currentPage, itemsPorPagina, filtrosBuscaAtual);
         let aulasData = [];
@@ -258,6 +270,8 @@ export async function verFetchPage() {
         return { data: dadosCombinados, ...resultUsos };
     } catch (error) {
         console.error("Não deu certo. Erro:", error);
+    } finally {
+        setTabelaLoading(false);
     }
 }
 
@@ -270,8 +284,10 @@ export async function verAulasFixasFetch() {
         if (mostrandoAulasFixas) {
             mostrandoAulasFixas = false;
             dadosAulasFixasCached = [];
-            return verFetch();
+            return await verFetch();
         }
+
+        setTabelaLoading(true);
 
         document.getElementById('containerTabela').style.display = 'block';
         const container = document.getElementById('containerTabela');
@@ -348,6 +364,8 @@ export async function verAulasFixasFetch() {
 
     } catch (error) {
         console.error("Erro ao carregar aulas fixas:", error);
+    } finally {
+        setTabelaLoading(false);
     }
 }
 

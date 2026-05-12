@@ -70,9 +70,13 @@
             <!-- <p id="painelMensagem"></p> -->
 		</div>
         <div class="containerPainel" id="containerTabela">
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+            <div class="tabelaTopBar">
                 <button class="btnSmall" id="btnMostrarAulasRegulares">Aulas Fixas</button>
-                <span id="filtrosAtivos" style="font-size:0.70em;color:#555;"></span>
+                <span id="filtrosAtivos" class="filtrosAtivos"></span>
+                <div id="tabelaLoadingIndicator" class="tabelaLoadingIndicator" aria-live="polite" aria-hidden="true">
+                    <span class="tabelaLoadingSpinner" aria-hidden="true"></span>
+                    Carregando...
+                </div>
             </div>
             <div id="tableInner"></div>
             <div id="containerPaginacao"></div>
