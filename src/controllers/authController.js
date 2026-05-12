@@ -136,8 +136,8 @@ export const resetarSenha = async (req, res) => {
         return res.status(400).json({ error: 'Token e nova senha sao obrigatorios.' });
     }
 
-    if (novaSenha.length < 6) {
-        return res.status(400).json({ error: 'A senha deve ter no minimo 6 caracteres.' });
+    if (novaSenha.length < 4) {
+        return res.status(400).json({ error: 'A senha deve ter no minimo 4 caracteres.' });
     }
 
     try {

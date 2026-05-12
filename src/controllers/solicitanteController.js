@@ -145,6 +145,10 @@ export const criarSolicitante = async (req, res) => {
 
         let { senha, role, estudioName, estudio } = req.body;
 
+        if (typeof senha !== 'string' || senha.length < 4) {
+            return res.status(400).json({ error: 'A senha deve ter no minimo 4 caracteres.' });
+        }
+
         // Unifica a entrada: usa estudioName ou estudio independente da sessão
         if (!estudioName && estudio) {
             estudioName = estudio;
@@ -329,6 +333,9 @@ export const atualizarSolicitante = async (req, res) => {
         if (updates.senha !== undefined) {
             if (typeof updates.senha !== 'string' || updates.senha.trim() === '') {
                 return res.status(400).json({ error: 'A senha não pode ser vazia.' });
+            }
+            if (updates.senha.length < 4) {
+                return res.status(400).json({ error: 'A senha deve ter no minimo 4 caracteres.' });
             }
             const saltRounds = 10;
             updates.senha = await bcrypt.hash(updates.senha, saltRounds);

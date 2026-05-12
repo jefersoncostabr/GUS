@@ -26,6 +26,12 @@ async function handleResetarSenha(event) {
         return;
     }
 
+    if (novaSenha.length < 4) {
+        painelMensagem.style.color = 'red';
+        painelMensagem.textContent = 'A nova senha deve ter no minimo 4 caracteres.';
+        return;
+    }
+
     const btnSubmit = form.querySelector('button[type="submit"]');
     const textoOriginal = btnSubmit.textContent;
 

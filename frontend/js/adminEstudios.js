@@ -255,6 +255,13 @@ function toggleEstudiosPanel() {
     isExpanded = !isExpanded
     content.style.display = isExpanded ? 'block' : 'none'
 
+    // Em telas pequenas, mantém a rolagem dentro do painel de estúdios
+    // para evitar que o conteúdo "vaze" e force rolagem da página inteira.
+    if (isExpanded) {
+        content.style.overflowX = 'auto'
+        content.style.maxWidth = '100%'
+    }
+
     if (btn) btn.textContent = isExpanded ? '-' : '+'
 
     if (isExpanded) {

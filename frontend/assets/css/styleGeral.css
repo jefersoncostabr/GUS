@@ -49,6 +49,7 @@ iframe {
     display: flex;
     flex-direction: column;
     align-items: left;
+    box-sizing: border-box;
     /* border: 1px solid black; */
     box-shadow: 0 4px 6px var(--shadow-color);
     margin: 5px;
@@ -277,6 +278,39 @@ label {
     transition:
         color 0.18s ease,
         background-color 0.18s ease;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: auto;
+}
+
+.authLink::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: -40%;
+    width: 42%;
+    height: 170%;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-220%) skewX(-20deg);
+    background: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.7) 42%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(0, 0, 0, 0.26) 58%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    transition:
+        opacity 0.16s linear,
+        transform 0.6s ease;
+}
+
+.authLink:hover::before,
+.authLink:focus-visible::before {
+    opacity: 1;
+    transform: translateX(580%) skewX(-20deg);
 }
 
 .authLink:hover,
@@ -304,8 +338,18 @@ label {
     width: 320px;
 }
 
+#criarForm .authInput {
+    width: 260px;
+}
+
 .authBtn {
     width: 220px;
+}
+
+.authBtn:hover,
+.authBtn:focus-visible {
+    color: #ffffff;
+    background-color: #0056b3;
 }
 
 .authMessage {
@@ -340,6 +384,18 @@ label {
     }
     button {
         margin: 5px;
+    }
+
+    .authPanel {
+        width: calc(100% - 16px);
+        max-width: calc(100% - 16px);
+        margin: 12px auto 0;
+        padding: 18px 12px;
+        overflow-x: hidden;
+    }
+
+    #criarForm .authInput {
+        width: min(240px, 100%);
     }
 }
 

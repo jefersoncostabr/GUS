@@ -49,6 +49,21 @@ export function renderSalasUI(data = []) {
             if (!item) return
             console.log('Editando sala selecionada:', item);
 
+            // Expandir painel se não estiver expandido
+            const content = document.getElementById('salasContent')
+            if (content && content.style.display === 'none') {
+                isExpanded = true
+                content.style.display = 'block'
+                content.style.overflowX = 'auto'
+                content.style.maxWidth = '100%'
+                const btn = document.getElementById('toggleSalasBtn')
+                if (btn) btn.textContent = '-'
+            }
+
+            // Mostrar formulário de edição
+            const formEditar = document.getElementById('formEditarSala')
+            if (formEditar) formEditar.style.display = 'block'
+
             // Tenta obter elementos via ID ou classe para evitar erros de 'null'
             const elId = document.getElementById('salaId');
             const elEstudio = document.getElementById('salaEstudio') || document.querySelector('.salaEstudioSelect');
@@ -64,7 +79,6 @@ export function renderSalasUI(data = []) {
             }
 
             if (elNome) elNome.value = item.nome || item.name || '';
-            showMessage('Pronto para editar a sala.', 'info', 3000)
         })
     )
 
@@ -130,6 +144,9 @@ function clearForm() {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
+    // Esconder formulário de edição
+    const formEditar = document.getElementById('formEditarSala')
+    if (formEditar) formEditar.style.display = 'none'
 }
 
 /**
@@ -327,6 +344,12 @@ function toggleSalasPanel() {
 
     isExpanded = !isExpanded
     content.style.display = isExpanded ? 'block' : 'none'
+
+    // Em telas pequenas, mantém a rolagem dentro do painel de salas
+    if (isExpanded) {
+        content.style.overflowX = 'auto'
+        content.style.maxWidth = '100%'
+    }
 
     if (btn) btn.textContent = isExpanded ? '-' : '+'
 

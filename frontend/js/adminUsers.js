@@ -170,6 +170,7 @@ if (addUserBtn)
         inputSenha.type = 'password'
         inputSenha.className = 'userSenha'
         inputSenha.placeholder = 'Senha'
+        inputSenha.minLength = 4
         inputSenha.style.width = '120px'
 
         const selectEstudio = document.createElement('select')
@@ -201,6 +202,10 @@ if (addUserBtn)
             const roleVal = selectRole.value || 'user'
             if (!estudioVal) {
                 showMessage('Estúdio é obrigatório.', 'error')
+                return
+            }
+            if (senhaVal.length < 4) {
+                showMessage('A senha deve ter no minimo 4 caracteres.', 'error')
                 return
             }
             document.dispatchEvent(

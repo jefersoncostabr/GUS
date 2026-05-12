@@ -37,6 +37,12 @@ async function handleCriarConta(event) {
         return;
     }
 
+    if (!data.senha || data.senha.length < 4) {
+        msgDiv.textContent = 'A senha deve ter no minimo 4 caracteres.';
+        msgDiv.style.color = 'red';
+        return;
+    }
+
     // SEGURANÇA: Não enviar o role. O backend determinará automaticamente baseado na existência do estúdio
     // Se for novo estúdio: role = 'admin'
     // Se for estúdio existente: role = 'user'

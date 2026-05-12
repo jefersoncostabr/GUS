@@ -4,6 +4,50 @@ let cachedData = []
 let cachedSalas = []
 let isExpanded = false
 
+function normalizarHoraEntrada(valorHora) {
+    const horaTexto = String(valorHora || '').trim()
+
+    // Aceita formatos como "19", "7" e "19:" como hora cheia.
+    if (/^\d{1,2}:?$/.test(horaTexto)) {
+        const horaNumerica = horaTexto.replace(':', '')
+        return `${horaNumerica}:00`
+    }
+
+    return horaTexto
+}
+
+function resolverSalaIdParaSelect(item, estudioId) {
+    const candidato = item?.sala ?? item?.salaId ?? item?.salaNome ?? ''
+    const salaRaw = (candidato && typeof candidato === 'object')
+        ? (candidato._id || candidato.id || candidato.nome || candidato.numero || '')
+        : candidato
+
+    const salaTexto = String(salaRaw || '').trim()
+    if (!salaTexto) return ''
+
+    // 1) Já é o próprio valor do option (id)
+    const selSala = document.getElementById('aulaSala')
+    if (selSala && Array.from(selSala.options).some(opt => String(opt.value) === salaTexto)) {
+        return salaTexto
+    }
+
+    // 2) Tenta achar no cache por id, número, nome, descrição e estúdio
+    const salaEncontrada = cachedSalas.find(s => {
+        const sId = String(s._id || s.id || '').trim()
+        const sNumero = String(s.numero || '').trim()
+        const sNome = String(s.nome || s.name || '').trim()
+        const sDescricao = String(s.descricao || '').trim()
+        const eVal = s.estudio || s.estudioId
+        const eId = String((eVal && typeof eVal === 'object') ? (eVal._id || eVal.id) : (eVal || '')).trim()
+
+        const bateSala = salaTexto === sId || salaTexto === sNumero || salaTexto === sNome || salaTexto === sDescricao
+        const bateEstudio = !estudioId || eId === String(estudioId)
+        return bateSala && bateEstudio
+    })
+
+    return salaEncontrada ? String(salaEncontrada._id || salaEncontrada.id || '') : ''
+}
+
 /**
  * Renderiza a tabela de aulas regulares.
  * @param {Array<Object>} data
@@ -65,8 +109,8 @@ export function renderAulasUI(data = []) {
             
             updateAulasSalasOptions(estudioId)
             
-            const salaId = getVal(item.sala || item.salaId)
-            document.getElementById('aulaSala').value = salaId
+            const salaIdResolvido = resolverSalaIdParaSelect(item, estudioId)
+            document.getElementById('aulaSala').value = salaIdResolvido
             
             document.getElementById('aulaDia').value = item.diaSemana || ''
             document.getElementById('aulaHora').value = item.horaInicio || ''
@@ -77,8 +121,6 @@ export function renderAulasUI(data = []) {
 
             const ativoEl = document.getElementById('aulaAtivo')
             if (ativoEl) ativoEl.checked = item.ativo !== false
-
-            showMessage('Pronto para editar a aula.', 'info', 3000)
         })
     })
 }
@@ -169,7 +211,9 @@ function salvarAula() {
     const estudioId = document.getElementById('aulaEstudio').value
     const salaId = document.getElementById('aulaSala').value
     const diaSemana = document.getElementById('aulaDia').value
-    const horaInicio = document.getElementById('aulaHora').value
+    const elHora = document.getElementById('aulaHora')
+    const horaInicio = normalizarHoraEntrada(elHora ? elHora.value : '')
+    if (elHora) elHora.value = horaInicio
     const modalidade = document.getElementById('aulaModalidade').value
     const professorId = document.getElementById('aulaProfessor').value
     const ativoEl = document.getElementById('aulaAtivo')

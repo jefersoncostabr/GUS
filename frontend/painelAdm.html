@@ -51,12 +51,24 @@
                 <h3>Salas <button type="button" id="toggleSalasBtn" class="btnSmall" style="margin-left: 10px;">+</button></h3>
                 <div id="salasContent" style="display: none;">
                     <form id="formSala">
+                        <input type="hidden" id="salaId">
+                        <div id="formEditarSala" style="display: none;">
+                            <div class="filialItem">
+                                <select id="salaEstudio" class="inputTexto" style="width: 200px;">
+                                    <option value="">-- Estúdio --</option>
+                                </select>
+                                <select id="salaNumero" class="inputTexto" style="width: 110px;">
+                                    <option value="">-- Número --</option>
+                                </select>
+                                <input type="text" id="salaNome" class="inputTexto" placeholder="Nome (Ex: VIP, Ensaio 1)" style="width: 200px;">
+                                <div class="actionButtons">
+                                    <button type="button" id="salvarSalaBtn" class="btnSmall">Salvar</button>
+                                    <button type="button" id="cancelarSalaBtn" class="btnSmall">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
                         <div id="salasListContainer" style="margin-top:10px;"></div>
                         <div style="margin-top:8px;"><button type="button" id="addSalaBtn" class="btnSmall">+ Sala</button></div>
-                        <div class="botoesForm">
-                            <button type="button" id="salvarSalaBtn" class="btnSmall">Salvar</button>
-                            <button type="button" id="cancelarSalaBtn" class="btnSmall">Cancelar</button>
-                        </div>
                     </form>
                     <div id="tableSalas"></div>
                 </div>
@@ -85,7 +97,9 @@
                         </div>
                         <div>
                             <label for="aulaSala">Sala:</label>
-                            <input type="text" id="aulaSala" class="inputTexto" placeholder="Sala">
+                            <select id="aulaSala" class="inputTexto">
+                                <option value="">-- selecione --</option>
+                            </select>
                         </div>
                         <div>
                             <label for="aulaDia">Dia:</label>
@@ -102,11 +116,11 @@
                         </div>
                         <div>
                             <label for="aulaHora">Hora:</label>
-                            <input type="time" id="aulaHora" class="inputNumerico">
+                            <input class="inputNumerico" type="text" id="aulaHora" placeholder="HH:MM" maxlength="5" inputmode="numeric">
                         </div>
                         <div>
                             <label for="aulaModalidade">Modalidade:</label>
-                            <input type="text" id="aulaModalidade" class="inputTexto" placeholder="Ex: Yoga">
+                            <input type="text" id="aulaModalidade" class="inputTexto" placeholder="Ex: Forró">
                         </div>
                         <div>
                             <label for="aulaProfessor">Professor:</label>
