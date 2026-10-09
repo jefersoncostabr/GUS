@@ -25,7 +25,31 @@ async function safeFetchJson(url, options) {
 }
 
 // Loaders
+function setAdminTableLoading(tableId, isLoading) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+
+  const existingLoader = table.querySelector('.adminTabelaLoading');
+  if (!isLoading) {
+    existingLoader?.remove();
+    return;
+  }
+  if (existingLoader) return;
+
+  const indicator = document.createElement('div');
+  indicator.className = 'tabelaLoadingIndicator is-visible adminTabelaLoading';
+  indicator.setAttribute('aria-live', 'polite');
+  indicator.setAttribute('aria-hidden', 'false');
+
+  const spinner = document.createElement('span');
+  spinner.className = 'tabelaLoadingSpinner';
+  spinner.setAttribute('aria-hidden', 'true');
+  indicator.append(spinner, document.createTextNode('Carregando...'));
+  table.append(indicator);
+}
+
 async function loadUsers() {
+  setAdminTableLoading('tableUsuarios', true);
   try {
     const data = await safeFetchJson(`${baseUrl}/admin/usuarios`);
     if (Array.isArray(data)) {
@@ -34,9 +58,11 @@ async function loadUsers() {
       setRelatorioProfessoresOptions(data);
     }
   } catch (e) { console.warn('Falha ao carregar usuários', e); }
+  finally { setAdminTableLoading('tableUsuarios', false); }
 }
 
 async function loadEstudios() {
+  setAdminTableLoading('tableEstudios', true);
   try {
     const data = await safeFetchJson(`${baseUrl}/admin/estudios`);
     if (Array.isArray(data)) {
@@ -53,9 +79,11 @@ async function loadEstudios() {
       }
     }
   } catch (e) { console.warn('Falha ao carregar estúdios', e); }
+  finally { setAdminTableLoading('tableEstudios', false); }
 }
 
 async function loadSalas() {
+  setAdminTableLoading('tableSalas', true);
   try {
     const data = await safeFetchJson(`${baseUrl}/admin/salas`);
     if (Array.isArray(data)) {
@@ -63,13 +91,16 @@ async function loadSalas() {
       setAulasSalasCache(data);
     }
   } catch (e) { console.warn('Falha ao carregar salas', e); }
+  finally { setAdminTableLoading('tableSalas', false); }
 }
 
 async function loadAulas() {
+  setAdminTableLoading('tableAulas', true);
   try {
     const data = await safeFetchJson(`${baseUrl}/admin/aulas`);
     if (Array.isArray(data)) setAulasData(data);
   } catch (e) { console.warn('Falha ao carregar aulas', e); }
+  finally { setAdminTableLoading('tableAulas', false); }
 }
 
 // Session check

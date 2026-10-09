@@ -40,6 +40,12 @@
     transform: translateY(2px) rotate(225deg);
 }
 
+.adminTabelaLoading {
+    display: flex;
+    justify-content: flex-start;
+    margin: 14px 0;
+}
+
 #usuarioContent {
     display: none;
     padding: 0 20px 0 20px;
