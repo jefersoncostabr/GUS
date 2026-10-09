@@ -262,7 +262,11 @@ function toggleEstudiosPanel() {
         content.style.maxWidth = '100%'
     }
 
-    if (btn) btn.textContent = isExpanded ? '-' : '+'
+    if (btn) {
+        btn.textContent = isExpanded ? '⌃' : '⌄'
+        btn.setAttribute('aria-expanded', String(isExpanded))
+        btn.setAttribute('aria-label', `${isExpanded ? 'Recolher' : 'Expandir'} Estúdios`)
+    }
 
     if (isExpanded) {
         // Solicita dados atualizados ao banco (via DataLayer) ao invés de usar o cache

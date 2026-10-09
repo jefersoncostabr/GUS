@@ -11,6 +11,10 @@
     /* min-width: 0; */
 }
 
+#relatoriosPanel {
+    --btn-shine-duration: 1.3s;
+}
+
 #usuarioContent {
     display: none;
     padding: 0 20px 0 20px;

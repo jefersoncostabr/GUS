@@ -130,7 +130,11 @@ function toggleUsersPanel() {
         content.style.maxWidth = '100%'
     }
 
-    if (btn) btn.textContent = isExpanded ? '-' : '+'
+    if (btn) {
+        btn.textContent = isExpanded ? '⌃' : '⌄'
+        btn.setAttribute('aria-expanded', String(isExpanded))
+        btn.setAttribute('aria-label', `${isExpanded ? 'Recolher' : 'Expandir'} Usuários`)
+    }
 
     if (isExpanded) {
         document.dispatchEvent(new CustomEvent('admin:user:fetch'))

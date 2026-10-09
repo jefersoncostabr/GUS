@@ -57,7 +57,11 @@ export function renderSalasUI(data = []) {
                 content.style.overflowX = 'auto'
                 content.style.maxWidth = '100%'
                 const btn = document.getElementById('toggleSalasBtn')
-                if (btn) btn.textContent = '-'
+                if (btn) {
+                    btn.textContent = '⌃'
+                    btn.setAttribute('aria-expanded', 'true')
+                    btn.setAttribute('aria-label', 'Recolher Salas')
+                }
             }
 
             // Mostrar formulário de edição
@@ -351,7 +355,11 @@ function toggleSalasPanel() {
         content.style.maxWidth = '100%'
     }
 
-    if (btn) btn.textContent = isExpanded ? '-' : '+'
+    if (btn) {
+        btn.textContent = isExpanded ? '⌃' : '⌄'
+        btn.setAttribute('aria-expanded', String(isExpanded))
+        btn.setAttribute('aria-label', `${isExpanded ? 'Recolher' : 'Expandir'} Salas`)
+    }
 
     if (isExpanded) {
         document.dispatchEvent(new CustomEvent('admin:sala:fetch'))
