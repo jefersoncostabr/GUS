@@ -21,6 +21,12 @@ th {
     gap: 10px;
 }
 
+#containerTabela #containerTabBotoes {
+    display: flex;
+    align-items: center;
+    margin: 24px 10px 10px !important;
+}
+
 .tabelaTopBar {
     display: flex;
     align-items: center;
