@@ -45,7 +45,7 @@ function setAdminTableLoading(tableId, isLoading) {
   spinner.className = 'tabelaLoadingSpinner';
   spinner.setAttribute('aria-hidden', 'true');
   indicator.append(spinner, document.createTextNode('Carregando...'));
-  table.append(indicator);
+  table.prepend(indicator);
 }
 
 async function loadUsers() {
