@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleBtn.addEventListener('click', () => {
             const isHidden = contentDiv.style.display === 'none';
             contentDiv.style.display = isHidden ? 'block' : 'none';
-            toggleBtn.textContent = isHidden ? '⌃' : '⌄';
             toggleBtn.setAttribute('aria-expanded', String(isHidden));
             toggleBtn.setAttribute('aria-label', `${isHidden ? 'Recolher' : 'Expandir'} Relatórios`);
 

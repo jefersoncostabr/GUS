@@ -15,6 +15,31 @@
     --btn-shine-duration: 1.3s;
 }
 
+.togglePanelBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    vertical-align: middle;
+}
+
+.togglePanelBtn::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+.togglePanelBtn[aria-expanded='true']::before {
+    transform: translateY(2px) rotate(225deg);
+}
+
 #usuarioContent {
     display: none;
     padding: 0 20px 0 20px;

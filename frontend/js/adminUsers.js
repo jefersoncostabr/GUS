@@ -131,7 +131,6 @@ function toggleUsersPanel() {
     }
 
     if (btn) {
-        btn.textContent = isExpanded ? '⌃' : '⌄'
         btn.setAttribute('aria-expanded', String(isExpanded))
         btn.setAttribute('aria-label', `${isExpanded ? 'Recolher' : 'Expandir'} Usuários`)
     }

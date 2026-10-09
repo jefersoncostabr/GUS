@@ -58,7 +58,6 @@ export function renderSalasUI(data = []) {
                 content.style.maxWidth = '100%'
                 const btn = document.getElementById('toggleSalasBtn')
                 if (btn) {
-                    btn.textContent = '⌃'
                     btn.setAttribute('aria-expanded', 'true')
                     btn.setAttribute('aria-label', 'Recolher Salas')
                 }
@@ -356,7 +355,6 @@ function toggleSalasPanel() {
     }
 
     if (btn) {
-        btn.textContent = isExpanded ? '⌃' : '⌄'
         btn.setAttribute('aria-expanded', String(isExpanded))
         btn.setAttribute('aria-label', `${isExpanded ? 'Recolher' : 'Expandir'} Salas`)
     }
