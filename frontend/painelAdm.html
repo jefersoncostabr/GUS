@@ -25,7 +25,10 @@
         <section id="adminArea" aria-label="Área administrativa">
 
             <div id="estudiosPanel" class="adminPanel">
-                <h3>Estúdios <button type="button" id="toggleEstudiosBtn" class="btnSmall togglePanelBtn" style="margin-left: 10px;" aria-label="Expandir Estúdios" aria-expanded="false"></button></h3>
+                <div class="adminPanelHeader">
+                    <h3>Estúdios</h3>
+                    <button type="button" id="toggleEstudiosBtn" class="btnSmall togglePanelBtn" aria-label="Expandir Estúdios" aria-expanded="false"></button>
+                </div>
                 <div id="estudiosContent" style="display: none;">
                     <form id="formEstudio">
 
@@ -48,7 +51,10 @@
 
 
             <div id="salasPanel" class="adminPanel">
-                <h3>Salas <button type="button" id="toggleSalasBtn" class="btnSmall togglePanelBtn" style="margin-left: 10px;" aria-label="Expandir Salas" aria-expanded="false"></button></h3>
+                <div class="adminPanelHeader">
+                    <h3>Salas</h3>
+                    <button type="button" id="toggleSalasBtn" class="btnSmall togglePanelBtn" aria-label="Expandir Salas" aria-expanded="false"></button>
+                </div>
                 <div id="salasContent" style="display: none;">
                     <form id="formSala">
                         <input type="hidden" id="salaId">
@@ -76,7 +82,10 @@
 
 
             <div id="usuariosPanel" class="adminPanel">
-                <h3>Usuários <button type="button" id="toggleUsuariosBtn" class="btnSmall togglePanelBtn" style="margin-left: 10px;" aria-label="Expandir Usuários" aria-expanded="false"></button></h3>
+                <div class="adminPanelHeader">
+                    <h3>Usuários</h3>
+                    <button type="button" id="toggleUsuariosBtn" class="btnSmall togglePanelBtn" aria-label="Expandir Usuários" aria-expanded="false"></button>
+                </div>
                 <div id="usuariosContent" style="display: none;">
                     <div id="tableUsuarios"></div>
                     <div style="margin-top:8px;"><button type="button" id="addUsuarioBtn" class="btnSmall">+ Usuário</button></div>
@@ -84,7 +93,10 @@
             </div>
 
             <div id="aulasRegularesPanel" class="adminPanel">
-                <h3>Aulas Regulares <button type="button" id="toggleAulasBtn" class="btnSmall togglePanelBtn" style="margin-left: 10px;" aria-label="Expandir Aulas Regulares" aria-expanded="false"></button></h3>
+                <div class="adminPanelHeader">
+                    <h3>Aulas Regulares</h3>
+                    <button type="button" id="toggleAulasBtn" class="btnSmall togglePanelBtn" aria-label="Expandir Aulas Regulares" aria-expanded="false"></button>
+                </div>
                 <div id="aulasContent" style="display: none;">
                     <form id="formAula">
                         <input type="hidden" id="aulaId">
@@ -140,7 +152,10 @@
 
             <!-- Relatórios -->
             <div id="relatoriosPanel" class="adminPanel">
-                <h3>Relatórios <button type="button" id="toggleRelatoriosBtn" class="btnSmall togglePanelBtn" style="margin-left: 10px;" aria-label="Expandir Relatórios" aria-expanded="false"></button></h3>
+                <div class="adminPanelHeader">
+                    <h3>Relatórios</h3>
+                    <button type="button" id="toggleRelatoriosBtn" class="btnSmall togglePanelBtn" aria-label="Expandir Relatórios" aria-expanded="false"></button>
+                </div>
                 <div id="relatoriosContent" style="display: none;">
                     <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
                         <button type="button" id="btnRelatorioSemana" class="btnSmall">Agendamentos da Semana</button>

@@ -11,9 +11,14 @@
     /* min-width: 0; */
 }
 
-.adminPanel > h3 {
+.adminPanelHeader {
     display: flex;
     align-items: center;
+    gap: 10px;
+}
+
+.adminPanelHeader h3 {
+    margin: 0;
 }
 
 #relatoriosPanel {
@@ -46,9 +51,9 @@
 }
 
 .adminTabelaLoading {
-    display: flex;
-    justify-content: flex-end;
-    margin: 0 0 0 auto;
+    display: inline-flex;
+    flex: 0 0 auto;
+    margin-left: auto;
 }
 
 #usuarioContent {

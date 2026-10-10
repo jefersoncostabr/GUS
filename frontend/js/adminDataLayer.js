@@ -29,10 +29,10 @@ function setAdminTableLoading(tableId, isLoading) {
   const table = document.getElementById(tableId);
   if (!table) return;
 
-  const heading = table.closest('.adminPanel')?.querySelector('h3');
-  if (!heading) return;
+  const header = table.closest('.adminPanel')?.querySelector('.adminPanelHeader');
+  if (!header) return;
 
-  const existingLoader = heading.querySelector('.adminTabelaLoading');
+  const existingLoader = header.querySelector('.adminTabelaLoading');
   if (!isLoading) {
     existingLoader?.remove();
     return;
@@ -48,7 +48,7 @@ function setAdminTableLoading(tableId, isLoading) {
   spinner.className = 'tabelaLoadingSpinner';
   spinner.setAttribute('aria-hidden', 'true');
   indicator.append(spinner, document.createTextNode('Carregando...'));
-  heading.append(indicator);
+  header.append(indicator);
 }
 
 async function loadUsers() {
