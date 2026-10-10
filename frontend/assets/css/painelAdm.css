@@ -11,6 +11,11 @@
     /* min-width: 0; */
 }
 
+.adminPanel > h3 {
+    display: flex;
+    align-items: center;
+}
+
 #relatoriosPanel {
     --btn-shine-duration: 1.3s;
 }
@@ -43,7 +48,7 @@
 .adminTabelaLoading {
     display: flex;
     justify-content: flex-end;
-    margin: 0 0 10px;
+    margin: 0 0 0 auto;
 }
 
 #usuarioContent {
