@@ -26,7 +26,7 @@ export async function getDados(page = 1, limit = 6, filters = {}) {
                 if (painelMensagem) {
                     painelMensagem.textContent = 'Acesso pendente de aprovação';
                 }
-                return { data: [], page: 1, limit, totalItems: 0, totalPages: 1 };
+                return { data: [], page: 1, limit, totalItems: 0, totalPages: 1, accessDenied: true };
             }
             const errorMsg = await response.text();
             throw new Error(`Servidor retornou erro ${response.status}: ${errorMsg}`);
@@ -42,7 +42,7 @@ export async function getDados(page = 1, limit = 6, filters = {}) {
         return json; // { data, page, limit, totalItems, totalPages }
     } catch (error) {
         console.error('Erro ao buscar dados paginados:', error);
-        return { data: [], page: 1, limit, totalItems: 0, totalPages: 1 };
+        return { data: [], page: 1, limit, totalItems: 0, totalPages: 1, error: true };
     }
 }
 

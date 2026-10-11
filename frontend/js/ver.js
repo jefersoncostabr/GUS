@@ -16,6 +16,16 @@ function setTabelaLoading(carregando) {
     indicador.setAttribute('aria-hidden', carregando ? 'false' : 'true');
 }
 
+function exibirMensagemBusca(mensagem) {
+    const painelSaida = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+    if (!painelSaida) return;
+
+    painelSaida.textContent = mensagem;
+    window.setTimeout(() => {
+        if (painelSaida.textContent === mensagem) painelSaida.textContent = '';
+    }, 5000);
+}
+
 /**
  * Atualiza o span #filtrosAtivos com um resumo legível dos filtros ativos.
  */
@@ -62,8 +72,11 @@ function filtrarDadosLocalmente(dados, filtros) {
 
     return dados.filter(item => {
         // Filtro por solicitante
-        if (filtros.solicitante && item.solicitante) {
-            if (!item.solicitante.toLowerCase().includes(filtros.solicitante.toLowerCase())) {
+        const nomeSolicitante = typeof item.solicitante === 'object'
+            ? item.solicitante?.solicitante
+            : item.solicitante;
+        if (filtros.solicitante && nomeSolicitante) {
+            if (!nomeSolicitante.toLowerCase().includes(filtros.solicitante.toLowerCase())) {
                 return false;
             }
         }
@@ -108,6 +121,15 @@ function limparTabela() {
     if (containerInner) containerInner.innerHTML = '';
 }
 
+function ocultarTabelaBusca() {
+    const containerTabela = document.getElementById('containerTabela');
+    if (containerTabela) containerTabela.style.display = 'none';
+
+    limparTabela();
+    const containerPaginacao = document.getElementById('containerPaginacao');
+    if (containerPaginacao) containerPaginacao.innerHTML = '';
+}
+
 
 /**
  * Busca os dados no servidor com paginação e filtros, e renderiza a tabela.
@@ -117,6 +139,15 @@ function limparTabela() {
 export async function verFetch() {
     setTabelaLoading(true);
     try {
+        const painelSaida = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
+        if (painelSaida) painelSaida.textContent = '';
+
+        if (!navigator.onLine) {
+            ocultarTabelaBusca();
+            exibirMensagemBusca('Sem conexão com a internet. Verifique sua conexão e tente novamente.');
+            return;
+        }
+
         mostrandoAulasFixas = false;
         dadosAulasFixasCached = [];
         atualizarVisualBotaoToggle(false);
@@ -154,35 +185,33 @@ export async function verFetch() {
             if (inputValues.sala) filtrosFrontend.sala = parseInt(inputValues.sala);
             if (inputValues.dia) filtrosFrontend.dia = inputValues.dia;
             
-            let horaBusca = rawValues.hora.trim();
-            const horaNumeros = horaBusca.replace(/\D/g, '');
-            if (horaNumeros.length > 0 && horaNumeros.length <= 2) {
-                horaBusca = horaNumeros.padStart(2, '0') + ':00';
-            }
-            if (horaBusca) filtrosFrontend.hora = horaBusca;
+            if (inputValues.hora) filtrosFrontend.hora = inputValues.hora;
 
-            if (rawValues.motivo) filtrosFrontend.motivo = rawValues.motivo.trim();
+            if (inputValues.motivo) filtrosFrontend.motivo = inputValues.motivo;
             console.log('filtrosFrontend:', filtrosFrontend);
         } else {
             filtrosFrontend = {};
         }
 
-        // Congela os filtros da busca atual para paginação consistente
-        filtrosBuscaAtual = temFiltros ? {} : {}; // Se tem filtros, não usar no servidor
+        // Mantém os filtros na busca de cada página.
+        filtrosBuscaAtual = { ...filtrosFrontend };
 
         // Registra callback de troca de página para recarregar dados
         setOnPageChange(async () => {
             await verFetchPage();
         });
 
-        // Carrega a primeira página de usos + aulas regulares em paralelo
-        // Se tem filtros do frontend, não enviar para servidor, trazer TODOS e filtrar localmente
-        const filtersParaServidor = temFiltros ? {} : (Object.keys(filtrosFrontend).length === 0 ? {} : filtrosFrontend);
-        
+        // O servidor aplica os filtros aos usos antes de paginar.
         const [resultUsos, respAulas] = await Promise.all([
-            getDados(currentPage, itemsPorPagina, filtersParaServidor),
+            getDados(currentPage, itemsPorPagina, filtrosBuscaAtual),
             fetch('/admin/relatorios/aulas').catch(() => ({ ok: false }))
         ]);
+
+        if (resultUsos.error || resultUsos.accessDenied) {
+            ocultarTabelaBusca();
+            if (resultUsos.error) exibirMensagemBusca('É preciso logar para ver.');
+            return resultUsos;
+        }
 
         const usosData = resultUsos.data || [];
         let aulasData = [];
@@ -196,29 +225,15 @@ export async function verFetch() {
             }
         }
 
-        // Combina usos e aulas
-        let dadosCombinados = [...usosData, ...aulasData];
-
-        // Se há filtros do frontend, aplicar filtragem local
-        if (temFiltros) {
-            dadosCombinados = filtrarDadosLocalmente(dadosCombinados, filtrosFrontend);
-            // Quando há filtros, não exibe a tabela
-            limparTabela();
-            criaTabela({ data: [], page: resultUsos.page, limit: resultUsos.limit, totalItems: 0, totalPages: 1 });
-            setTotalPages(1);
-            criarElementospaginacaoTab();
-            return { data: [], ...resultUsos };
-        }
+        // As aulas fixas não vêm do endpoint paginado de usos, então são filtradas localmente.
+        const aulasFiltradas = temFiltros
+            ? filtrarDadosLocalmente(aulasData, filtrosFrontend)
+            : aulasData;
+        const dadosCombinados = [...usosData, ...aulasFiltradas];
 
         if (!dadosCombinados || dadosCombinados.length === 0) {
             console.log("Nenhum registro encontrado");
-            const painelSaida = document.getElementById('painelMensagem');
-            if (painelSaida) {
-                painelSaida.innerText = 'Nenhum registro encontrado';
-                setTimeout(() => {
-                    painelSaida.innerText = '';
-                }, 5000);
-            }
+            exibirMensagemBusca('Nenhum registro encontrado');
         }
 
         limparTabela();
@@ -255,12 +270,10 @@ export async function verFetchPage() {
             console.error('Erro ao buscar aulas:', e);
         }
 
-        let dadosCombinados = [...(resultUsos.data || []), ...aulasData];
-
-        // Se há filtros do frontend, aplicar filtragem local
-        if (Object.keys(filtrosFrontend).length > 0) {
-            dadosCombinados = filtrarDadosLocalmente(dadosCombinados, filtrosFrontend);
-        }
+        const aulasFiltradas = Object.keys(filtrosFrontend).length > 0
+            ? filtrarDadosLocalmente(aulasData, filtrosFrontend)
+            : aulasData;
+        const dadosCombinados = [...(resultUsos.data || []), ...aulasFiltradas];
 
         limparTabela();
         criaTabela({ data: dadosCombinados, ...resultUsos });
