@@ -51,7 +51,7 @@ export const listarUsos = async (req, res) => {
             return res.status(500).json({ error: 'Modelo de Utilização não inicializado.' });
         }
 
-        const { solicitante, sala, dia, hora, motivo } = req.query;
+        const { solicitante, estudio, sala, dia, hora, motivo } = req.query;
         const query = {};
 
         // Filtro por nome do solicitante (busca o ID correspondente)
@@ -60,7 +60,12 @@ export const listarUsos = async (req, res) => {
             const idsUsuarios = usuarios.map(u => u._id);
             query.solicitante = { $in: idsUsuarios };
         }
-        if (sala) query.sala = sala;
+        if (sala) {
+            query.sala = sala;
+        } else if (estudio) {
+            const estudioEscapado = estudio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            query.sala = { $regex: new RegExp(`^${estudioEscapado}[|:]`) };
+        }
         if (dia) query.dia = dia;
         if (hora) query.hora = hora;
         if (motivo) query.motivo = motivo;

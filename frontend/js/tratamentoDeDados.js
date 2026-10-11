@@ -4,6 +4,30 @@
 export const OPCOES_MOTIVO = ['Particular', 'Ensaio', 'Reunião', 'Aula Regular', 'Sublocação'];
 
 /**
+ * Normaliza o valor da sala para o número da sala, mesmo quando a UI usa
+ * um identificador composto por estúdio + sala para distinguir filiais.
+ *
+ * Exemplos aceitos:
+ * - "5"
+ * - "estudioA|5"
+ * - "estudioA:5"
+ *
+ * @param {string|number} valorSala
+ * @returns {string}
+ */
+export function normalizarSalaValor(valorSala) {
+    if (valorSala === null || valorSala === undefined) return '';
+
+    const texto = String(valorSala).trim();
+    if (!texto) return '';
+
+    // Preserva valores compostos como "estudioId|numero" ou "estudioId:numero",
+    // que são usados para distinguir salas iguais em filiais diferentes.
+    // Apenas converte para string limpa, sem perder o identificador do estúdio.
+    return texto;
+}
+
+/**
  * Trata e formata os dados de uso (Solicitante, Sala, Dia, Hora, Motivo)
  * conforme regras de negócio estritas.
  * 
@@ -17,9 +41,8 @@ export function tratarDados(dados) {
     // Remove tudo que não for letra ou espaço
     solicitante = solicitante.replace(/[^a-zA-Z\u00C0-\u00FF\s]/g, '').trim();
 
-    // 2. Sala: Somente números
-    let sala = dados.sala || '';
-    sala = sala.replace(/\D/g, '');
+    // 2. Sala: mantém o identificador real da sala, que pode ser composto por estúdio + número.
+    let sala = normalizarSalaValor(dados.sala);
 
     // 3. Dia: Tratamento para input date (YYYY-MM-DD) ou manual
     let diaFinal = '';

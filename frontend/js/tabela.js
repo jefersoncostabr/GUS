@@ -93,7 +93,12 @@ function preencherInputs(dados) {
     if (salaValor) {
         const elEstudio = document.getElementById('estudio');
         const todasAsSalas = window.__todasAsSalas || [];
-        const salaEncontrada = todasAsSalas.find((s) => String(s.numero) === salaValor);
+        const salaEncontrada = todasAsSalas.find((s) => {
+            const idSala = String(s._id || s.id || '');
+            const numeroSala = String(s.numero || '');
+            const compositeSala = `${String(s.estudio || s.estudioId || '')}|${numeroSala}`;
+            return idSala === salaValor || numeroSala === salaValor || compositeSala === salaValor;
+        });
 
         if (salaEncontrada && elEstudio) {
             const eVal = salaEncontrada.estudio || salaEncontrada.estudioId;
@@ -108,7 +113,7 @@ function preencherInputs(dados) {
         }
 
         if (elSala) {
-            const temOpcao = Array.from(elSala.options).some((o) => o.value === salaValor);
+            const temOpcao = Array.from(elSala.options).some((o) => o.value === salaValor || o.textContent === `Sala ${salaValor}`);
             if (!temOpcao) {
                 const novaOpcao = document.createElement('option');
                 novaOpcao.value = salaValor;
@@ -215,8 +220,216 @@ function formatarDiaParaTabela(valorDia, isAulaFixa = false) {
         return valorDia;
 }
 
+function resolverRotuloEstudioPorId(estudioId) {
+    const estudios = Array.isArray(window.__estudiosCache) ? window.__estudiosCache : [];
+    const todasAsSalas = Array.isArray(window.__todasAsSalas) ? window.__todasAsSalas : [];
+    const idEstudio = (valor) => {
+        if (valor && typeof valor === 'object') return String(valor._id || valor.id || '');
+        return typeof valor === 'string' ? valor.trim() : '';
+    };
+    const estudioSelecionado = estudios.find((item) => idEstudio(item) === String(estudioId));
+    if (!estudioSelecionado) return '';
+
+    const idsComSalas = new Set(todasAsSalas.map((sala) => idEstudio(sala.estudio || sala.estudioId)).filter(Boolean));
+    idsComSalas.add(String(estudioId));
+    const dataCriacao = (estudio) => {
+        if (estudio.createdAt) return new Date(estudio.createdAt).getTime();
+        const id = idEstudio(estudio);
+        return /^[\da-f]{24}$/i.test(id) ? Number.parseInt(id.slice(0, 8), 16) * 1000 : 0;
+    };
+    const estudiosDoTenant = estudios
+        .filter((estudio) => idsComSalas.has(idEstudio(estudio)))
+        .sort((a, b) => dataCriacao(a) - dataCriacao(b) || idEstudio(a).localeCompare(idEstudio(b)));
+    const nome = String(estudioSelecionado.nome || estudioSelecionado.name || '');
+    if (nome.toLowerCase().includes('matriz')) return 'Matriz';
+
+    const filiais = estudiosDoTenant.filter((estudio) =>
+        !String(estudio.nome || estudio.name || '').toLowerCase().includes('matriz')
+    );
+    const indiceFilial = filiais.findIndex((estudio) => idEstudio(estudio) === String(estudioId));
+    if (indiceFilial < 0) return '';
+    return indiceFilial === 0 ? 'Filial' : `Filial ${indiceFilial + 1}`;
+}
+
+function resolverNomeCadastradoEstudio(dado) {
+    const estudios = Array.isArray(window.__estudiosCache) ? window.__estudiosCache : [];
+    const todasAsSalas = Array.isArray(window.__todasAsSalas) ? window.__todasAsSalas : [];
+    const obterId = (valor) => {
+        if (valor && typeof valor === 'object') return String(valor._id || valor.id || '');
+        return typeof valor === 'string' ? valor.trim() : '';
+    };
+    const nomePorId = (id) => {
+        const estudio = estudios.find((item) => obterId(item) === String(id));
+        return estudio?.nome || estudio?.name || '';
+    };
+
+    const salaValor = dado.sala != null ? String(dado.sala) : '';
+    const [estudioIdDaSala = '', numeroSala = ''] = salaValor.split(/[|:]/);
+    const idEstudio = obterId(dado.estudioId)
+        || obterId(dado.estudio)
+        || (/^[\da-f]{24}$/i.test(String(dado.estudioNome || '').trim()) ? String(dado.estudioNome).trim() : '')
+        || (salaValor.includes('|') || salaValor.includes(':') ? estudioIdDaSala : '');
+    const nomePorIdDireto = nomePorId(idEstudio);
+    if (nomePorIdDireto) return nomePorIdDireto;
+
+    const salaEncontrada = todasAsSalas.find((sala) => {
+        const idDaSala = obterId(sala.estudio || sala.estudioId);
+        if (salaValor.includes('|') || salaValor.includes(':')) {
+            return String(sala.numero || '') === numeroSala && idDaSala === estudioIdDaSala;
+        }
+        if (idEstudio) return String(sala.numero || '') === salaValor && idDaSala === idEstudio;
+        return String(sala.numero || '') === salaValor;
+    });
+    if (salaEncontrada) {
+        if (salaEncontrada.estudioNome) return salaEncontrada.estudioNome;
+        const nomeDaSala = salaEncontrada.estudio || salaEncontrada.estudioId;
+        const nomeDiretoDaSala = nomeDaSala && typeof nomeDaSala === 'object'
+            ? nomeDaSala.nome || nomeDaSala.name
+            : '';
+        if (nomeDiretoDaSala) return nomeDiretoDaSala;
+        const nomeResolvidoDaSala = nomePorId(obterId(nomeDaSala));
+        if (nomeResolvidoDaSala) return nomeResolvidoDaSala;
+    }
+
+    return dado.estudioNome || dado.estudio?.nome || dado.estudio?.name || '';
+}
+
+function resolverTextoEstudio(dado, mostrarNomeCadastrado = false) {
+    if (!dado || typeof dado !== 'object') return 'Não preenchido';
+    if (mostrarNomeCadastrado) return resolverNomeCadastradoEstudio(dado) || 'Não preenchido';
+
+    const estudios = Array.isArray(window.__estudiosCache) ? window.__estudiosCache : [];
+    const todasAsSalas = Array.isArray(window.__todasAsSalas) ? window.__todasAsSalas : [];
+    const idEstudio = (valor) => {
+        if (valor && typeof valor === 'object') return String(valor._id || valor.id || '');
+        return typeof valor === 'string' ? valor.trim() : '';
+    };
+    const nomeVisivel = (valor) => {
+        if (typeof valor !== 'string' || !valor.trim()) return '';
+        const nome = valor.trim();
+        if (/^[\da-f]{24}$/i.test(nome)) return '';
+        const normalizado = nome.toLowerCase();
+        if (normalizado.includes('matriz')) return 'Matriz';
+        if (normalizado.includes('filial')) {
+            const filialNumerada = nome.match(/filial\s+\d+/i);
+            return filialNumerada ? `Filial ${filialNumerada[0].match(/\d+/)[0]}` : 'Filial';
+        }
+        return nome;
+    };
+    const salaValor = dado.sala != null ? String(dado.sala) : '';
+    const [estudioIdDaSala = ''] = salaValor.split(/[|:]/);
+    const idDireto = idEstudio(dado.estudioId)
+        || idEstudio(dado.estudio)
+        || (/^[\da-f]{24}$/i.test(String(dado.estudioNome || '').trim()) ? String(dado.estudioNome).trim() : '');
+    const idParaRotulo = idDireto || (salaValor.includes('|') || salaValor.includes(':') ? estudioIdDaSala : '');
+    const rotuloOrdenado = resolverRotuloEstudioPorId(idParaRotulo);
+    if (rotuloOrdenado) return rotuloOrdenado;
+
+    const nomePorId = (valor) => {
+        const id = idEstudio(valor);
+        if (!id) return '';
+        const estudio = estudios.find((item) => String(item._id || item.id || '') === id);
+        return nomeVisivel(estudio?.nome || estudio?.name);
+    };
+
+    const nomeDireto = nomeVisivel(dado.estudioNome)
+        || nomeVisivel(dado.estudio?.nome)
+        || nomeVisivel(dado.estudio?.name)
+        || nomeVisivel(dado.estudio)
+        || nomeVisivel(dado.estudioId?.nome)
+        || nomeVisivel(dado.estudioId?.name)
+        || nomeVisivel(dado.estudioId);
+    if (nomeDireto) return nomeDireto;
+
+    const nomeDiretoPorId = nomePorId(idDireto);
+    if (nomeDiretoPorId) return nomeDiretoPorId;
+
+    const [, numeroDaSala = ''] = salaValor.split(/[|:]/);
+    const salaComposta = salaValor.includes('|') || salaValor.includes(':');
+    const idEstudioResolvido = idDireto || estudioIdDaSala;
+    let salasCorrespondentes = todasAsSalas.filter((sala) => {
+        const numero = String(sala.numero || '');
+        const idSala = String(sala._id || sala.id || '');
+        const valorEstudioSala = sala.estudio || sala.estudioId;
+        const idSalaEstudio = idEstudio(valorEstudioSala);
+        if (salaComposta) {
+            return numero === numeroDaSala
+                && idSalaEstudio === estudioIdDaSala;
+        }
+        if (idSala === salaValor) return true;
+        if (numero !== salaValor) return false;
+        return !idEstudioResolvido || idSalaEstudio === idEstudioResolvido;
+    });
+
+    if (!salaComposta && salasCorrespondentes.length > 1) {
+        salasCorrespondentes = [];
+    }
+    const salaEncontrada = salasCorrespondentes[0];
+
+    if (salaEncontrada) {
+        const eVal = salaEncontrada.estudio || salaEncontrada.estudioId;
+        const nomeDaSala = nomeVisivel(salaEncontrada.estudioNome)
+            || nomeVisivel(eVal?.nome || eVal?.name)
+            || nomePorId(eVal);
+        if (nomeDaSala) return nomeDaSala;
+    }
+
+    return 'Não preenchido';
+}
+
+function resolverNomeCadastradoSala(dado) {
+    const todasAsSalas = Array.isArray(window.__todasAsSalas) ? window.__todasAsSalas : [];
+    const obterId = (valor) => {
+        if (valor && typeof valor === 'object') return String(valor._id || valor.id || '');
+        return typeof valor === 'string' ? valor.trim() : '';
+    };
+    const salaValor = dado.sala != null ? String(dado.sala).trim() : '';
+    if (!salaValor) return '';
+
+    const separador = salaValor.search(/[|:]/);
+    const composta = separador >= 0;
+    const partesSala = composta ? salaValor.split(/[|:]/) : [];
+    const estudioId = obterId(dado.estudioId)
+        || obterId(dado.estudio)
+        || (composta ? partesSala[0] : '');
+    const numero = composta ? partesSala[partesSala.length - 1] : salaValor;
+    let salasCorrespondentes = todasAsSalas.filter((sala) => {
+        const idSala = String(sala._id || sala.id || '');
+        if (!composta && idSala === salaValor) return true;
+        if (String(sala.numero || '') !== numero) return false;
+        if (estudioId) return obterId(sala.estudioId || sala.estudio) === estudioId;
+        return true;
+    });
+
+    if (salasCorrespondentes.length !== 1) return '';
+    const salaEncontrada = salasCorrespondentes[0];
+    const nomeSala = String(salaEncontrada.nome || '').trim();
+    const numeroSala = String(salaEncontrada.numero || numero);
+    if (!nomeSala) return numeroSala;
+    return nomeSala === numeroSala ? nomeSala : `${nomeSala} (${numeroSala})`;
+}
+
+function resolverTextoSala(dado, mostrarNomeCadastrado = false) {
+    if (!dado || dado.sala == null) return '---';
+    if (mostrarNomeCadastrado) return resolverNomeCadastradoSala(dado) || resolverTextoSala(dado);
+
+    const salaValor = String(dado.sala).trim();
+    const separador = salaValor.search(/[|:]/);
+    if (separador >= 0) {
+        return salaValor.slice(separador + 1).split(/[|:]/).pop().trim();
+    }
+
+    const todasAsSalas = Array.isArray(window.__todasAsSalas) ? window.__todasAsSalas : [];
+    const salaEncontrada = todasAsSalas.find((sala) => String(sala._id || sala.id || '') === salaValor);
+    return salaEncontrada ? String(salaEncontrada.numero ?? salaEncontrada.nome ?? salaValor) : salaValor;
+}
+
 function renderTabelaComPaginacao(data) {
     const containerTabela = document.getElementById('tableInner');
+    let mostrarNomeCadastrado = false;
+    const celulasEstudio = [];
+    let mostrarNomeSala = false;
+    const celulasSala = [];
 
     // Criar tabela HTML
     const tabela = document.createElement('table');
@@ -224,9 +437,61 @@ function renderTabelaComPaginacao(data) {
     // Criar cabeçalho da tabela
     const cabecalho = tabela.createTHead();
     const linhaCabecalho = cabecalho.insertRow();
-    ['Solicitante', 'Sala', 'Dia', 'Hora', 'Motivo'].forEach((coluna) => {
-        const celula = linhaCabecalho.insertCell();
+    ['Solicitante', 'Estúdio', 'Sala', 'Dia', 'Hora', 'Motivo'].forEach((coluna) => {
+        const celula = document.createElement('th');
         celula.textContent = coluna;
+        linhaCabecalho.appendChild(celula);
+        if (coluna === 'Estúdio') {
+            celula.style.cursor = 'pointer';
+            celula.tabIndex = 0;
+            celula.setAttribute('role', 'button');
+            celula.setAttribute('aria-pressed', 'false');
+            celula.title = 'Clique para exibir o nome cadastrado do estúdio';
+
+            const alternarNomeEstudio = () => {
+                mostrarNomeCadastrado = !mostrarNomeCadastrado;
+                celula.setAttribute('aria-pressed', String(mostrarNomeCadastrado));
+                celula.title = mostrarNomeCadastrado
+                    ? 'Clique para voltar aos rótulos resumidos'
+                    : 'Clique para exibir o nome cadastrado do estúdio';
+                celulasEstudio.forEach(({ celulaEstudio, dado }) => {
+                    celulaEstudio.textContent = resolverTextoEstudio(dado, mostrarNomeCadastrado);
+                });
+            };
+
+            celula.addEventListener('click', alternarNomeEstudio);
+            celula.addEventListener('keydown', (evento) => {
+                if (evento.key === 'Enter' || evento.key === ' ') {
+                    evento.preventDefault();
+                    alternarNomeEstudio();
+                }
+            });
+        } else if (coluna === 'Sala') {
+            celula.style.cursor = 'pointer';
+            celula.tabIndex = 0;
+            celula.setAttribute('role', 'button');
+            celula.setAttribute('aria-pressed', 'false');
+            celula.title = 'Clique para exibir o nome cadastrado da sala';
+
+            const alternarNomeSala = () => {
+                mostrarNomeSala = !mostrarNomeSala;
+                celula.setAttribute('aria-pressed', String(mostrarNomeSala));
+                celula.title = mostrarNomeSala
+                    ? 'Clique para voltar ao número da sala'
+                    : 'Clique para exibir o nome cadastrado da sala';
+                celulasSala.forEach(({ celulaSala, dado }) => {
+                    celulaSala.textContent = resolverTextoSala(dado, mostrarNomeSala);
+                });
+            };
+
+            celula.addEventListener('click', alternarNomeSala);
+            celula.addEventListener('keydown', (evento) => {
+                if (evento.key === 'Enter' || evento.key === ' ') {
+                    evento.preventDefault();
+                    alternarNomeSala();
+                }
+            });
+        }
     });
 
     // Criar linhas da tabela
@@ -244,7 +509,13 @@ function renderTabelaComPaginacao(data) {
         }
         atribuirClick(linha, dado);
 
-        linha.insertCell().textContent = dado.sala;
+        const celulaEstudio = linha.insertCell();
+        celulaEstudio.textContent = resolverTextoEstudio(dado, mostrarNomeCadastrado);
+        celulasEstudio.push({ celulaEstudio, dado });
+
+        const celulaSala = linha.insertCell();
+        celulaSala.textContent = resolverTextoSala(dado, mostrarNomeSala);
+        celulasSala.push({ celulaSala, dado });
         linha.insertCell().textContent = formatarDiaParaTabela(dado.dia, dado.isAulaFixa);
         linha.insertCell().textContent = dado.hora;
         linha.insertCell().textContent = dado.motivo;

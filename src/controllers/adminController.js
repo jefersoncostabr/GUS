@@ -135,22 +135,36 @@ class AdminController {
             // 1. Busca todas as salas do tenant
             const salas = await Sala.find({}).lean();
 
-            // 2. Extrai os IDs dos estúdios (que estão no Master)
+            // 2. Define o estúdio principal do tenant como fallback para registros legados sem estudo vinculado.
+            const tenantDbName = req.session?.user?.tenantDbName;
+            const principalEstudio = tenantDbName
+                ? await Estudio.findOne({ tenantDbName }).select('_id nome tenantDbName').lean()
+                : null;
+
+            // 3. Extrai os IDs dos estúdios (que estão no Master)
             const estudioIds = [...new Set(salas.map(s => s.estudioId).filter(id => id))];
 
-            // 3. Busca os estúdios correspondentes no Master DB
+            // 4. Busca os estúdios correspondentes no Master DB
             const estudios = await Estudio.find({ _id: { $in: estudioIds } }, 'nome').lean();
             const estudioMap = new Map(estudios.map(e => [e._id.toString(), e.nome]));
 
-            // 4. Combina os dados manualmente
-            const salasFormatadas = salas.map(s => ({
-                _id: s._id,
-                numero: s.numero,
-                nome: s.nome,
-                ativo: s.ativo,
-                estudioId: s.estudioId,
-                estudioNome: s.estudioId ? (estudioMap.get(s.estudioId.toString()) || 'Estúdio não encontrado') : 'N/A'
-            }));
+            // 5. Combina os dados manualmente, usando o estúdio principal do tenant como fallback.
+            const salasFormatadas = salas.map(s => {
+                const estudioId = s.estudioId ? s.estudioId.toString() : (principalEstudio ? principalEstudio._id.toString() : null);
+                const estudioNome = estudioId
+                    ? (estudioMap.get(estudioId) || principalEstudio?.nome || 'Principal')
+                    : (principalEstudio?.nome || 'Não preenchido');
+
+                return {
+                    _id: s._id,
+                    numero: s.numero,
+                    nome: s.nome,
+                    ativo: s.ativo,
+                    estudioId: s.estudioId || principalEstudio?._id || null,
+                    estudioNome,
+                    tipoEstudio: estudioNome.toLowerCase().includes('filial') ? 'Filial' : (estudioNome.toLowerCase().includes('matriz') ? 'Matriz' : 'Principal')
+                };
+            });
 
             res.status(200).json(salasFormatadas);
         } catch (erro) {

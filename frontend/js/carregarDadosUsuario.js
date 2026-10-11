@@ -46,6 +46,7 @@ async function carregarEstudios() {
             throw new Error('Falha ao carregar estúdios.');
         }
         const estudios = await response.json();
+        window.__estudiosCache = estudios;
 
         // Limpa opções existentes e adiciona uma padrão
         selectEstudio.innerHTML = '<option value="">Selecione</option>';
@@ -109,11 +110,15 @@ function atualizarSalasDisponiveis() {
         return idDoEstudioNaSala == estudioId;
     });
 
-    // Preenche o select de salas com as opções filtradas
+    // Preenche o select de salas com a identidade real da sala, não apenas o número.
+    // Isso evita conflitar "Sala 1" de filiais/estúdios diferentes.
     salasDoEstudio.forEach(sala => {
+        const salaNumero = String(sala.numero ?? '');
+        const estudoIdLocal = String(estudioId || '');
+        const valorUnico = `${estudoIdLocal}|${salaNumero}`;
         const option = document.createElement('option');
-        option.value = sala.numero; 
-        option.textContent = sala.nome ? `${sala.nome} (Sala ${sala.numero})` : `Sala ${sala.numero}`;
+        option.value = valorUnico;
+        option.textContent = sala.nome ? `${sala.nome} (Sala ${salaNumero})` : `Sala ${salaNumero}`;
         selectSala.appendChild(option);
     });
 }

@@ -10,6 +10,8 @@ export function normalizarAulaParaUso(aula) {
             solicitante: aula.professor.solicitante || "Professor não definido",
             _id: aula.professor._id 
         } : { solicitante: "Não definido" },
+        estudioNome: aula.estudioNome,
+        estudioId: aula.estudioId || aula.estudio,
         sala: aula.sala,
         dia: aula.diaSemana,      // Mapeia diaSemana (ex: segunda) para a coluna Dia
         hora: aula.horaInicio,    // Mapeia horaInicio para a coluna Hora

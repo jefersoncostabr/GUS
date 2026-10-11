@@ -62,7 +62,7 @@ function atualizarFiltrosLabel() {
 /**
  * Filtra localmente um array de dados de acordo com os filtros do frontend.
  * @param {Array} dados - Array com os dados a filtrar
- * @param {Object} filtros - Objeto com filtros { solicitante, sala, dia, hora, motivo }
+ * @param {Object} filtros - Objeto com filtros { solicitante, estudio, sala, dia, hora, motivo }
  * @returns {Array} Array filtrado
  */
 function filtrarDadosLocalmente(dados, filtros) {
@@ -81,9 +81,31 @@ function filtrarDadosLocalmente(dados, filtros) {
             }
         }
 
-        // Filtro por sala (comparação numérica)
-        if (filtros.sala !== undefined && item.sala !== filtros.sala) {
-            return false;
+        if (filtros.estudio) {
+            const estudio = item.estudioId || item.estudio;
+            const estudioId = estudio && typeof estudio === 'object'
+                ? String(estudio._id || estudio.id || '')
+                : String(estudio || '');
+            if (estudioId !== String(filtros.estudio)) return false;
+        }
+
+        // O filtro pode ser apenas o número ou a chave composta estúdio|número.
+        if (filtros.sala !== undefined && filtros.sala !== '') {
+            const salaFiltro = String(filtros.sala);
+            const [estudioFiltro, numeroFiltro] = salaFiltro.split(/[|:]/);
+            const salaItem = String(item.sala ?? '');
+            const [estudioDaSala, numeroDaSala] = salaItem.split(/[|:]/);
+            const estudioItem = item.estudioId || item.estudio;
+            const estudioIdItem = estudioItem && typeof estudioItem === 'object'
+                ? String(estudioItem._id || estudioItem.id || '')
+                : String(estudioItem || estudioDaSala || '');
+            const numeroItem = numeroDaSala || estudioDaSala;
+
+            if (numeroFiltro !== undefined) {
+                if (numeroItem !== numeroFiltro || estudioIdItem !== estudioFiltro) return false;
+            } else if ((numeroDaSala || salaItem) !== salaFiltro) {
+                return false;
+            }
         }
 
         // Filtro por dia (para usos é DD/MM/AA, para aulas é nome do dia)
@@ -160,6 +182,7 @@ export async function verFetch() {
 
         const rawValues = {
             solicitante: document.getElementById('solicitante').value,
+            estudio: document.getElementById('estudio')?.value || '',
             sala: document.getElementById('sala').value,
             dia: document.getElementById('date').value,
             hora: document.getElementById('hora').value,
@@ -182,7 +205,8 @@ export async function verFetch() {
 
             filtrosFrontend = {};
             if (inputValues.solicitante) filtrosFrontend.solicitante = inputValues.solicitante;
-            if (inputValues.sala) filtrosFrontend.sala = parseInt(inputValues.sala);
+            if (rawValues.estudio) filtrosFrontend.estudio = rawValues.estudio;
+            if (inputValues.sala) filtrosFrontend.sala = inputValues.sala;
             if (inputValues.dia) filtrosFrontend.dia = inputValues.dia;
             
             if (inputValues.hora) filtrosFrontend.hora = inputValues.hora;
