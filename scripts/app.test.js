@@ -28,10 +28,22 @@ describe('Testes de Integração - Sistema GUS', () => {
         expect(Array.isArray(res.body)).toBe(true);
     });
 
-    it('Deve proteger rotas administrativas (Redirecionar se não autenticado)', async () => {
-        const res = await request(app).get('/admin');
-        // O authMiddleware redireciona para login.html em requisições GET sem sessão
-        expect(res.statusCode).toEqual(302);
+    it('Deve proteger a API administrativa com 401 JSON quando não autenticado', async () => {
+        const res = await request(app)
+            .get('/admin/usuarios')
+            .set('Accept', 'application/json');
+
+        expect(res.statusCode).toEqual(401);
+        expect(res.body).toEqual(expect.objectContaining({
+            error: expect.any(String)
+        }));
+    });
+
+    it('Deve servir o painel administrativo estático', async () => {
+        const res = await request(app).get('/painelAdm.html');
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.headers['content-type']).toContain('text/html');
     });
 
     it('Deve falhar ao tentar criar um solicitante sem dados (POST /solicitantes/solicitantes)', async () => {

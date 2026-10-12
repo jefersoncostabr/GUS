@@ -424,11 +424,28 @@ function resolverTextoSala(dado, mostrarNomeCadastrado = false) {
     return salaEncontrada ? String(salaEncontrada.numero ?? salaEncontrada.nome ?? salaValor) : salaValor;
 }
 
+const PREFERENCIA_NOME_ESTUDIO = 'gus.tabela.nomeCadastrado.estudio';
+const PREFERENCIA_NOME_SALA = 'gus.tabela.nomeCadastrado.sala';
+
+function carregarPreferenciaExibicao(chave) {
+    try {
+        return localStorage.getItem(chave) === 'true';
+    } catch {
+        return false;
+    }
+}
+
+function salvarPreferenciaExibicao(chave, valor) {
+    try {
+        localStorage.setItem(chave, String(valor));
+    } catch {}
+}
+
 function renderTabelaComPaginacao(data) {
     const containerTabela = document.getElementById('tableInner');
-    let mostrarNomeCadastrado = false;
+    let mostrarNomeCadastrado = carregarPreferenciaExibicao(PREFERENCIA_NOME_ESTUDIO);
     const celulasEstudio = [];
-    let mostrarNomeSala = false;
+    let mostrarNomeSala = carregarPreferenciaExibicao(PREFERENCIA_NOME_SALA);
     const celulasSala = [];
 
     // Criar tabela HTML
@@ -445,11 +462,14 @@ function renderTabelaComPaginacao(data) {
             celula.style.cursor = 'pointer';
             celula.tabIndex = 0;
             celula.setAttribute('role', 'button');
-            celula.setAttribute('aria-pressed', 'false');
-            celula.title = 'Clique para exibir o nome cadastrado do estúdio';
+            celula.setAttribute('aria-pressed', String(mostrarNomeCadastrado));
+            celula.title = mostrarNomeCadastrado
+                ? 'Clique para voltar aos rótulos resumidos'
+                : 'Clique para exibir o nome cadastrado do estúdio';
 
             const alternarNomeEstudio = () => {
                 mostrarNomeCadastrado = !mostrarNomeCadastrado;
+                salvarPreferenciaExibicao(PREFERENCIA_NOME_ESTUDIO, mostrarNomeCadastrado);
                 celula.setAttribute('aria-pressed', String(mostrarNomeCadastrado));
                 celula.title = mostrarNomeCadastrado
                     ? 'Clique para voltar aos rótulos resumidos'
@@ -470,11 +490,14 @@ function renderTabelaComPaginacao(data) {
             celula.style.cursor = 'pointer';
             celula.tabIndex = 0;
             celula.setAttribute('role', 'button');
-            celula.setAttribute('aria-pressed', 'false');
-            celula.title = 'Clique para exibir o nome cadastrado da sala';
+            celula.setAttribute('aria-pressed', String(mostrarNomeSala));
+            celula.title = mostrarNomeSala
+                ? 'Clique para voltar ao número da sala'
+                : 'Clique para exibir o nome cadastrado da sala';
 
             const alternarNomeSala = () => {
                 mostrarNomeSala = !mostrarNomeSala;
+                salvarPreferenciaExibicao(PREFERENCIA_NOME_SALA, mostrarNomeSala);
                 celula.setAttribute('aria-pressed', String(mostrarNomeSala));
                 celula.title = mostrarNomeSala
                     ? 'Clique para voltar ao número da sala'

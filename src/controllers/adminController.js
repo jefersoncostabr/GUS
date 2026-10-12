@@ -313,6 +313,33 @@ class AdminController {
         }
     }
 
+    static async atualizarAula(req, res) {
+        try {
+            const { id } = req.params;
+            const Aula = req.tenantModels?.Aula;
+
+            if (!Aula) {
+                return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
+            }
+
+            const dadosUpdate = { ...req.body };
+            delete dadosUpdate.id;
+            delete dadosUpdate._id;
+
+            const aulaAtualizada = await Aula.findByIdAndUpdate(id, dadosUpdate, {
+                new: true,
+                runValidators: true
+            });
+            if (!aulaAtualizada) {
+                return res.status(404).json({ error: 'Aula não encontrada.' });
+            }
+
+            res.status(200).json({ message: 'Aula atualizada com sucesso', aula: aulaAtualizada });
+        } catch (erro) {
+            res.status(500).json({ error: `${erro.message} - falha ao atualizar aula` });
+        }
+    }
+
     static async deletarAula(req, res) {
         try {
             const { id } = req.params;

@@ -217,6 +217,7 @@ async function handleAulaSave(e) {
       showMessage('Aula criada.', 'success');
     }
     await loadAulas();
+    document.dispatchEvent(new CustomEvent('admin:aula:saved'));
   } catch (err) { }
 }
 

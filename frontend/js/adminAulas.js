@@ -3,6 +3,7 @@ import { showMessage } from './admin.js'
 let cachedData = []
 let cachedSalas = []
 let isExpanded = false
+let linhaAulaSelecionada = null
 
 function normalizarHoraEntrada(valorHora) {
     const horaTexto = String(valorHora || '').trim()
@@ -100,9 +101,15 @@ export function renderAulasUI(data = []) {
             const item = data.find(x => (x._id || x.id) == id)
             if (!item) return
 
+            if (linhaAulaSelecionada) linhaAulaSelecionada.classList.remove('aulaSelecionada')
+            linhaAulaSelecionada = tr
+            tr.classList.add('aulaSelecionada')
+
             const getVal = (v) => (v && typeof v === 'object') ? (v._id || v.id) : (v || '')
 
             document.getElementById('aulaId').value = id
+            const btnSalvar = document.getElementById('salvarAulaBtn')
+            if (btnSalvar) btnSalvar.textContent = 'Alterar'
             
             const estudioId = getVal(item.estudio || item.estudioId)
             document.getElementById('aulaEstudio').value = estudioId
@@ -244,8 +251,6 @@ function salvarAula() {
     }
 
     document.dispatchEvent(new CustomEvent('admin:aula:save', { detail: payload }))
-    showMessage('Solicitado salvar aula.', 'info', 3000)
-    clearForm()
 }
 
 function clearForm() {
@@ -256,6 +261,11 @@ function clearForm() {
     })
     const ativoEl = document.getElementById('aulaAtivo')
     if (ativoEl) ativoEl.checked = true
+
+    const btnSalvar = document.getElementById('salvarAulaBtn')
+    if (btnSalvar) btnSalvar.textContent = 'Salvar'
+    if (linhaAulaSelecionada) linhaAulaSelecionada.classList.remove('aulaSelecionada')
+    linhaAulaSelecionada = null
     
     updateAulasSalasOptions('')
 }
@@ -313,6 +323,8 @@ if (aulasTable) {
 
     const btnLimpar = document.getElementById('limparCamposBtn')
     if (btnLimpar) btnLimpar.addEventListener('click', clearForm)
+
+    document.addEventListener('admin:aula:saved', clearForm)
 
     const toggleBtn = document.getElementById('toggleAulasBtn');
     if (toggleBtn) toggleBtn.addEventListener('click', toggleAulasPanel);

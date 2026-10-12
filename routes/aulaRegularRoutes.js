@@ -10,6 +10,7 @@ const router = express.Router();
 // Rotas para gerenciamento de Aulas Regulares
 router.get("/", AdminController.listarAulas);
 router.post("/", AdminController.criarAula);
+router.put("/:id", AdminController.atualizarAula);
 router.delete("/:id", AdminController.deletarAula);
 
 export default router;

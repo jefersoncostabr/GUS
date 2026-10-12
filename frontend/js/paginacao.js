@@ -17,7 +17,9 @@ export function setOnPageChange(cb) {
  * @param {number} tp - Total de páginas.
  */
 export function setTotalPages(tp) {
-    totalPages = tp;
+    const paginas = Number(tp);
+    totalPages = Number.isFinite(paginas) ? Math.max(1, Math.floor(paginas)) : 1;
+    if (currentPage > totalPages) currentPage = totalPages;
     updatePaginaInfo();
 }
 
@@ -26,7 +28,8 @@ export function setTotalPages(tp) {
  * @param {number} p - Número da página.
  */
 export function setPage(p) {
-    currentPage = p;
+    const pagina = Number(p);
+    currentPage = Number.isFinite(pagina) ? Math.min(totalPages, Math.max(1, Math.floor(pagina))) : 1;
     updatePaginaInfo();
 }
 
@@ -42,8 +45,16 @@ function updatePaginaInfo() {
         const isMobile = window.innerWidth < 600;
         infoEl.textContent = isMobile ? `${currentPage}/${totalPages}` : `Página ${currentPage} / ${totalPages}`;
     }
-    if (btnPrev) btnPrev.disabled = false;
-    if (btnNext) btnNext.disabled = false;
+    if (btnPrev) {
+        btnPrev.disabled = currentPage <= 1;
+        btnPrev.setAttribute('aria-disabled', String(btnPrev.disabled));
+        btnPrev.title = btnPrev.disabled ? 'Você está na primeira página' : '';
+    }
+    if (btnNext) {
+        btnNext.disabled = currentPage >= totalPages;
+        btnNext.setAttribute('aria-disabled', String(btnNext.disabled));
+        btnNext.title = btnNext.disabled ? 'Você está na última página' : '';
+    }
 }
 
 /**
@@ -102,9 +113,9 @@ export function criarElementospaginacaoTab() {
  * Retrocede uma página (se possível) e aciona o callback de mudança.
  */
 export async function voltarPaginacao() {
-    currentPage = currentPage > 1 ? currentPage - 1 : totalPages;
-    updatePaginaInfo();
-    if (onPageChange) onPageChange();
+    if (currentPage <= 1) return;
+    setPage(currentPage - 1);
+    if (onPageChange) await onPageChange();
 }
 
 /**
@@ -112,9 +123,9 @@ export async function voltarPaginacao() {
  * Ao ultrapassar a última página, volta para a primeira.
  */
 export async function avancarPaginacao() {
-    currentPage = currentPage < totalPages ? currentPage + 1 : 1;
-    updatePaginaInfo();
-    if (onPageChange) onPageChange();
+    if (currentPage >= totalPages) return;
+    setPage(currentPage + 1);
+    if (onPageChange) await onPageChange();
 }
 
 /*

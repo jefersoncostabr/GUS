@@ -28,6 +28,16 @@ th {
     margin: 24px 10px 10px !important;
 }
 
+#containerTabela #containerTabBotoes button:disabled {
+    background-color: #d8d5dc;
+    border-color: #b8b4bd;
+    box-shadow: none;
+    color: #777;
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.7;
+}
+
 .tabelaTopBar {
     display: flex;
     align-items: center;

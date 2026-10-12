@@ -5,6 +5,7 @@ import { normalizarListaAulas } from "./normalizador.js";
 
 let mostrandoAulasFixas = false;
 let dadosAulasFixasCached = []; // cache para paginação client-side das aulas fixas
+let dadosTabelaAtual = [];
 let filtrosBuscaAtual = {}; // mantém os filtros aplicados na última busca (botão Ver)
 let filtrosFrontend = {}; // filtros a serem aplicados localmente (client-side)
 
@@ -152,6 +153,37 @@ function ocultarTabelaBusca() {
     if (containerPaginacao) containerPaginacao.innerHTML = '';
 }
 
+async function buscarTodosUsos(filtros = {}) {
+    const primeiraPagina = await getDados(1, 100, filtros);
+    if (primeiraPagina.error || primeiraPagina.accessDenied) return primeiraPagina;
+
+    const usos = [...(primeiraPagina.data || [])];
+    for (let pagina = 2; pagina <= (primeiraPagina.totalPages || 1); pagina += 1) {
+        const resultado = await getDados(pagina, 100, filtros);
+        if (resultado.error || resultado.accessDenied) return resultado;
+        usos.push(...(resultado.data || []));
+    }
+
+    return { ...primeiraPagina, data: usos, totalItems: usos.length };
+}
+
+function renderPaginaTabela(dados) {
+    const totalPaginas = Math.max(1, Math.ceil(dados.length / itemsPorPagina));
+    setTotalPages(totalPaginas);
+    if (currentPage > totalPaginas) setPage(totalPaginas);
+
+    const inicio = (currentPage - 1) * itemsPorPagina;
+    const fatia = dados.slice(inicio, inicio + itemsPorPagina);
+    criaTabela({
+        data: fatia,
+        page: currentPage,
+        limit: itemsPorPagina,
+        totalItems: dados.length,
+        totalPages: totalPaginas
+    });
+    criarElementospaginacaoTab();
+}
+
 
 /**
  * Busca os dados no servidor com paginação e filtros, e renderiza a tabela.
@@ -159,6 +191,35 @@ function ocultarTabelaBusca() {
  * @returns {Promise<Object>} O objeto JSON retornado pelo servidor contendo dados e metadados.
  */
 export async function verFetch() {
+    const campoData = document.getElementById('date');
+    const existeOutroFiltro = ['solicitante', 'estudio', 'sala', 'hora', 'motivo']
+        .some((id) => String(document.getElementById(id)?.value || '').trim() !== '');
+    if (campoData?.validity?.badInput && !existeOutroFiltro) {
+        if (!navigator.onLine) {
+            exibirMensagemBusca('Sem conexão com a internet. Verifique sua conexão e tente novamente.');
+            return;
+        }
+
+        try {
+            const respostaSessao = await fetch('/usuario-logado', { credentials: 'include' });
+            if (respostaSessao.status === 401) {
+                exibirMensagemBusca('É preciso logar para ver.');
+                return;
+            }
+            if (!respostaSessao.ok) {
+                exibirMensagemBusca('Não foi possível verificar a sessão.');
+                return;
+            }
+        } catch (error) {
+            console.error('Erro ao verificar sessão antes da busca:', error);
+            exibirMensagemBusca('Não foi possível verificar a sessão.');
+            return;
+        }
+
+        exibirMensagemBusca('Complete a data');
+        return;
+    }
+
     setTabelaLoading(true);
     try {
         const painelSaida = document.getElementById('painelSaida') || document.getElementById('painelMensagem');
@@ -225,9 +286,8 @@ export async function verFetch() {
             await verFetchPage();
         });
 
-        // O servidor aplica os filtros aos usos antes de paginar.
         const [resultUsos, respAulas] = await Promise.all([
-            getDados(currentPage, itemsPorPagina, filtrosBuscaAtual),
+            buscarTodosUsos(filtrosBuscaAtual),
             fetch('/admin/relatorios/aulas').catch(() => ({ ok: false }))
         ]);
 
@@ -239,14 +299,17 @@ export async function verFetch() {
 
         const usosData = resultUsos.data || [];
         let aulasData = [];
-        
+
         if (respAulas.ok) {
             try {
                 const aulasOriginais = await respAulas.json();
                 aulasData = normalizarListaAulas(aulasOriginais);
             } catch (e) {
                 console.error('Erro ao processar aulas:', e);
+                exibirMensagemBusca('Não foi possível processar as aulas fixas.');
             }
+        } else {
+            exibirMensagemBusca('Não foi possível carregar as aulas fixas.');
         }
 
         // As aulas fixas não vêm do endpoint paginado de usos, então são filtradas localmente.
@@ -260,12 +323,11 @@ export async function verFetch() {
             exibirMensagemBusca('Nenhum registro encontrado');
         }
 
-        limparTabela();
-        criaTabela({ data: dadosCombinados, page: resultUsos.page, limit: resultUsos.limit, totalItems: dadosCombinados.length, totalPages: resultUsos.totalPages });
-        setTotalPages(resultUsos.totalPages || 1);
-        criarElementospaginacaoTab();
+        dadosTabelaAtual = dadosCombinados;
+        setOnPageChange(verFetchPage);
+        renderPaginaTabela(dadosTabelaAtual);
 
-        return { data: dadosCombinados, ...resultUsos };
+        return { ...resultUsos, data: dadosCombinados };
     } catch (error) {
         console.error("Não deu certo. Erro:", error);
     } finally {
@@ -274,37 +336,21 @@ export async function verFetch() {
 }
 
 /**
- * Função auxiliar para buscar a página atual (acionada por paginacao.js).
- * Reaplica os filtros atuais e renderiza a tabela mantendo a página selecionada.
- * @returns {Promise<Object>} O objeto JSON retornado pelo servidor.
+ * Renderiza a página atual do conjunto de dados já carregado.
+ * @returns {Promise<Object>} Dados e metadados da página exibida.
  */
 export async function verFetchPage() {
     setTabelaLoading(true);
     try {
-        const resultUsos = await getDados(currentPage, itemsPorPagina, filtrosBuscaAtual);
-        let aulasData = [];
-        
-        try {
-            const respAulas = await fetch('/admin/relatorios/aulas');
-            if (respAulas.ok) {
-                const aulasOriginais = await respAulas.json();
-                aulasData = normalizarListaAulas(aulasOriginais);
-            }
-        } catch (e) {
-            console.error('Erro ao buscar aulas:', e);
-        }
-
-        const aulasFiltradas = Object.keys(filtrosFrontend).length > 0
-            ? filtrarDadosLocalmente(aulasData, filtrosFrontend)
-            : aulasData;
-        const dadosCombinados = [...(resultUsos.data || []), ...aulasFiltradas];
-
-        limparTabela();
-        criaTabela({ data: dadosCombinados, ...resultUsos });
-        setTotalPages(resultUsos.totalPages || 1);
-        // recria os controles de paginação a cada mudança de página
-        criarElementospaginacaoTab();
-        return { data: dadosCombinados, ...resultUsos };
+        renderPaginaTabela(dadosTabelaAtual);
+        const totalPages = Math.max(1, Math.ceil(dadosTabelaAtual.length / itemsPorPagina));
+        return {
+            data: dadosTabelaAtual.slice((currentPage - 1) * itemsPorPagina, currentPage * itemsPorPagina),
+            page: currentPage,
+            limit: itemsPorPagina,
+            totalItems: dadosTabelaAtual.length,
+            totalPages
+        };
     } catch (error) {
         console.error("Não deu certo. Erro:", error);
     } finally {
@@ -350,7 +396,7 @@ export async function verAulasFixasFetch() {
         // Busca Aulas Regulares e Usos (Agendamentos) em paralelo para exibir juntos
         const [respAulas, resultUsos] = await Promise.all([
             fetch('/admin/relatorios/aulas'),
-            getDados(1, 100, filters) // Busca os agendamentos que batem com o filtro atual
+            buscarTodosUsos(filters)
         ]);
         
         if (!respAulas.ok) throw new Error('Erro ao buscar aulas fixas');
