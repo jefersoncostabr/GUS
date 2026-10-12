@@ -83,6 +83,13 @@
         width: auto;
     }
 
+    #adminArea > .adminPanel > div[id$='Content'] {
+        box-sizing: border-box;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+    }
+
     /* No painel de usuários, mantém Nome/Email com largura mínima e usa rolagem horizontal. */
     #usuariosContent .painelTabela {
         width: max-content;
@@ -99,11 +106,6 @@
         min-width: 260px;
     }
 
-    #estudiosContent {
-        overflow-x: auto;
-        max-width: 100%;
-    }
-
     #estudiosContent .painelTabela {
         width: max-content;
         min-width: 100%;
@@ -114,17 +116,17 @@
         min-width: 100%;
     }
 
-    #salasContent {
-        overflow-x: auto;
-        max-width: 100%;
-    }
-
     #salasContent .painelTabela {
         width: max-content;
         min-width: 100%;
     }
 
     #salasContent .filialItem {
+        width: max-content;
+        min-width: 100%;
+    }
+
+    #aulasContent .painelTabela {
         width: max-content;
         min-width: 100%;
     }

@@ -3,9 +3,11 @@ import { currentPage, itemsPorPagina, setOnPageChange, setTotalPages, setPage, c
 import { tratarDados } from "./tratamentoDeDados.js";
 import { normalizarListaAulas } from "./normalizador.js";
 
-let mostrandoAulasFixas = false;
-let dadosAulasFixasCached = []; // cache para paginação client-side das aulas fixas
+let mostrandoAulasFixas = true;
+let dadosAulasFixasCached = [];
+let dadosUsosCached = [];
 let dadosTabelaAtual = [];
+let tabelaCarregada = false;
 let filtrosBuscaAtual = {}; // mantém os filtros aplicados na última busca (botão Ver)
 let filtrosFrontend = {}; // filtros a serem aplicados localmente (client-side)
 
@@ -231,9 +233,7 @@ export async function verFetch() {
             return;
         }
 
-        mostrandoAulasFixas = false;
-        dadosAulasFixasCached = [];
-        atualizarVisualBotaoToggle(false);
+        tabelaCarregada = false;
         atualizarFiltrosLabel();
 
         document.getElementById('containerTabela').style.display = 'block';
@@ -316,7 +316,12 @@ export async function verFetch() {
         const aulasFiltradas = temFiltros
             ? filtrarDadosLocalmente(aulasData, filtrosFrontend)
             : aulasData;
-        const dadosCombinados = [...usosData, ...aulasFiltradas];
+        dadosUsosCached = usosData;
+        dadosAulasFixasCached = aulasFiltradas;
+        const dadosCombinados = [
+            ...dadosUsosCached,
+            ...(mostrandoAulasFixas ? dadosAulasFixasCached : [])
+        ];
 
         if (!dadosCombinados || dadosCombinados.length === 0) {
             console.log("Nenhum registro encontrado");
@@ -324,6 +329,7 @@ export async function verFetch() {
         }
 
         dadosTabelaAtual = dadosCombinados;
+        tabelaCarregada = true;
         setOnPageChange(verFetchPage);
         renderPaginaTabela(dadosTabelaAtual);
 
@@ -359,97 +365,22 @@ export async function verFetchPage() {
 }
 
 /**
- * Busca e exibe as Aulas Regulares (Usos Fixos)
+ * Alterna a exibição das aulas regulares junto aos usos.
  */
 export async function verAulasFixasFetch() {
-    try {
-        // Lógica de Toggle: Se já estiver mostrando, volta para a visão padrão
-        if (mostrandoAulasFixas) {
-            mostrandoAulasFixas = false;
-            dadosAulasFixasCached = [];
-            return await verFetch();
-        }
+    mostrandoAulasFixas = !mostrandoAulasFixas;
+    atualizarVisualBotaoToggle(mostrandoAulasFixas);
 
-        setTabelaLoading(true);
-
-        document.getElementById('containerTabela').style.display = 'block';
-        const container = document.getElementById('containerTabela');
-        container.style.display = 'block';
-        container.style.marginTop = '20px'; // Adiciona o espaçamento
-
-        const painelSaida = document.getElementById('painelMensagem') || document.getElementById('painelSaida');
-
-        // Obtém os filtros atuais da tela para buscar também os agendamentos pontuais (Usos)
-        const rawValues = {
-            solicitante: document.getElementById('solicitante').value,
-            sala: document.getElementById('sala').value,
-            dia: document.getElementById('date').value,
-            hora: document.getElementById('hora').value,
-            motivo: document.getElementById('motivo').value,
-        };
-        const inputValues = tratarDados(rawValues);
-        const filters = {};
-        if (inputValues.solicitante) filters.solicitante = inputValues.solicitante;
-        if (inputValues.sala) filters.sala = parseInt(inputValues.sala);
-        if (inputValues.dia) filters.dia = inputValues.dia;
-
-        // Busca Aulas Regulares e Usos (Agendamentos) em paralelo para exibir juntos
-        const [respAulas, resultUsos] = await Promise.all([
-            fetch('/admin/relatorios/aulas'),
-            buscarTodosUsos(filters)
-        ]);
-        
-        if (!respAulas.ok) throw new Error('Erro ao buscar aulas fixas');
-        
-        const aulasOriginais = await respAulas.json();
-        const usosExistentes = resultUsos.data || [];
-        
-        // Normaliza as aulas fixas para o formato da tabela (compatível com a estrutura de Usos)
-        const aulasNormalizadas = normalizarListaAulas(aulasOriginais);
-
-        // Combina os dois tipos de dados para exibição conjunta
-        const dadosCombinados = [...usosExistentes, ...aulasNormalizadas];
-
-        if (dadosCombinados.length === 0) {
-            if (painelSaida) painelSaida.innerText = 'Nenhum registro (agendamento ou aula fixa) encontrado';
-            limparTabela();
-            return;
-        }
-
-        // Armazena no cache para paginação client-side
-        dadosAulasFixasCached = dadosCombinados;
-        mostrandoAulasFixas = true;
-        atualizarVisualBotaoToggle(true);
-
-        // Reseta para a primeira página
-        setPage(1);
-
-        const totalPags = Math.ceil(dadosCombinados.length / itemsPorPagina);
-
-        // Registra callback de troca de página para recarregar a fatia correta
-        setOnPageChange(() => {
-            const inicio = (currentPage - 1) * itemsPorPagina;
-            const fatia = dadosAulasFixasCached.slice(inicio, inicio + itemsPorPagina);
-            limparTabela();
-            criaTabela({ data: fatia, totalPages: Math.ceil(dadosAulasFixasCached.length / itemsPorPagina) });
-            criarElementospaginacaoTab();
-        });
-
-        // Renderiza a primeira página
-        const fatiaInicial = dadosCombinados.slice(0, itemsPorPagina);
-        limparTabela();
-        criaTabela({ data: fatiaInicial, totalPages: totalPags });
-
-        if (painelSaida) painelSaida.innerText = ''; // Limpa mensagens anteriores
-
-        setTotalPages(totalPags);
-        criarElementospaginacaoTab();
-
-    } catch (error) {
-        console.error("Erro ao carregar aulas fixas:", error);
-    } finally {
-        setTabelaLoading(false);
+    if (!tabelaCarregada) {
+        return await verFetch();
     }
+
+    dadosTabelaAtual = [
+        ...dadosUsosCached,
+        ...(mostrandoAulasFixas ? dadosAulasFixasCached : [])
+    ];
+    setPage(1);
+    renderPaginaTabela(dadosTabelaAtual);
 }
 
 /**
@@ -460,13 +391,15 @@ function atualizarVisualBotaoToggle(ativo) {
     if (!btn) return;
 
     if (ativo) {
-        btn.style.filter = "brightness(0.9)";
-        btn.innerText = "Ocultar Aulas Fixas";
+        btn.style.filter = "";
+        btn.innerText = "Ocultar usos regulares";
     } else {
         btn.style.filter = "";
-        btn.innerText = "Aulas Fixas";
+        btn.innerText = "Ver usos regulares";
     }
 }
+
+atualizarVisualBotaoToggle(mostrandoAulasFixas);
 
 document.getElementById('getUsosBtn').addEventListener('click', verFetch);
 document.getElementById('btnMostrarAulasRegulares')?.addEventListener('click', verAulasFixasFetch);
