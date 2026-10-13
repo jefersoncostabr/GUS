@@ -143,6 +143,15 @@ async function handleUserUpdate(e) {
   } catch (err) { }
 }
 
+async function handleUserCancel(e) {
+  const { id } = e.detail || {};
+  if (!id) { showMessage('ID ausente para recarregar usuário.', 'error'); return; }
+  try {
+    const user = await safeFetchJson(`${baseUrl}/admin/usuarios/${id}`);
+    document.dispatchEvent(new CustomEvent('admin:user:cancelled', { detail: { id, user } }));
+  } catch (err) { }
+}
+
 async function handleUserDelete(e) {
   const { id } = e.detail || {};
   if (!id) { showMessage('ID ausente para exclusão.', 'error'); return; }
@@ -192,6 +201,8 @@ async function handleSalaSave(e) {
       showMessage('Sala criada.', 'success');
     }
     await loadSalas();
+    // Sincroniza Qtd Salas do estúdio: recarrega lista (backend já corrige se real > 1)
+    await loadEstudios();
   } catch (err) { }
 }
 
@@ -202,6 +213,8 @@ async function handleSalaDelete(e) {
     await safeFetchJson(`${baseUrl}/admin/salas/${id}`, { method: 'DELETE' });
     showMessage('Sala excluída.', 'success');
     await loadSalas();
+    // Recarrega estúdios para refletir nova contagem real
+    await loadEstudios();
   } catch (err) { }
 }
 
@@ -349,6 +362,7 @@ export function initAdminDataLayer() {
   // attach listeners
   document.addEventListener('admin:user:create', handleUserCreate);
   document.addEventListener('admin:user:update', handleUserUpdate);
+  document.addEventListener('admin:user:cancel', handleUserCancel);
   document.addEventListener('admin:user:delete', handleUserDelete);
   document.addEventListener('admin:user:fetch', loadUsers);
   document.addEventListener('admin:estudio:save', handleEstudioSave);

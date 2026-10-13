@@ -26,6 +26,13 @@ router.get('/rotas-disponiveis', authMiddleware, verificaRole, (req, res) => {
         { metodo: 'POST', endpoint: '/logout', descricao: 'Encerra a sessão' },
         { metodo: 'GET', endpoint: '/usuario-logado', descricao: 'Verifica sessão ativa' },
 
+        // Gestão de tenants da plataforma (superadmin)
+        { metodo: 'GET', endpoint: '/platform/tenants', descricao: 'Lista tenants; acesso exclusivo ao superadmin' },
+        { metodo: 'GET', endpoint: '/platform/tenants/pending-approval', descricao: 'Lista tenants aguardando aprovação' },
+        { metodo: 'POST', endpoint: '/platform/tenants/:id/approve', descricao: 'Aprova um tenant permanentemente' },
+        { metodo: 'POST', endpoint: '/platform/tenants/:id/reject', descricao: 'Reprova e bloqueia novas inclusões do tenant' },
+        { metodo: 'DELETE', endpoint: '/platform/tenants/:id', descricao: 'Exclui tenant, banco e usuários relacionados; exige confirmação' },
+
         // Usos (Agendamentos)
         { metodo: 'GET', endpoint: '/usos', descricao: 'Rota de teste inicial de usos' },
         { metodo: 'GET', endpoint: '/usos/usos', descricao: 'Lista usos (paginado)' },
@@ -70,9 +77,7 @@ router.get('/rotas-disponiveis', authMiddleware, verificaRole, (req, res) => {
         { metodo: 'DELETE', endpoint: '/admin/aulas/:id', descricao: 'Remove uma aula regular' },
 
         // Admin - Manutenção (Limpeza de Banco de Dados)
-        { metodo: 'DELETE', endpoint: '/admin/limpar/solicitantes', descricao: 'Remove todos os solicitantes' },
         { metodo: 'DELETE', endpoint: '/admin/limpar/usos', descricao: 'Remove todos os usos' },
-        { metodo: 'DELETE', endpoint: '/admin/limpar/estudios', descricao: 'Remove todos os estúdios' },
         { metodo: 'DELETE', endpoint: '/admin/limpar/motivos', descricao: 'Remove todos os motivos' },
         { metodo: 'DELETE', endpoint: '/admin/limpar/salas', descricao: 'Remove todas as salas' },
         { metodo: 'DELETE', endpoint: '/admin/limpar/aulas', descricao: 'Remove todas as aulas regulares' },

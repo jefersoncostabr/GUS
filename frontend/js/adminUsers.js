@@ -62,11 +62,6 @@ export function renderUsersUI(data = []) {
         const roleSel = tr.querySelector('.roleSelect')
         if (u && roleSel) roleSel.value = u.role || 'user'
 
-        // store originals for cancel behavior
-        tr.dataset.originalNome = u ? u.nome || '' : ''
-        tr.dataset.originalEmail = u ? u.email || '' : ''
-        tr.dataset.originalRole = u ? u.role || 'user' : 'user'
-
         const saveBtn = tr.querySelector('.saveUser')
         if (saveBtn)
             saveBtn.addEventListener('click', () => {
@@ -84,13 +79,7 @@ export function renderUsersUI(data = []) {
         const cancelBtn = tr.querySelector('.cancelUser')
         if (cancelBtn)
             cancelBtn.addEventListener('click', () => {
-                const nomeEl = tr.querySelector('.userNome')
-                const emailEl = tr.querySelector('.userEmail')
-                const roleEl = tr.querySelector('.roleSelect')
-                if (nomeEl) nomeEl.value = tr.dataset.originalNome || ''
-                if (emailEl) emailEl.value = tr.dataset.originalEmail || ''
-                if (roleEl) roleEl.value = tr.dataset.originalRole || 'user'
-                showMessage('Alterações revertidas.', 'info', 2000)
+                document.dispatchEvent(new CustomEvent('admin:user:cancel', { detail: { id } }))
             })
 
         const delBtn = tr.querySelector('.delUser')
@@ -102,6 +91,21 @@ export function renderUsersUI(data = []) {
             })
     })
 }
+
+document.addEventListener('admin:user:cancelled', event => {
+    const { id, user } = event.detail || {}
+    const row = Array.from(document.querySelectorAll('#tableUsuarios tr[data-id]'))
+        .find(item => item.dataset.id === String(id))
+    if (!row || !user) return
+
+    const nomeEl = row.querySelector('.userNome')
+    const emailEl = row.querySelector('.userEmail')
+    const roleEl = row.querySelector('.roleSelect')
+    if (nomeEl) nomeEl.value = user.solicitante || user.nome || ''
+    if (emailEl) emailEl.value = user.email || ''
+    if (roleEl) roleEl.value = user.role || 'user'
+    showMessage('Dados atualizados do servidor.', 'info', 2000)
+})
 
 /**
  * Setter para injetar dados de usuários no UI.

@@ -7,6 +7,7 @@ import { getUsoRegularModel } from '../src/models/usoRegularModel.js';
 import { getSalaModel } from '../src/models/salaModel.js';
 import { getAulaModel } from '../src/models/aulaModel.js';
 import { getMotivosModel } from '../src/models/motivosmodel.js';
+import { getEstudioModel } from '../src/models/estudiomodel.js';
 
 /**
  * Middleware de Identificação de Tenant
@@ -46,7 +47,7 @@ export default async function tenantMiddleware(req, res, next) {
         // Extrai o tenantId do tenantDbName
         // Ex: "gus_tenant_estudio_a" -> "estudio_a"
         const dbNamePrefix = 'gus_tenant_';
-        const tenantId = user.tenantDbName.startsWith(dbNamePrefix)
+        let tenantId = user.tenantDbName.startsWith(dbNamePrefix)
             ? user.tenantDbName.slice(dbNamePrefix.length)
             : user.tenantDbName;
 
@@ -75,6 +76,23 @@ export default async function tenantMiddleware(req, res, next) {
                 console.error('Falha ao tentar corrigir tenantId via DB:', e.message);
             }
         }
+
+        const Estudio = getEstudioModel(mongoose.connection);
+        const tenantRegistry = await Estudio.findOne({ tenantDbName: user.tenantDbName })
+            .select('_id approvalStatus trialEndsAt')
+            .lean();
+        if (!tenantRegistry) {
+            return res.status(403).json({ error: 'O tenant desta conta não está mais disponível.' });
+        }
+        if (tenantRegistry.approvalStatus === 'deleting' || tenantRegistry.approvalStatus === 'provisioning') {
+            return res.status(423).json({ error: 'Este tenant não está disponível durante uma operação de provisionamento.' });
+        }
+        req.tenantLifecycle = {
+            estudioId: tenantRegistry._id,
+            approvalStatus: tenantRegistry.approvalStatus || 'approved',
+            trialEndsAt: tenantRegistry.trialEndsAt || null
+        };
+
         const tenantConnection = await getTenantConnection(tenantId);
 
         // Injeta a conexão e os modelos compilados no objeto req

@@ -27,7 +27,8 @@ export function authMiddleware(req, res, next) {
          */
         const isApiRoute = req.originalUrl.includes('/solicitantes') || 
                            req.originalUrl.includes('/admin') || 
-                           req.originalUrl.includes('/usos');
+                           req.originalUrl.includes('/usos') ||
+                           req.originalUrl.includes('/platform');
 
         if (req.method !== 'GET' || isApiRoute || (req.headers.accept && req.headers.accept.includes('application/json'))) {
             console.log(` -> Resposta: 401 JSON (Correto para APIs)`);
@@ -56,6 +57,29 @@ export async function verificaRole(req, res, next) {
     }
 
     next();
+}
+
+export function requireSuperAdmin(req, res, next) {
+    if (req.session?.user?.role !== 'superadmin') {
+        return res.status(403).json({ error: 'Acesso restrito ao desenvolvedor.' });
+    }
+    next();
+}
+
+export function requireTenantCanCreate(req, res, next) {
+    const lifecycle = req.tenantLifecycle;
+    if (!lifecycle || lifecycle.approvalStatus === 'approved') return next();
+
+    const expirado = !lifecycle.trialEndsAt
+        || new Date(lifecycle.trialEndsAt).getTime() <= Date.now();
+    if (lifecycle.approvalStatus === 'pending' && !expirado) return next();
+
+    return res.status(423).json({
+        error: lifecycle.approvalStatus === 'rejected'
+            ? 'Este tenant foi reprovado. Novas inclusões estão bloqueadas.'
+            : 'O período de teste expirou. Novas inclusões estão bloqueadas; edição e exclusão continuam disponíveis.',
+        tenantLocked: true
+    });
 }
 
 // ⚠️ IMPORTANTE: verificaSolicitante foi removida deste arquivo

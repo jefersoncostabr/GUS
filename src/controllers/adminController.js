@@ -20,7 +20,31 @@ class AdminController {
     static async listarEstudios(req, res) {
         try {
             const Estudio = getEstudioModel(masterConnection);
-            const estudios = await Estudio.find({});
+            const tenantDbName = req.session?.user?.tenantDbName;
+            if (!tenantDbName) {
+                return res.status(403).json({ error: 'Administração de estúdios exige um tenant associado.' });
+            }
+            const estudios = await Estudio.find({
+                $or: [{ tenantDbName }, { ownerTenantDbName: tenantDbName }]
+            }).lean();
+
+            // Sincroniza Qtd Salas com a contagem real de salas do tenant.
+            // Evita exibir número defasado (ex: 1 ou 2 gravados na criação).
+            const Sala = req.tenantModels?.Sala;
+            if (Sala) {
+                const contagem = await Sala.aggregate([
+                    { $group: { _id: '$estudioId', total: { $sum: 1 } } }
+                ]);
+                const mapa = new Map(contagem.map(c => [String(c._id), c.total]));
+                for (const e of estudios) {
+                    const real = mapa.get(String(e._id)) || 0;
+                    // Só atualiza se houver salas reais e o valor gravado estiver defasado
+                    if (real > 1 && e.quantidadeSalas !== real) {
+                        e.quantidadeSalas = real;
+                        await Estudio.updateOne({ _id: e._id }, { $set: { quantidadeSalas: real } });
+                    }
+                }
+            }
             res.status(200).json(estudios);
         } catch (erro) {
             res.status(500).json({ error: `${erro.message} - falha ao listar estúdios` });
@@ -30,7 +54,16 @@ class AdminController {
     static async criarEstudio(req, res) {
         try {
             const Estudio = getEstudioModel(masterConnection);
-            const novoEstudio = await Estudio.create(req.body);
+            const tenantDbName = req.session?.user?.tenantDbName;
+            if (!tenantDbName) {
+                return res.status(403).json({ error: 'Não é permitido criar tenants por esta rota.' });
+            }
+            const novoEstudio = await Estudio.create({
+                nome: req.body.nome,
+                localizacao: req.body.localizacao,
+                quantidadeSalas: req.body.quantidadeSalas,
+                ownerTenantDbName: tenantDbName
+            });
             res.status(201).json({ message: "Estúdio criado com sucesso", estudio: novoEstudio });
         } catch (erro) {
             res.status(500).json({ error: `${erro.message} - falha ao cadastrar estúdio` });
@@ -41,7 +74,20 @@ class AdminController {
         try {
             const { id } = req.params;
             const Estudio = getEstudioModel(masterConnection);
-            await Estudio.findByIdAndUpdate(id, req.body);
+            const tenantDbName = req.session?.user?.tenantDbName;
+            if (!tenantDbName) {
+                return res.status(403).json({ error: 'Administração de estúdios exige um tenant associado.' });
+            }
+            const atualizacoes = {};
+            for (const campo of ['nome', 'localizacao', 'quantidadeSalas']) {
+                if (req.body[campo] !== undefined) atualizacoes[campo] = req.body[campo];
+            }
+            const estudio = await Estudio.findOneAndUpdate(
+                { _id: id, $or: [{ tenantDbName }, { ownerTenantDbName: tenantDbName }] },
+                atualizacoes,
+                { new: true, runValidators: true }
+            );
+            if (!estudio) return res.status(404).json({ error: 'Estúdio não encontrado neste tenant.' });
             res.status(200).json({ message: "Estúdio atualizado com sucesso" });
         } catch (erro) {
             res.status(500).json({ error: `${erro.message} - falha ao atualizar estúdio` });
@@ -52,7 +98,19 @@ class AdminController {
         try {
             const { id } = req.params;
             const Estudio = getEstudioModel(masterConnection);
-            await Estudio.findByIdAndDelete(id);
+            const tenantDbName = req.session?.user?.tenantDbName;
+            if (!tenantDbName) {
+                return res.status(403).json({ error: 'Administração de estúdios exige um tenant associado.' });
+            }
+            const estudio = await Estudio.findOne({
+                _id: id,
+                $or: [{ tenantDbName }, { ownerTenantDbName: tenantDbName }]
+            });
+            if (!estudio) return res.status(404).json({ error: 'Estúdio não encontrado neste tenant.' });
+            if (estudio.tenantDbName === tenantDbName) {
+                return res.status(409).json({ error: 'O tenant principal deve ser removido pela gestão da plataforma.' });
+            }
+            await estudio.deleteOne();
             res.status(200).json({ message: "Estúdio excluído com sucesso" });
         } catch (erro) {
             res.status(500).json({ error: `${erro.message} - falha ao excluir estúdio` });

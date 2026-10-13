@@ -14,6 +14,11 @@ const estudioSchema = new mongoose.Schema(
             trim: true,
             unique: true // Cada estúdio deve ter seu próprio banco exclusivo
         },
+        ownerTenantDbName: {
+            type: String,
+            trim: true,
+            index: true
+        },
         localizacao: {
             type: String,
             trim: true,
@@ -23,6 +28,19 @@ const estudioSchema = new mongoose.Schema(
             type: Boolean,
             default: true
         },
+        approvalStatus: {
+            type: String,
+            enum: ['pending', 'approved', 'rejected', 'provisioning', 'deleting'],
+            default: 'approved',
+            index: true
+        },
+        trialStartedAt: { type: Date },
+        trialEndsAt: { type: Date },
+        approvedAt: { type: Date },
+        approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Solicitante' },
+        rejectedAt: { type: Date },
+        rejectedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Solicitante' },
+        rejectionReason: { type: String, trim: true, maxlength: 1000 },
         quantidadeSalas: { // Novo campo para a quantidade total de salas do estúdio
             type: Number,
             required: [true, 'A quantidade de salas é obrigatória.'],

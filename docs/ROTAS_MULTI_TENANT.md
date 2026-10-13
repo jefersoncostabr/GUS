@@ -91,6 +91,24 @@ Quando a requisição chega, o fluxo é:
 | DELETE | `/admin/limpar/aulas` | idem |
 | DELETE | `/admin/limpar/tudo` | **CUIDADO** - limpa o banco tenant atual por completo |
 
+## 🛡️ Gestão de tenants da plataforma
+
+Estas rotas não passam pelo `tenantMiddleware`. Todas exigem sessão ativa e papel `superadmin`; um administrador de tenant recebe `403`. O bootstrap inicial é feito uma única vez com `npm run superadmin:create`, que solicita e-mail e senha em terminal interativo e grava a senha com bcrypt cost 10.
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/platform/tenants` | Lista tenants provisionados e seus estados/trial |
+| GET | `/platform/tenants/pending-approval` | Lista tenants aguardando aprovação |
+| POST | `/platform/tenants/:id/approve` | Aprova permanentemente; grava responsável e horário |
+| POST | `/platform/tenants/:id/reject` | Reprova imediatamente novas inclusões; requer `{ "motivo": "..." }` |
+| DELETE | `/platform/tenants/:id` | Exclui banco, registro Master, usuários e sessões; requer `{ "confirmTenantDbName": "gus_tenant_..." }` |
+
+O status `pending` permite uso completo durante sete dias desde a criação. Após o prazo, novas inclusões retornam `423`; leitura, atualização e exclusão continuam disponíveis. `approved` remove o prazo; `rejected` bloqueia inclusões imediatamente. O endpoint de exclusão é irreversível e exige confirmação exata do banco tenant.
+
+Antes de liberar a versão com trial, execute uma vez `npm run tenant:migrate-lifecycle` contra o banco Master. A migração marca registros antigos como aprovados e não cria trial retroativo.
+
+As antigas rotas `/admin/limpar/solicitantes` e `/admin/limpar/estudios` foram removidas do router tenant por apagarem dados Master globalmente. A exclusão de tenants deve ser feita individualmente pelas rotas de plataforma.
+
 ## 📝 Observações Gerais
 - Rotas que começam com `/admin` geralmente exigem `verificaRole` para
   confirmar perfil `admin`.

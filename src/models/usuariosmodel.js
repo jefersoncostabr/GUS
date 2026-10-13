@@ -18,11 +18,12 @@ const solicitanteSchema = new mongoose.Schema(
         },
         senha: {
             type: String,
-            required: [true, 'A senha é obrigatória.']
+            required: [true, 'A senha é obrigatória.'],
+            select: false
         },
         role: {
             type: String,
-            enum: ['user', 'admin', 'pendente'],
+            enum: ['user', 'admin', 'pendente', 'superadmin'],
             default: 'user'
         },
         // Campo para identificar o banco de dados do tenant associado a este usuário.

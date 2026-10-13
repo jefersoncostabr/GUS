@@ -165,7 +165,7 @@ class EstudioModalManager {
      */
     confirmarCriacaoNovo(nomeCriacaoEstudio) {
         const confirmacao = confirm(
-            `Você será o Administrador deste novo estúdio: "${nomeCriacaoEstudio}".\n\nConfirma?`
+            `Este estúdio será criado do zero: "${nomeCriacaoEstudio}".\n\nO desenvolvedor será avisado para autorizar o uso da aplicação. O tenant terá 7 dias de uso completo; depois, se não for aprovado, novas inclusões serão bloqueadas, mas será possível editar e excluir dados existentes.\n\nConfirma a criação?`
         );
         
         if (confirmacao) {

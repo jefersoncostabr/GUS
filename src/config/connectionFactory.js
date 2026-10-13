@@ -81,6 +81,35 @@ export async function getTenantConnection(tenantId) {
     }
 }
 
+export async function dropTenantDatabase(tenantDbName) {
+    if (typeof tenantDbName !== 'string' || !/^gus_tenant_[a-z0-9_-]+$/i.test(tenantDbName) || tenantDbName.length > 38) {
+        throw new Error('Nome de banco tenant inválido para exclusão.');
+    }
+
+    let connection = tenantConnections[tenantDbName];
+    if (connection?.readyState === 2) await connection.asPromise();
+
+    if (!connection || connection.readyState !== 1) {
+        if (connection) delete tenantConnections[tenantDbName];
+        const mongoUriBase = process.env.MONGO_URI_BASE;
+        if (!mongoUriBase) throw new Error('MONGO_URI_BASE não está configurada.');
+        connection = mongoose.createConnection(`${mongoUriBase}/${tenantDbName}?retryWrites=true&w=majority`);
+        await connection.asPromise();
+    }
+
+    try {
+        await connection.db.dropDatabase();
+    } finally {
+        try {
+            await connection.close();
+        } finally {
+            if (tenantConnections[tenantDbName] === connection) {
+                delete tenantConnections[tenantDbName];
+            }
+        }
+    }
+}
+
 /*
 ================================================================================
 DOCUMENTAÇÃO: O Conceito de "Connection Factory" (Fábrica de Conexões)

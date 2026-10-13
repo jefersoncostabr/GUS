@@ -13,13 +13,19 @@ Todas as rotas abaixo utilizam o método HTTP **DELETE**.
 
 | Coleção Alvo | Rota Completa | Descrição |
 | :--- | :--- | :--- |
-| **Solicitantes** | `DELETE /admin/limpar/solicitantes` | Remove todos os usuários/solicitantes cadastrados. |
 | **Usos (Agendamentos)** | `DELETE /admin/limpar/usos` | Remove todos os agendamentos de salas. |
-| **Estúdios** | `DELETE /admin/limpar/estudios` | Remove todos os estúdios cadastrados. |
 | **Motivos** | `DELETE /admin/limpar/motivos` | Remove todos os motivos de uso. |
 | **Salas** | `DELETE /admin/limpar/salas` | Remove todas as salas cadastradas. |
 | **Aulas Regulares** | `DELETE /admin/limpar/aulas` | Remove todas as aulas regulares. |
 | **LIMPAR TUDO** | `DELETE /admin/limpar/tudo` | **Apaga todo o banco de dados** (executa todas as operações acima sequencialmente). |
+
+As antigas rotas de limpeza global de usuários e estúdios Master não são mais expostas por `/admin`, pois um administrador de tenant não deve apagar dados de todos os clientes. Para excluir um tenant, use exclusivamente `DELETE /platform/tenants/:id` com uma sessão superadmin e o corpo de confirmação `{ "confirmTenantDbName": "<tenantDbName exato>" }`. Esta operação remove o database tenant, o registro do estúdio, usuários vinculados e sessões e não pode ser desfeita.
+
+## Ciclo de vida e migração
+
+Antes de ativar trial em produção, faça backup do Master e execute uma vez `npm run tenant:migrate-lifecycle`. A migração marca tenants existentes como aprovados, sem trial retroativo. Novos tenants começam pendentes com sete dias de uso completo; após o prazo sem aprovação, apenas novas inclusões são bloqueadas. Aprovação libera o tenant sem prazo; reprovação bloqueia novas inclusões imediatamente.
+
+Para criar a conta inicial do desenvolvedor, execute `npm run superadmin:create` em terminal interativo. A senha não aparece na tela e é armazenada com bcrypt cost 10. O papel superadmin não pode ser atribuído pelo cadastro público nem pela edição de usuários do tenant.
 
 ---
 

@@ -24,7 +24,7 @@ routerSolicitantes.get("/", (req, res) => {
 routerSolicitantes.get("/solicitantes", listarSolicitantes);
 
 // http://localhost:3000/solicitantes/solicitantes/:id
-routerSolicitantes.get("/solicitantes/:id", buscarSolicitantePorId);
+routerSolicitantes.get("/solicitantes/:id", verificaPermissaoSolicitante, buscarSolicitantePorId);
 
 routerSolicitantes.get('/buscaidsolicitante', buscarIdSolicitante);
 
@@ -32,7 +32,7 @@ routerSolicitantes.get('/buscaidsolicitante', buscarIdSolicitante);
 routerSolicitantes.put('/solicitantes/:id', authMiddleware, verificaPermissaoSolicitante, atualizarSolicitante);
 
 // http://localhost:3000/solicitantes/solicitantes/:id
-routerSolicitantes.delete('/solicitantes/:id', deletarSolicitante);
+routerSolicitantes.delete('/solicitantes/:id', verificaPermissaoSolicitante, deletarSolicitante);
 
 export default routerSolicitantes;
 

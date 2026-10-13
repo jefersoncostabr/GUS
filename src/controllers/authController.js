@@ -32,7 +32,7 @@ export const login = async (req, res) => {
             query.solicitante = { $regex: new RegExp(`^${solicitante.trim()}$`, 'i') };
         }
         
-        const usuario = await Solicitante.findOne(query).lean();
+        const usuario = await Solicitante.findOne(query).select('+senha').lean();
 
         if (!usuario) {
             // Retornamos 401 para não dar pista se o usuário existe ou não (boa prática)

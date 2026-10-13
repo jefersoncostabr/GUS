@@ -1,5 +1,5 @@
 import express from "express";
-import { verificaRole, authMiddleware } from "../middleware/authMiddleware.js";
+import { verificaRole, authMiddleware, requireTenantCanCreate } from "../middleware/authMiddleware.js";
 
 // notas de middleware:
 // - todas as rotas USOS requerem authMiddleware + tenantMiddleware
@@ -32,10 +32,10 @@ routerUsos.get("/usos/:id", buscarUsoPorId);
 routerUsos.get('/buscaid', buscarIdUso);
 
 // http://localhost:3000/usos/usos
-routerUsos.post('/usos', criarUso);
+routerUsos.post('/usos', requireTenantCanCreate, criarUso);
 
 // http://localhost:3000/usos/usos/gerar-teste
-routerUsos.post('/usos/gerar-teste', authMiddleware, verificaRole, criarDezUsosTeste);
+routerUsos.post('/usos/gerar-teste', authMiddleware, verificaRole, requireTenantCanCreate, criarDezUsosTeste);
 
 // http://localhost:3000/usos/usos/:id
 routerUsos.put('/usos/:id', atualizarUso);

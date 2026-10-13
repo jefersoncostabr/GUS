@@ -17,3 +17,44 @@ export const enviarEmailRecuperacao = async (destinatario, token) => {
         `
     });
 };
+
+function escaparHtml(valor) {
+    return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[caractere]);
+}
+
+export const enviarAvisoNovoTenant = async ({ nomeEstudio, tenantDbName, usuarioNome, usuarioEmail, usuarioRole, trialEndsAt }) => {
+    const fimDoTrial = trialEndsAt
+        ? new Date(trialEndsAt).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+        : 'não informado';
+    const dados = {
+        nomeEstudio: escaparHtml(nomeEstudio),
+        tenantDbName: escaparHtml(tenantDbName),
+        usuarioNome: escaparHtml(usuarioNome),
+        usuarioEmail: escaparHtml(usuarioEmail),
+        usuarioRole: escaparHtml(usuarioRole),
+        fimDoTrial: escaparHtml(fimDoTrial)
+    };
+
+    const { error } = await resend.emails.send({
+        from: process.env.EMAIL_FROM,
+        to: 'jefersonb88@gmail.com',
+        subject: 'Novo estúdio e tenant criados no GUS',
+        html: `
+            <h2>Novo tenant criado</h2>
+            <p><strong>Estúdio:</strong> ${dados.nomeEstudio}</p>
+            <p><strong>Banco tenant:</strong> ${dados.tenantDbName}</p>
+            <p><strong>Usuário inicial:</strong> ${dados.usuarioNome}</p>
+            <p><strong>E-mail do usuário:</strong> ${dados.usuarioEmail}</p>
+            <p><strong>Perfil atribuído:</strong> ${dados.usuarioRole}</p>
+            <p><strong>Fim do período de teste:</strong> ${dados.fimDoTrial}</p>
+        `
+    });
+
+    if (error) throw error;
+};

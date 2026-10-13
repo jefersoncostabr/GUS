@@ -1,3 +1,3 @@
 import bcrypt from 'bcrypt'
 
-console.log(await bcrypt.hash("131300-appweb-gus", 10))
+console.log(await bcrypt.hash("sua-senha", 10))

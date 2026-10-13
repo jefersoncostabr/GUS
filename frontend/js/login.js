@@ -50,7 +50,8 @@ async function handleLogin(event) {
             let dados = {};
             try { dados = await response.json(); } catch (e) { /* ignora */ }
 
-            if (dados.role === 'pendente') {
+            const role = dados.usuario?.role || dados.role;
+            if (role === 'pendente') {
                 window.location.href = './aguardando.html';
             } else {
                 window.location.href = './painelGeral.html';

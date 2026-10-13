@@ -14,6 +14,7 @@ import sistemaRoutes from "./routes/sistemaRoutes.js";
 import aulaRegularRoutes from "./routes/aulaRegularRoutes.js";
 import relatoriosRoutes from "./routes/relatoriosRoutes.js";
 import publicSolicitanteRoutes from './routes/publicSolicitanteRoutes.js';
+import platformTenantRoutes from './routes/platformTenantRoutes.js';
 import { getEstudioModel } from './src/models/estudiomodel.js';
 import rateLimit from 'express-rate-limit';
 
@@ -31,6 +32,14 @@ const authLimiter = rateLimit({
     legacyHeaders: false, // Desabilita headers X-RateLimit-*
     // Garante que o rate limit seja aplicado apenas a métodos de escrita
     skipSuccessfulRequests: false 
+});
+
+const signupLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { error: 'Muitas tentativas de cadastro. Aguarde 15 minutos e tente novamente.' },
+    standardHeaders: true,
+    legacyHeaders: false
 });
 
 dotenv.config();
@@ -112,16 +121,34 @@ app.use(session({
 app.use(sessionMiddleware);
 
 app.use(routesAuth);
+app.use('/platform/tenants', platformTenantRoutes);
 
 // Rotas públicas para solicitantes (criação de conta) - devem vir ANTES das rotas protegidas
+app.post('/solicitantes', signupLimiter, (req, res, next) => next());
 app.use('/', publicSolicitanteRoutes);
 
-// Rota para buscar a lista de estúdios
+// Rota para buscar a lista de estúdios DO TENANT LOGADO (painel geral)
+// Isolamento: nunca retorna estúdios de outros tenants.
 app.get('/estudios', async (req, res) => {
     try {
-        // Obtém o modelo do Estudio do banco Master
+        const usuario = req.session?.user;
+        if (!usuario) {
+            return res.status(401).json({ error: 'Usuário não autenticado. Faça login primeiro.' });
+        }
+        // Superadmin (sem tenant) pode ver tudo — painel geral de tenant sempre tem tenant.
+        if (!usuario.tenantDbName) {
+            if (usuario.role === 'superadmin') {
+                const Estudio = getEstudioModel(conexao);
+                const estudios = await Estudio.find({}, 'nome').sort({ nome: 1 });
+                return res.status(200).json(estudios);
+            }
+            return res.status(403).json({ error: 'Usuário sem tenant associado.' });
+        }
+        // Obtém o modelo do Estudio do banco Master e filtra pelo tenant da sessão
         const Estudio = getEstudioModel(conexao);
-        const estudios = await Estudio.find({}, 'nome');
+        const estudios = await Estudio.find({
+            $or: [{ tenantDbName: usuario.tenantDbName }, { ownerTenantDbName: usuario.tenantDbName }]
+        }, 'nome').sort({ nome: 1 });
         res.status(200).json(estudios);
     } catch (error) {
         console.error("Erro ao buscar estúdios no banco de dados:", error);

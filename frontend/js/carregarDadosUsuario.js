@@ -41,7 +41,9 @@ async function carregarEstudios() {
     if (!selectEstudio) return;
 
     try {
-        const response = await fetch(`${getBaseUrl()}/estudios`);
+        const response = await fetch(`${getBaseUrl()}/estudios`, {
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error('Falha ao carregar estúdios.');
         }

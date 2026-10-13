@@ -1,10 +1,16 @@
 import { getSolicitanteModel } from "../models/usuariosmodel.js";
 import { getEstudioModel } from "../models/estudiomodel.js";
-import { getTenantConnection } from "../config/connectionFactory.js";
+import { getTenantConnection, dropTenantDatabase } from "../config/connectionFactory.js";
+import { enviarAvisoNovoTenant } from "../services/emailService.js";
 import bcrypt from "bcrypt";
+import crypto from 'node:crypto';
 import mongoose from "mongoose";
 
 const masterConnection = mongoose.connection;
+
+function escaparRegex(valor) {
+    return valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /**
  * Lista todos os estúdios com apenas nome e ID (para preenchimento do modal no frontend).
@@ -40,7 +46,7 @@ function gerarTenantDbName(estudioName) {
     
     // Trunca o slug se o nome total for muito longo para evitar exceder o limite do DB.
     // Limite do DB é ~64, mas Atlas pode ter limites menores (ex: 38 bytes).
-    const maxSlugLength = 25;
+    const maxSlugLength = 20;
     if (slug.length > maxSlugLength) {
         slug = slug.substring(0, maxSlugLength);
     }
@@ -48,7 +54,8 @@ function gerarTenantDbName(estudioName) {
     // Remove hífens no final do slug que podem ter sido criados pelo truncamento
     slug = slug.replace(/-+$/, '');
 
-    return `gus_tenant_${slug}`;
+    const sufixoUnico = crypto.randomBytes(3).toString('hex');
+    return `gus_tenant_${slug}-${sufixoUnico}`;
 }
 
 /**
@@ -75,18 +82,13 @@ async function inicializarTenantDb(tenantConnection) {
 
 export const listarSolicitantes = async (req, res) => {
     try {
-        // Usa o modelo do banco Master (Solicitantes são globais)
-        const SolicitanteModel = getSolicitanteModel(masterConnection);
-        
-        const query = {};
-        
-        // Se o usuário logado tem um tenantDbName, filtramos por ele.
-        // Se não tem (Super Admin), deixamos a query vazia para trazer todos.
-        if (req.session?.user?.role === 'admin' && req.session?.user?.tenantDbName) {
-            query.tenantDbName = req.session.user.tenantDbName;
+        const tenantDbName = req.session?.user?.tenantDbName;
+        if (!['admin', 'adm'].includes(req.session?.user?.role) || !tenantDbName) {
+            return res.status(403).json({ error: 'A listagem de usuários exige administração do tenant.' });
         }
 
-        const listaDeSolicitantes = await SolicitanteModel.find(query);
+        const SolicitanteModel = getSolicitanteModel(masterConnection);
+        const listaDeSolicitantes = await SolicitanteModel.find({ tenantDbName }).select('-senha');
         res.status(200).json(listaDeSolicitantes || []);
     } catch (error) {
         console.error('Erro ao buscar solicitantes:', error);
@@ -94,10 +96,50 @@ export const listarSolicitantes = async (req, res) => {
     }
 };
 
+export const buscarSolicitanteAdminPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'ID de usuário inválido.' });
+        }
+
+        const usuario = req.session?.user;
+        if (!['admin', 'adm'].includes(usuario?.role) || !usuario.tenantDbName) {
+            return res.status(403).json({ error: 'A consulta exige administração do tenant.' });
+        }
+
+        const SolicitanteModel = getSolicitanteModel(masterConnection);
+        const solicitante = await SolicitanteModel.findOne({ _id: id, tenantDbName: usuario.tenantDbName })
+            .select('solicitante email role')
+            .lean();
+        if (!solicitante) {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+
+        return res.status(200).json(solicitante);
+    } catch (error) {
+        console.error('Erro ao buscar usuário administrativo:', error);
+        return res.status(500).json({ error: 'Erro ao buscar usuário.' });
+    }
+};
+
 export const buscarSolicitantePorId = async (req, res) => {
     try {
+        const usuario = req.session?.user;
+        if (!usuario) return res.status(401).json({ error: 'Autenticação obrigatória.' });
+
+        const query = { _id: req.params.id };
+        if (['admin', 'adm'].includes(usuario.role)) {
+            if (!usuario.tenantDbName) {
+                return res.status(403).json({ error: 'Administração de usuários exige um tenant associado.' });
+            }
+            query.tenantDbName = usuario.tenantDbName;
+        } else if (String(usuario._id) !== String(req.params.id)) {
+            return res.status(403).json({ error: 'Não é permitido consultar outro usuário.' });
+        }
+
         const SolicitanteModel = getSolicitanteModel(masterConnection);
-        const solicitante = await SolicitanteModel.findById(req.params.id);
+        const solicitante = await SolicitanteModel.findOne(query).select('-senha');
         if (!solicitante) {
             res.status(404).json({ message: 'solicitante não encontrado com esse id' });
         } else {
@@ -134,20 +176,25 @@ export const buscarIdSolicitante = async (req, res) => {
 };
 
 export const criarSolicitante = async (req, res) => {
+    let provisionamentoNovo = null;
     console.log("\n[CRIAR USUÁRIO] Iniciando processo...");
-    console.log("-> Dados recebidos:", JSON.stringify(req.body));
     try {
         // Capitaliza a primeira letra do solicitante e remove espaços extras
-        if (req.body.solicitante && typeof req.body.solicitante === 'string') {
-            const nome = req.body.solicitante.trim();
-            req.body.solicitante = nome.charAt(0).toUpperCase() + nome.slice(1);
+        if (typeof req.body.solicitante !== 'string' || !req.body.solicitante.trim()) {
+            return res.status(400).json({ error: 'O nome do usuário é obrigatório.' });
         }
+        const nome = req.body.solicitante.trim();
+        req.body.solicitante = nome.charAt(0).toUpperCase() + nome.slice(1);
 
         let { senha, role, estudioName, estudio } = req.body;
 
         if (typeof senha !== 'string' || senha.length < 4) {
             return res.status(400).json({ error: 'A senha deve ter no minimo 4 caracteres.' });
         }
+        if (typeof req.body.email !== 'string' || !req.body.email.trim()) {
+            return res.status(400).json({ error: 'O e-mail é obrigatório.' });
+        }
+        req.body.email = req.body.email.trim().toLowerCase();
 
         // Unifica a entrada: usa estudioName ou estudio independente da sessão
         if (!estudioName && estudio) {
@@ -155,21 +202,34 @@ export const criarSolicitante = async (req, res) => {
         }
 
         // SEGURANÇA: Remover role vindo do frontend (será determinado automaticamente)
-        if (!req.session?.user) {
-            // Para registros públicos, ignorar o role e deixar ser determinado pela lógica
-            role = undefined;
+        const cadastroAdminTenant = (req.originalUrl || '').startsWith('/admin/usuarios')
+            && req.session?.user?.role === 'admin';
+        if (cadastroAdminTenant && role === 'superadmin') {
+            return res.status(403).json({ error: 'Não é permitido criar superadmin pela administração do tenant.' });
         }
-
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(senha, saltRounds);
+        if (!cadastroAdminTenant) role = undefined;
 
         // Validação de entrada
         if (!estudioName || (typeof estudioName === 'string' && estudioName.trim() === '')) {
             return res.status(400).json({ error: 'O nome do estúdio é obrigatório.' });
         }
+        estudioName = String(estudioName).trim();
 
         const masterConnection = mongoose.connection;
         const EstudioModel = getEstudioModel(masterConnection);
+        const SolicitanteModel = getSolicitanteModel(masterConnection);
+
+        const usuarioDuplicado = await SolicitanteModel.findOne({
+            $or: [
+                { solicitante: req.body.solicitante },
+                { email: req.body.email }
+            ]
+        }).select('solicitante email').lean();
+        if (usuarioDuplicado) {
+            const campo = usuarioDuplicado.email === req.body.email ? 'e-mail' : 'nome de usuário';
+            return res.status(409).json({ error: `Este ${campo} já está cadastrado.` });
+        }
+        const hashedPassword = await bcrypt.hash(senha, 10);
 
         // Busca inteligente: tenta por ID primeiro (comum no Admin), senão por Nome (comum no Registro)
         let estudioExistente;
@@ -179,13 +239,16 @@ export const criarSolicitante = async (req, res) => {
 
         if (!estudioExistente) {
             estudioExistente = await EstudioModel.findOne({ 
-                nome: { $regex: new RegExp(`^${estudioName}$`, 'i') } 
+                nome: { $regex: new RegExp(`^${escaparRegex(estudioName)}$`, 'i') }
             });
         }
 
         // Se não existir, valida o novo nome antes de criar o estúdio
         if (!estudioExistente) {
             console.log(`-> Estúdio "${estudioName}" não encontrado. Tentando criar novo estúdio...`);
+            if (cadastroAdminTenant) {
+                return res.status(403).json({ error: 'A criação de tenant novo deve ser feita pelo cadastro de plataforma.' });
+            }
             const nomesProibidos = ['teste', 'test', 'admin', 'desconhecido', 'asdf', '123456', 'root'];
             const nomeLimpo = String(estudioName).trim().toLowerCase();
 
@@ -201,6 +264,9 @@ export const criarSolicitante = async (req, res) => {
         let tenantDbName;
         let roleAssigned;
         let idDoEstudio;
+        let tenantCriado = false;
+        let trialStartedAt;
+        let trialEndsAt;
 
         if (estudioExistente) {
             console.log(`✓✓✓ Estúdio "${estudioExistente.nome}" encontrado para o novo usuário. Associando ao estúdio existente.`);
@@ -209,52 +275,45 @@ export const criarSolicitante = async (req, res) => {
             // O novo usuário será um 'user' desse estúdio
             
             if (!estudioExistente.tenantDbName) {
-                console.log(`⚠⚠⚠ Estúdio "${estudioExistente.nome}" encontrado sem tenantDbName. Gerando um novo tenantDbName...`);
-                // Se o estúdio existe mas não tem banco vinculado, geramos um e SALVAMOS no estúdio
-                tenantDbName = gerarTenantDbName(estudioExistente.nome);
-                await EstudioModel.findByIdAndUpdate(estudioExistente._id, { tenantDbName });
-                console.log(`⚠ Estúdio "${estudioExistente.nome}" não possuía tenantDbName. Gerado e vinculado agora: ${tenantDbName}`);
-            } else {
-                // Se já existe, usamos exatamente o que está no banco do estúdio
-                tenantDbName = estudioExistente.tenantDbName;
+                return res.status(409).json({ error: 'Este estúdio ainda não possui um tenant provisionado. Contate o suporte.' });
+            }
+            tenantDbName = estudioExistente.tenantDbName;
+
+            const statusTenant = estudioExistente.approvalStatus || 'approved';
+            const trialExpirado = statusTenant === 'pending'
+                && (!estudioExistente.trialEndsAt || new Date(estudioExistente.trialEndsAt) <= new Date());
+            if (statusTenant === 'rejected' || statusTenant === 'provisioning' || statusTenant === 'deleting' || trialExpirado) {
+                return res.status(423).json({ error: 'Este tenant não está aceitando novos usuários.' });
             }
 
             idDoEstudio = estudioExistente._id;
             // Registro público (sem sessão): usuário entra como 'pendente' até aprovação do admin
             // Criação pelo admin (com sessão): usa o role especificado ou 'user' como padrão
-            roleAssigned = req.session?.user ? (role || 'user') : 'pendente';
+            roleAssigned = cadastroAdminTenant ? (role || 'user') : 'pendente';
             estudioName = estudioExistente.nome; // Atualiza para o nome real para o log de sucesso
             console.log(`✓ Estúdio existente encontrado: ${estudioExistente.nome}`);
         } else {
-            // Cenário B: Estúdio não existe
-            // Criar novo estúdio e provisionar tenant
-            // O primeiro para este estúdio será 'admin'
-            try {
-                tenantDbName = gerarTenantDbName(estudioName);
-                const tenantId = tenantDbName.replace('gus_tenant_', '');
-                const tenantConnection = await getTenantConnection(tenantId);
-                
-                // Inicializar banco do tenant
-                await inicializarTenantDb(tenantConnection);
-                
-                // Criar registro do Estúdio no banco Master
-                const novoEstudio = new EstudioModel({ 
-                    nome: estudioName,
-                    tenantDbName: tenantDbName,
-                    quantidadeSalas: req.body.quantidadeSalas || 1 // Define 1 por padrão ou o que vier do form
-                });
-                await novoEstudio.save();
-                idDoEstudio = novoEstudio._id;
-                
-                roleAssigned = 'admin'; // Primeiro usuário é admin
-                console.log(`✓ Novo estúdio criado e banco provisionado: ${tenantDbName}`);
-            } catch (error) {
-                console.error('Erro ao provisionar estúdio:', error);
-                return res.status(500).json({ error: 'Erro ao provisionar novo estúdio.' });
-            }
-        }
+            tenantDbName = gerarTenantDbName(estudioName);
+            const novoEstudio = await EstudioModel.create({
+                nome: estudioName,
+                tenantDbName,
+                approvalStatus: 'provisioning',
+                quantidadeSalas: req.body.quantidadeSalas || 1
+            });
+            idDoEstudio = novoEstudio._id;
+            provisionamentoNovo = { tenantDbName, estudioId: idDoEstudio };
 
-        const SolicitanteModel = getSolicitanteModel(masterConnection);
+            const tenantId = tenantDbName.replace('gus_tenant_', '');
+            const tenantConnection = await getTenantConnection(tenantId);
+            await inicializarTenantDb(tenantConnection);
+
+            trialStartedAt = new Date();
+            trialEndsAt = new Date(trialStartedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+            provisionamentoNovo.trialStartedAt = trialStartedAt;
+            provisionamentoNovo.trialEndsAt = trialEndsAt;
+            roleAssigned = 'admin';
+            console.log(`✓ Novo estúdio e tenant provisionados: ${tenantDbName}`);
+        }
 
         // Criar objeto do novo solicitante com role determinado automaticamente
         const novoSolicitanteData = {
@@ -271,10 +330,63 @@ export const criarSolicitante = async (req, res) => {
         const novoSolicitante = new SolicitanteModel(novoSolicitanteData);
         await novoSolicitante.save();
         console.log(`Novo usuário criado: Estúdio "${estudioName}" (Tenant: "${tenantDbName}")`);
+
+        if (provisionamentoNovo) {
+            provisionamentoNovo.usuarioId = novoSolicitante._id;
+            const resultadoProvisionamento = await EstudioModel.updateOne(
+                { _id: idDoEstudio, approvalStatus: 'provisioning' },
+                {
+                    $set: {
+                        approvalStatus: 'pending',
+                        trialStartedAt,
+                        trialEndsAt
+                    }
+                }
+            );
+            if (resultadoProvisionamento.matchedCount !== 1) {
+                throw new Error('Não foi possível concluir o estado do tenant provisionado.');
+            }
+            tenantCriado = true;
+        }
+
+        if (tenantCriado) {
+            try {
+                await enviarAvisoNovoTenant({
+                    nomeEstudio: estudioName,
+                    tenantDbName,
+                    usuarioNome: novoSolicitante.solicitante,
+                    usuarioEmail: novoSolicitante.email,
+                    usuarioRole: novoSolicitante.role,
+                    trialEndsAt
+                });
+            } catch (emailError) {
+                console.error('Usuário e tenant foram criados, mas o aviso por e-mail falhou:', emailError);
+            }
+        }
         
         console.log(`[SUCESSO] Usuário: ${novoSolicitante.solicitante} | Banco: ${novoSolicitante.tenantDbName}`);
-        res.status(201).json(novoSolicitante); 
+        res.status(201).json({
+            _id: novoSolicitante._id,
+            solicitante: novoSolicitante.solicitante,
+            email: novoSolicitante.email,
+            role: novoSolicitante.role,
+            tenantDbName: novoSolicitante.tenantDbName
+        });
     } catch (error) {
+        if (provisionamentoNovo) {
+            try {
+                const EstudioModel = getEstudioModel(mongoose.connection);
+                const SolicitanteModel = getSolicitanteModel(mongoose.connection);
+                if (provisionamentoNovo.usuarioId) {
+                    await SolicitanteModel.deleteOne({ _id: provisionamentoNovo.usuarioId });
+                }
+                await dropTenantDatabase(provisionamentoNovo.tenantDbName);
+                await EstudioModel.deleteOne({ _id: provisionamentoNovo.estudioId, approvalStatus: 'provisioning' });
+            } catch (cleanupError) {
+                console.error('Falha ao reverter provisionamento incompleto; o tenant permanece bloqueado:', cleanupError);
+                return res.status(500).json({ error: 'Provisionamento incompleto e limpeza pendente. Contate o suporte.' });
+            }
+        }
         // Captura erros de validação do Mongoose (campos obrigatórios, formato de email, etc)
         if (error.name === 'ValidationError') {
             if (error.errors.email) {
@@ -307,7 +419,13 @@ export const criarSolicitante = async (req, res) => {
 export const atualizarSolicitante = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = { ...req.body };
+        const usuarioSessao = req.session?.user;
+        if (!usuarioSessao) return res.status(401).json({ error: 'Autenticação obrigatória.' });
+
+        const updates = {};
+        for (const campo of ['solicitante', 'nome', 'email', 'senha', 'role']) {
+            if (req.body[campo] !== undefined) updates[campo] = req.body[campo];
+        }
 
         // Garante que se o frontend enviar 'nome', ele seja tratado como 'solicitante'
         if (updates.nome && !updates.solicitante) {
@@ -316,8 +434,21 @@ export const atualizarSolicitante = async (req, res) => {
         }
 
         // Proteção: Apenas admin pode alterar o campo 'role'
-        if (updates.role && req.session.user?.role !== 'admin') {
+        if (updates.role === 'superadmin') {
+            return res.status(403).json({ error: 'Não é permitido atribuir o perfil superadmin.' });
+        }
+        if (updates.role && !['user', 'admin', 'pendente'].includes(updates.role)) {
+            return res.status(400).json({ error: 'Perfil de usuário inválido.' });
+        }
+        if (updates.role && !['admin', 'adm'].includes(usuarioSessao.role)) {
             delete updates.role;
+        }
+
+        if (updates.email !== undefined) {
+            if (typeof updates.email !== 'string' || !updates.email.trim()) {
+                return res.status(400).json({ error: 'O e-mail não pode ser vazio.' });
+            }
+            updates.email = updates.email.trim().toLowerCase();
         }
 
         // Validação e Padronização de Nome
@@ -343,18 +474,27 @@ export const atualizarSolicitante = async (req, res) => {
 
         const masterConnection = mongoose.connection;
         const SolicitanteModel = getSolicitanteModel(masterConnection);
+        const query = { _id: id };
+        if (['admin', 'adm'].includes(usuarioSessao.role)) {
+            if (!usuarioSessao.tenantDbName) {
+                return res.status(403).json({ error: 'Administração de usuários exige um tenant associado.' });
+            }
+            query.tenantDbName = usuarioSessao.tenantDbName;
+        } else if (String(usuarioSessao._id) !== String(id)) {
+            return res.status(403).json({ error: 'Não é permitido alterar outro usuário.' });
+        }
 
-        const solicitante = await SolicitanteModel.findByIdAndUpdate(id, updates, { new: true });
+        const solicitante = await SolicitanteModel.findOneAndUpdate(query, updates, { new: true, runValidators: true }).select('-senha');
         if (!solicitante) {
             res.status(404).json({ error: 'solicitante não encontrado' });
             return;
         }
 
         // Atualiza a sessão se o usuário estiver alterando o próprio cadastro
-        if (req.session.user && String(req.session.user._id) === id) {
-            req.session.user.solicitante = solicitante.solicitante;
-            req.session.user.role = solicitante.role;
-            req.session.user.tenantDbName = solicitante.tenantDbName;
+        if (String(usuarioSessao._id) === String(id)) {
+            usuarioSessao.solicitante = solicitante.solicitante;
+            usuarioSessao.role = solicitante.role;
+            usuarioSessao.tenantDbName = solicitante.tenantDbName;
         }
 
         res.status(200).json(solicitante);
@@ -370,8 +510,20 @@ export const deletarSolicitante = async (req, res) => {
     try {
         const masterConnection = mongoose.connection;
         const SolicitanteModel = getSolicitanteModel(masterConnection);
+        const usuarioSessao = req.session?.user;
+        if (!usuarioSessao) return res.status(401).json({ error: 'Autenticação obrigatória.' });
 
-        const solicitante = await SolicitanteModel.findByIdAndDelete(req.params.id);
+        const query = { _id: req.params.id };
+        if (['admin', 'adm'].includes(usuarioSessao.role)) {
+            if (!usuarioSessao.tenantDbName) {
+                return res.status(403).json({ error: 'Administração de usuários exige um tenant associado.' });
+            }
+            query.tenantDbName = usuarioSessao.tenantDbName;
+        } else if (String(usuarioSessao._id) !== String(req.params.id)) {
+            return res.status(403).json({ error: 'Não é permitido excluir outro usuário.' });
+        }
+
+        const solicitante = await SolicitanteModel.findOneAndDelete(query);
         if (!solicitante) {
             res.status(404).json({ error: 'solicitante não encontrado' });
             return;

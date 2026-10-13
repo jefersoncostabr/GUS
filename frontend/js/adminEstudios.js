@@ -28,7 +28,7 @@ export function renderEstudiosUI(data = []) {
                     <td>${e.quantidadeSalas || 0}</td>
                     <td>
 						<button class="editEstudio btnSmall">Editar</button>
-						<button class="delEstudio btnSmall">Excluir</button>
+                        ${e.tenantDbName ? '' : '<button class="delEstudio btnSmall">Excluir</button>'}
 					</td>
                 </tr>`
             )
