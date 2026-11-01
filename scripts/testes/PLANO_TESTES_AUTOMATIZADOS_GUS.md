@@ -119,8 +119,10 @@ lista de cenários a implementar, não uma afirmação de que todos já existem.
 
 - Cada rotina de limpeza afeta somente a coleção e o tenant previstos.
 - Limpeza total exige autorização e afeta exclusivamente o tenant autenticado.
-- Scripts de backup, migração e manutenção são testados com banco descartável,
-  verificando efeitos e tratamento de falhas de conexão.
+- Scripts operacionais de backup, migração, limpeza e repopulação devem ser
+  importáveis sem efeitos colaterais e ter suas decisões testadas com
+  dependências simuladas; testes de integração devem verificar os efeitos em
+  banco descartável.
 - Operações destrutivas devem ter testes que confirmem que dados de outros
   tenants permanecem intactos.
 
@@ -164,10 +166,31 @@ lista de cenários a implementar, não uma afirmação de que todos já existem.
 
 ## Ordem sugerida de implementação
 
-1. Tornar a inicialização do app independente da conexão automática ao banco e
-   adicionar infraestrutura de banco de teste descartável.
-2. Cobrir autenticação, autorização e isolamento multi-tenant.
-3. Cobrir criação/duplicidade, permissões e paginação dos agendamentos.
-4. Cobrir ciclo de vida, cadastro e operações administrativas.
-5. Cobrir relatórios, scripts de manutenção e utilitários do frontend.
-6. Adicionar poucos testes de ponta a ponta e executar tudo no CI.
+1. **Concluído nesta etapa:** separar a criação do Express da inicialização do
+   servidor, permitindo testes sem conexão automática; adicionar utilitário
+   com URI explícita e nome randômico para MongoDB descartável. Ver
+   `scripts/testes/README.md`.
+2. **Concluído nesta etapa:** cobrir login, sessão, autorização e roteamento
+   isolado por tenant com dependências simuladas. Ver
+   `scripts/testes/authentication.test.js` e
+   `scripts/testes/tenantMiddleware.test.js`.
+3. **Concluído nesta etapa:** cobrir criação, duplicidade, índice de unicidade,
+   permissões de edição/exclusão e paginação de agendamentos. As rotas de uso
+   também passaram a exigir autenticação explicitamente. Ver
+   `scripts/testes/usos.test.js`.
+4. **Concluído nesta etapa:** cobrir aprovação/reprovação e exclusão segura de
+   tenants, validação e regras de cadastro, escopo de alterações administrativas
+   por tenant e operações selecionadas de salas/aulas. Os testes detectaram e
+   permitiram corrigir referências incorretas ao tenant durante a exclusão.
+   Ver `scripts/testes/tenantLifecycle.test.js` e
+   `scripts/testes/registrationAdmin.test.js`.
+5. **Parcialmente concluída:** relatórios, limpeza de coleções do tenant,
+   utilitários de frontend e decisões dos scripts operacionais são cobertos por
+   testes unitários com dependências simuladas. As rotinas operacionais foram
+   protegidas contra execução durante import e a limpeza legada não usa mais
+   banco local implícito. Ainda faltam testes de integração com MongoDB
+   descartável para confirmar efeitos reais de migração e limpeza.
+6. **Concluído nesta etapa:** adicionar um fluxo HTTP ponta a ponta de login,
+   sessão e logout, além de executar a suíte no GitHub Actions com Node.js 20 e
+   22. Ver `scripts/testes/e2e-auth-session.test.js` e
+   `.github/workflows/test.yml`.

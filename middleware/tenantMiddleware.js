@@ -24,8 +24,18 @@ import { getEstudioModel } from '../src/models/estudiomodel.js';
  *   app.use(authMiddleware);
  *   app.use(tenantMiddleware);
  */
-export default async function tenantMiddleware(req, res, next) {
-    try {
+export function createTenantMiddleware({
+    getTenantConnection: resolveTenantConnection = getTenantConnection,
+    masterConnection = mongoose.connection,
+    getSolicitanteModel: resolveSolicitanteModel = getSolicitanteModel,
+    getUsoRegularModel: resolveUsoRegularModel = getUsoRegularModel,
+    getSalaModel: resolveSalaModel = getSalaModel,
+    getAulaModel: resolveAulaModel = getAulaModel,
+    getMotivosModel: resolveMotivosModel = getMotivosModel,
+    getEstudioModel: resolveEstudioModel = getEstudioModel
+} = {}) {
+    return async function tenantMiddleware(req, res, next) {
+      try {
         // Verifica se o usuário está autenticado
         if (!req.session || !req.session.user) {
             // Se não estiver autenticado, pula para a próxima middleware/rota
@@ -59,8 +69,7 @@ export default async function tenantMiddleware(req, res, next) {
         if (tenantId.length > 38) {
             try {
                 console.warn('tenantId do usuário excede 38 caracteres, tentando corrigir via DB');
-                const masterConn = mongoose.connection;
-                const SolicitanteModel = getSolicitanteModel(masterConn);
+                const SolicitanteModel = resolveSolicitanteModel(masterConnection);
                 const fresh = await SolicitanteModel.findById(user._id).lean();
                 if (fresh && fresh.tenantDbName && fresh.tenantDbName.length <= 38) {
                     console.log('Atualizando sessão com tenantDbName corrigido:', fresh.tenantDbName);
@@ -77,7 +86,7 @@ export default async function tenantMiddleware(req, res, next) {
             }
         }
 
-        const Estudio = getEstudioModel(mongoose.connection);
+        const Estudio = resolveEstudioModel(masterConnection);
         const tenantRegistry = await Estudio.findOne({ tenantDbName: user.tenantDbName })
             .select('_id approvalStatus trialEndsAt')
             .lean();
@@ -93,7 +102,7 @@ export default async function tenantMiddleware(req, res, next) {
             trialEndsAt: tenantRegistry.trialEndsAt || null
         };
 
-        const tenantConnection = await getTenantConnection(tenantId);
+        const tenantConnection = await resolveTenantConnection(tenantId);
 
         // Injeta a conexão e os modelos compilados no objeto req
         req.tenantConnection = tenantConnection;
@@ -101,10 +110,10 @@ export default async function tenantMiddleware(req, res, next) {
 
         // Compila os modelos para esta conexão específica
         req.tenantModels = {
-            Utilizacao: getUsoRegularModel(tenantConnection),
-            Sala: getSalaModel(tenantConnection),
-            Aula: getAulaModel(tenantConnection),
-            Motivos: getMotivosModel(tenantConnection),
+            Utilizacao: resolveUsoRegularModel(tenantConnection),
+            Sala: resolveSalaModel(tenantConnection),
+            Aula: resolveAulaModel(tenantConnection),
+            Motivos: resolveMotivosModel(tenantConnection),
         };
 
         if (process.env.DEBUG_TENANT === 'true') {
@@ -112,15 +121,18 @@ export default async function tenantMiddleware(req, res, next) {
         }
         next();
 
-    } catch (error) {
+      } catch (error) {
         console.error('Erro no tenantMiddleware:', error);
         // Retorna um erro 500 se houver problema ao conectar ao banco do tenant
         res.status(500).json({
             error: 'Erro ao conectar ao banco de dados do seuário.',
             details: error.message
         });
-    }
+      }
+    };
 }
+
+export default createTenantMiddleware();
 
 /*
 ================================================================================

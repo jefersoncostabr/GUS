@@ -1,69 +1,64 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import SolicitanteModelo from "../src/models/usuariosmodel.js";
-import UsoModelo from "../src/models/utilizacaomodel.js";
+import mongoose from 'mongoose';
+import { getSolicitanteModel } from '../src/models/usuariosmodel.js';
+import { getUsoModel } from '../src/models/utilizacaomodel.js';
+import { isDirectExecution } from './isDirectExecution.js';
 
-dotenv.config();
+import 'dotenv/config';
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/gus";
+export async function limparBanco({
+    uri = process.env.MONGO_URI,
+    connect = mongoose.connect.bind(mongoose),
+    disconnect = mongoose.disconnect.bind(mongoose),
+    getCollection = (connection, name) => connection.collection(name),
+    getSolicitante = getSolicitanteModel,
+    getUso = getUsoModel,
+    connection = mongoose.connection,
+    logger = console
+} = {}) {
+    if (!uri) throw new Error('MONGO_URI não está configurada; limpeza cancelada.');
 
-/**
- * Script de Manutenção e Limpeza do Banco de Dados.
- * 
- * Executa duas operações principais:
- * 1. Remove agendamentos antigos onde o campo 'solicitante' ainda é uma String (falha de migração).
- * 2. Remove agendamentos órfãos (onde o ID do solicitante existe no agendamento, mas o usuário foi excluído).
- * 
- * @function limparBanco
- * @returns {Promise<void>} Encerra o processo com código 0 (sucesso) ou 1 (erro).
- */
-async function limparBanco() {
+    await connect(uri);
     try {
-        await mongoose.connect(MONGO_URI);
-        console.log("Conectado ao MongoDB para limpeza...");
+        logger.log('Conectado ao MongoDB para limpeza...');
 
-        const collectionUsos = mongoose.connection.collection("usosdesala");
+        const Solicitante = getSolicitante(connection);
+        const Uso = getUso(connection);
+        const collectionUsos = getCollection(connection, 'usosdesala');
 
-        // 1. Remover registros onde 'solicitante' ainda é String (não migrados)
-        const resultadoStrings = await collectionUsos.deleteMany({ 
-            solicitante: { $type: "string" } 
+        const resultadoStrings = await collectionUsos.deleteMany({
+            solicitante: { $type: 'string' }
         });
-        
+
         if (resultadoStrings.deletedCount > 0) {
-            console.log(`🗑️  Removidos ${resultadoStrings.deletedCount} agendamentos com formato antigo (String).`);
+            logger.log(`Removidos ${resultadoStrings.deletedCount} agendamentos com formato antigo (String).`);
         } else {
-            console.log("✅ Nenhum agendamento com formato de String encontrado.");
+            logger.log('Nenhum agendamento com formato de String encontrado.');
         }
 
-        // 2. Remover registros órfãos (ID existe no agendamento, mas usuário não existe)
-        // Busca todos os IDs de usuários válidos
-        const usuariosValidos = await SolicitanteModelo.find({}, '_id');
-        const listaIdsValidos = usuariosValidos.map(u => u._id.toString());
-
-        // Busca todos os agendamentos
-        const todosAgendamentos = await UsoModelo.find({});
-        const idsParaRemover = [];
-
-        todosAgendamentos.forEach(uso => {
-            // Se tem solicitante, mas o ID não está na lista de válidos
-            if (uso.solicitante && !listaIdsValidos.includes(uso.solicitante.toString())) {
-                idsParaRemover.push(uso._id);
-            }
-        });
+        const usuariosValidos = await Solicitante.find({}, '_id');
+        const listaIdsValidos = new Set(usuariosValidos.map((usuario) => usuario._id.toString()));
+        const todosAgendamentos = await Uso.find({});
+        const idsParaRemover = todosAgendamentos
+            .filter((uso) => uso.solicitante && !listaIdsValidos.has(uso.solicitante.toString()))
+            .map((uso) => uso._id);
 
         if (idsParaRemover.length > 0) {
-            await UsoModelo.deleteMany({ _id: { $in: idsParaRemover } });
-            console.log(`🗑️  Removidos ${idsParaRemover.length} agendamentos órfãos (usuário não existe mais).`);
+            await Uso.deleteMany({ _id: { $in: idsParaRemover } });
+            logger.log(`Removidos ${idsParaRemover.length} agendamentos órfãos (usuário não existe mais).`);
         } else {
-            console.log("✅ Nenhum agendamento órfão encontrado.");
+            logger.log('Nenhum agendamento órfão encontrado.');
         }
 
-        console.log("Limpeza concluída!");
-        process.exit(0);
-    } catch (error) {
-        console.error("Erro na limpeza:", error);
-        process.exit(1);
+        logger.log('Limpeza concluída!');
+        return { legacyDeletedCount: resultadoStrings.deletedCount, orphanDeletedCount: idsParaRemover.length };
+    } finally {
+        await disconnect();
     }
 }
 
-limparBanco();
+if (isDirectExecution(import.meta.url)) {
+    limparBanco().catch((error) => {
+        console.error('Erro na limpeza:', error);
+        process.exitCode = 1;
+    });
+}

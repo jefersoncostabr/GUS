@@ -9,59 +9,51 @@ import { enviarEmailRecuperacao } from '../services/emailService.js';
  * Se o login for bem-sucedido, armazena os dados do usuário na sessão,
  * incluindo o `tenantDbName` para a arquitetura multi-tenant.
  */
-export const login = async (req, res) => {
-    // Permite login com 'email' ou 'solicitante' (nome de usuário)
-    const { email, password, solicitante } = req.body;
-    const loginIdentifier = (email || solicitante)?.trim();
-
-    if (!loginIdentifier || !password) {
-        return res.status(400).json({ error: 'Usuário/Email e senha são obrigatórios.' });
-    }
-
-    try {
-        // Obtém o modelo 'Solicitante' da conexão principal (Master)
+export function createLoginHandler({
+    findUser = async (query) => {
         const Solicitante = getSolicitanteModel(mongoose.connection);
+        return Solicitante.findOne(query).select('+senha').lean();
+    },
+    comparePassword = bcrypt.compare
+} = {}) {
+    return async (req, res) => {
+        const { email, password, solicitante } = req.body;
+        const loginIdentifier = (email || solicitante)?.trim();
 
-        // Constrói a query para buscar por email ou nome de usuário
-        const query = {};
-        if (email) {
-            // Busca por email (case-insensitive)
-            query.email = email.trim().toLowerCase();
-        } else {
-            // Busca por nome de usuário de forma insensível a maiúsculas (case-insensitive)
-            query.solicitante = { $regex: new RegExp(`^${solicitante.trim()}$`, 'i') };
-        }
-        
-        const usuario = await Solicitante.findOne(query).select('+senha').lean();
-
-        if (!usuario) {
-            // Retornamos 401 para não dar pista se o usuário existe ou não (boa prática)
-            return res.status(401).json({ error: 'Credenciais inválidas.' });
+        if (!loginIdentifier || !password) {
+            return res.status(400).json({ error: 'Usuário/Email e senha são obrigatórios.' });
         }
 
-        const senhaCorreta = await bcrypt.compare(password, usuario.senha);
+        try {
+            const query = {};
+            if (email) {
+                query.email = email.trim().toLowerCase();
+            } else {
+                query.solicitante = { $regex: new RegExp(`^${solicitante.trim()}$`, 'i') };
+            }
 
-        if (!senhaCorreta) {
-            return res.status(401).json({ error: 'Credenciais inválidas.' });
+            const usuario = await findUser(query);
+            if (!usuario || !(await comparePassword(password, usuario.senha))) {
+                return res.status(401).json({ error: 'Credenciais inválidas.' });
+            }
+
+            req.session.user = {
+                _id: usuario._id,
+                solicitante: usuario.solicitante,
+                email: usuario.email,
+                role: usuario.role,
+                tenantDbName: usuario.tenantDbName,
+            };
+
+            res.status(200).json({ message: 'Login bem-sucedido!', usuario: req.session.user });
+        } catch (error) {
+            console.error('Erro no processo de login:', error);
+            res.status(500).json({ error: 'Erro interno do servidor ao tentar fazer login.' });
         }
+    };
+}
 
-        // Armazena as informações essenciais do usuário na sessão
-        req.session.user = {
-            _id: usuario._id,
-            solicitante: usuario.solicitante, // O nome do usuário
-            email: usuario.email,
-            role: usuario.role, // A permissão do usuário
-            tenantDbName: usuario.tenantDbName, // Campo CRÍTICO para o multi-tenant
-        };
-
-        // Retorna uma resposta de sucesso com os dados do usuário para o frontend
-        res.status(200).json({ message: 'Login bem-sucedido!', usuario: req.session.user });
-
-    } catch (error) {
-        console.error('Erro no processo de login:', error);
-        res.status(500).json({ error: 'Erro interno do servidor ao tentar fazer login.' });
-    }
-};
+export const login = createLoginHandler();
 
 /**
  * Realiza o logout do usuário, destruindo a sessão ativa.

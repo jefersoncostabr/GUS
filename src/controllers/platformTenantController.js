@@ -120,7 +120,7 @@ export async function excluirTenant(req, res) {
     let bancoExcluido = false;
 
     try {
-        estudio = await Estudio.findById(id);
+        estudo = await Estudio.findById(id);
         if (!estudo) return res.status(404).json({ error: 'Tenant não encontrado.' });
         if (!estudo.tenantDbName) {
             return res.status(409).json({ error: 'Este registro não possui banco tenant associado.' });
@@ -142,12 +142,12 @@ export async function excluirTenant(req, res) {
         await Solicitante.deleteMany({
             $or: [
                 { tenantDbName: estudo.tenantDbName },
-                { estudio: estudio._id }
+                { estudio: estudo._id }
             ]
         });
-        await Estudio.deleteOne({ _id: estudio._id });
+        await Estudio.deleteOne({ _id: estudo._id });
 
-        console.warn(`[PLATFORM] Tenant excluído: ${estudio._id}, banco ${estudio.tenantDbName}, por ${req.session.user._id}`);
+        console.warn(`[PLATFORM] Tenant excluído: ${estudo._id}, banco ${estudo.tenantDbName}, por ${req.session.user._id}`);
         return res.status(200).json({ message: 'Tenant, banco, usuários e sessões relacionados foram excluídos.' });
     } catch (error) {
         console.error('Falha ao excluir tenant:', error);

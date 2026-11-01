@@ -1,25 +1,36 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { getEstudioModel } from '../src/models/estudiomodel.js';
+import { isDirectExecution } from './isDirectExecution.js';
 
-async function main() {
-    if (!process.env.MONGO_URI_MASTER) throw new Error('MONGO_URI_MASTER não está configurada.');
+export async function migrateTenantLifecycle({
+    uri = process.env.MONGO_URI_MASTER,
+    connect = mongoose.connect.bind(mongoose),
+    disconnect = mongoose.disconnect.bind(mongoose),
+    getModel = getEstudioModel,
+    connection = mongoose.connection,
+    logger = console
+} = {}) {
+    if (!uri) throw new Error('MONGO_URI_MASTER não está configurada.');
 
-    await mongoose.connect(process.env.MONGO_URI_MASTER);
-    const Estudio = getEstudioModel(mongoose.connection);
-    const resultado = await Estudio.updateMany(
-        { $or: [{ approvalStatus: { $exists: false } }, { approvalStatus: null }] },
-        { $set: { approvalStatus: 'approved' } }
-    );
+    await connect(uri);
+    try {
+        const Estudio = getModel(connection);
+        const resultado = await Estudio.updateMany(
+            { $or: [{ approvalStatus: { $exists: false } }, { approvalStatus: null }] },
+            { $set: { approvalStatus: 'approved' } }
+        );
 
-    console.log(`Migração concluída. Tenants aprovados: ${resultado.modifiedCount}. Trial retroativo: nenhum.`);
+        logger.log(`Migração concluída. Tenants aprovados: ${resultado.modifiedCount}. Trial retroativo: nenhum.`);
+        return resultado;
+    } finally {
+        await disconnect();
+    }
 }
 
-main()
-    .catch((error) => {
+if (isDirectExecution(import.meta.url)) {
+    migrateTenantLifecycle().catch((error) => {
         console.error(`Falha na migração de lifecycle: ${error.message}`);
         process.exitCode = 1;
-    })
-    .finally(async () => {
-        if (mongoose.connection.readyState !== 0) await mongoose.disconnect();
     });
+}

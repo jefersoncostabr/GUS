@@ -40,6 +40,13 @@ function normalizarDia(valorDia) {
     return `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${aaaa}`;
 }
 
+function usuarioPodeGerenciarUso(usuario, uso) {
+    if (['admin', 'adm'].includes(usuario?.role)) return true;
+    return usuario?._id != null
+        && uso?.solicitante != null
+        && String(usuario._id) === String(uso.solicitante);
+}
+
 export const listarUsos = async (req, res) => {
     try {
         // Extrai os modelos injetados pelo tenantMiddleware
@@ -71,11 +78,12 @@ export const listarUsos = async (req, res) => {
         if (motivo) query.motivo = motivo;
 
         // Paginação
-        let page = parseInt(req.query.page, 10) || 1;
-        let limit = parseInt(req.query.limit, 10) || 5;
+        const pageSolicitada = Number.parseInt(req.query.page, 10);
+        const limiteSolicitado = Number.parseInt(req.query.limit, 10);
+        let page = Number.isFinite(pageSolicitada) ? Math.max(1, pageSolicitada) : 1;
+        let limit = Number.isFinite(limiteSolicitado) ? Math.max(1, limiteSolicitado) : 5;
         const maxLimit = 100;
         if (limit > maxLimit) limit = maxLimit;
-        if (page < 1) page = 1;
 
         const totalItems = await Uso.countDocuments(query);
         const totalPages = Math.max(1, Math.ceil(totalItems / limit));
@@ -210,6 +218,19 @@ export const atualizarUso = async (req, res) => {
             return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
         }
 
+        const usuario = req.session?.user;
+        if (!usuario) {
+            return res.status(401).json({ error: 'Usuário não autenticado.' });
+        }
+
+        const usoExistente = await Uso.findById(req.params.id);
+        if (!usoExistente) {
+            return res.status(404).json({ error: 'Uso não encontrado' });
+        }
+        if (!usuarioPodeGerenciarUso(usuario, usoExistente)) {
+            return res.status(403).json({ error: 'Você não tem permissão para alterar este uso.' });
+        }
+
         // Filtra apenas os campos permitidos para edição.
         // Isso evita o erro de tentar salvar o NOME (string) no campo SOLICITANTE (ObjectId).
         const { sala, dia, hora, motivo } = req.body;
@@ -240,10 +261,18 @@ export const deletarUso = async (req, res) => {
             return res.status(500).json({ error: 'Modelos de tenant não inicializados.' });
         }
 
+        const usuario = req.session?.user;
+        if (!usuario) {
+            return res.status(401).json({ error: 'Usuário não autenticado.' });
+        }
+
         const uso = await Uso.findById(req.params.id);
         if (!uso) {
             res.status(404).json({ error: 'Uso não encontrado' });
             return;
+        }
+        if (!usuarioPodeGerenciarUso(usuario, uso)) {
+            return res.status(403).json({ error: 'Você não tem permissão para remover este uso.' });
         }
         await Uso.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Uso removido com sucesso' });
