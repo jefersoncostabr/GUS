@@ -341,3 +341,49 @@
     max-width: 120px;
     min-width: 0;
 }
+
+#relatoriosContent [hidden] {
+    display: none !important;
+}
+
+#relatorioConfiguracao {
+    display: grid;
+    gap: 10px;
+}
+
+#relatorioConfiguracao label {
+    font-weight: 600;
+}
+
+#relatorioConfiguracao select {
+    box-sizing: border-box;
+    width: min(100%, 360px);
+}
+
+#containerRelatorioProf {
+    display: grid;
+    gap: 6px;
+}
+
+#relatorioAcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#relatorioAcoes button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+#relatorioVisualizacao {
+    box-sizing: border-box;
+    max-height: 60vh;
+    overflow: auto;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

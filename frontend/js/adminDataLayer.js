@@ -253,7 +253,7 @@ async function handleRelatorioSemana(e) {
     const data = await safeFetchJson(`${baseUrl}/admin/relatorios/semana`);
     if (data && data.length > 0) {
       console.log('Agendamentos da semana atual:', data);
-      showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+      showMessage(`Relatório gerado: ${data.length} agendamentos. Use TXT ou JSON para visualizar.`, 'success');
       // Exibe os botões de exportação ao lado do botão que foi clicado
       showExportButtons(data, 'btnRelatorioSemana');
     } else {
@@ -263,7 +263,7 @@ async function handleRelatorioSemana(e) {
   } catch (err) {
     // safeFetchJson já mostra a mensagem de erro de rede
   } finally {
-    if (button) { button.disabled = false; button.textContent = 'Agendamentos da Semana'; }
+    if (button) { button.disabled = false; button.textContent = 'Gerar relatório'; }
   }
 }
 
@@ -275,7 +275,7 @@ async function handleRelatorioMes(e) {
     const data = await safeFetchJson(`${baseUrl}/admin/relatorios/mes`);
     if (data && data.length > 0) {
       console.log('Agendamentos do mês atual:', data);
-      showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+      showMessage(`Relatório gerado: ${data.length} agendamentos. Use TXT ou JSON para visualizar.`, 'success');
       showExportButtons(data, 'btnRelatorioMes');
     } else {
       console.log('Nenhum agendamento encontrado para o mês atual.');
@@ -284,7 +284,7 @@ async function handleRelatorioMes(e) {
   } catch (err) {
     // safeFetchJson já mostra a mensagem de erro de rede
   } finally {
-    if (button) { button.disabled = false; button.textContent = 'Agendamentos do Mês'; }
+    if (button) { button.disabled = false; button.textContent = 'Gerar relatório'; }
   }
 }
 
@@ -298,7 +298,7 @@ async function handleRelatorioProfessor(e) {
     const data = await safeFetchJson(`${baseUrl}/admin/relatorios/professor/${id}`);
     if (data && data.length > 0) {
       console.log(`Agendamentos do professor (ID: ${id}):`, data);
-      showMessage(`Relatório gerado. ${data.length} agendamentos encontrados no console.`, 'success');
+      showMessage(`Relatório gerado: ${data.length} agendamentos. Use TXT ou JSON para visualizar.`, 'success');
       showExportButtons(data, 'btnIrRelatorioProf');
     } else {
       console.log('Nenhum agendamento encontrado para este professor.');
@@ -307,7 +307,7 @@ async function handleRelatorioProfessor(e) {
   } catch (err) {
     // safeFetchJson já lida com erros de rede
   } finally {
-    if (button) { button.disabled = false; button.textContent = 'Ir'; }
+    if (button) { button.disabled = false; button.textContent = 'Gerar relatório'; }
   }
 }
 
@@ -324,7 +324,7 @@ async function handleRelatorioAulas(e) {
       // Isso faz com que as aulas sejam exibidas na tabela administrativa imediatamente
       setAulasData(data);
 
-      showMessage(`Relatório gerado. ${data.length} aulas carregadas na lista abaixo.`, 'success');
+      showMessage(`Relatório gerado: ${data.length} aulas. Use TXT ou JSON para visualizar.`, 'success');
       showExportButtons(data, 'btnRelatorioAulas');
     } else {
       console.log('Nenhuma aula regular encontrada.');
@@ -333,7 +333,7 @@ async function handleRelatorioAulas(e) {
   } catch (err) {
     // safeFetchJson já lida com erros de rede
   } finally {
-    if (button) { button.disabled = false; button.textContent = 'Aulas regulares'; }
+    if (button) { button.disabled = false; button.textContent = 'Gerar relatório'; }
   }
 }
 
@@ -345,7 +345,7 @@ async function handleRelatorioProfessores(e) {
     const data = await safeFetchJson(`${baseUrl}/admin/relatorios/professores`);
     if (data && data.length > 0) {
       console.log('Relatório de Professores:', data);
-      showMessage(`Relatório gerado. ${data.length} professores encontrados no console.`, 'success');
+      showMessage(`Relatório gerado: ${data.length} professores. Use TXT ou JSON para visualizar.`, 'success');
       showExportButtons(data, 'btnRelatorioProfs');
     } else {
       console.log('Nenhum professor encontrado.');
@@ -354,7 +354,7 @@ async function handleRelatorioProfessores(e) {
   } catch (err) {
     // safeFetchJson já lida com erros de rede
   } finally {
-    if (button) { button.disabled = false; button.textContent = 'Professores'; }
+    if (button) { button.disabled = false; button.textContent = 'Gerar relatório'; }
   }
 }
 

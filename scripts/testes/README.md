@@ -129,6 +129,20 @@ simulados; não precisa de MongoDB.
 npm test -- --runTestsByPath scripts\testes\relatorios.test.js
 ```
 
+### `adminRelatorios.test.js`
+
+Testa a interface de relatórios administrativos: seleção progressiva dos tipos,
+exigência de professor no relatório correspondente, eventos enviados para cada
+tipo, limpeza do resultado ao mudar a seleção, visualização nos formatos TXT e
+JSON, exibição de Copiar/Salvar somente enquanto o conteúdo está visível, cópia
+do formato exibido, gravação pelo seletor de destino e tratamento de erros.
+Também verifica o preenchimento da lista de professores. O DOM e os módulos
+externos são simulados; não precisa de navegador, MongoDB ou serviços externos.
+
+```powershell
+npm test -- --runTestsByPath scripts\testes\adminRelatorios.test.js
+```
+
 ### `maintenance.test.js`
 
 Testa a limpeza individual de cada coleção do tenant e a limpeza total, que
