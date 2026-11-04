@@ -24,6 +24,7 @@ Segurança:       ████████░ 85%  (Bom, pode melhorar auditoria
 ```
 
 ---
+---
 
 ## ✅ FUNCIONALIDADES PRONTAS
 
