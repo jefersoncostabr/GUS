@@ -1,5 +1,7 @@
 # Documentação de Manutenção do Banco de Dados (GUS)
 
+[Visão geral do superadmin](./SUPERADMIN.md) · [Manual de rotas do superadmin](./SUPERADMIN_ROTAS.md) · [Mapa de rotas multi-tenant](./ROTAS_MULTI_TENANT.md)
+
 Esta documentação descreve as rotas criadas para limpeza e manutenção das coleções do banco de dados MongoDB do projeto GUS.
 
 > **⚠️ ZONA DE PERIGO:** Estas rotas removem dados permanentemente. Não há opção de desfazer. Use com extrema cautela, preferencialmente apenas em ambiente de desenvolvimento.

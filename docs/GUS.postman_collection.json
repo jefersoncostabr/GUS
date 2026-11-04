@@ -25,7 +25,65 @@
                 "rotas-disponiveis"
               ]
             },
-            "description": "Exibe este mapa de rotas"
+            "description": "Exige login e perfil admin/adm."
+          },
+          "response": []
+        },
+        {
+          "name": "Rota raiz (health check)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": []
+            },
+            "description": "Verifica se a API est? acess?vel."
+          },
+          "response": []
+        },
+        {
+          "name": "Lista est?dios do usu?rio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/estudios",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "estudios"
+              ]
+            },
+            "description": "Exige sess?o autenticada."
+          },
+          "response": []
+        },
+        {
+          "name": "Rotas exclusivas de superadmin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/rotas-superadimin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "rotas-superadimin"
+              ]
+            },
+            "description": "Exige login e perfil superadmin."
           },
           "response": []
         }
@@ -102,6 +160,64 @@
             "description": "Verifica sessão ativa"
           },
           "response": []
+        },
+        {
+          "name": "Solicitar recuperação de senha",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/esqueci-senha",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "esqueci-senha"
+              ]
+            },
+            "description": "Informe o usuário e o e-mail cadastrados.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"solicitante\": \"NOME_DO_USUARIO\",\n  \"email\": \"usuario@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Redefinir senha",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/resetar-senha",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "resetar-senha"
+              ]
+            },
+            "description": "Use o token recebido por e-mail e uma senha com pelo menos 4 caracteres.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"TOKEN_RECEBIDO_POR_EMAIL\",\n  \"novaSenha\": \"novaSenha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -155,7 +271,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/usos/:id",
+              "raw": "http://localhost:3000/usos/usos/{{usoId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -164,7 +280,7 @@
               "path": [
                 "usos",
                 "usos",
-                ":id"
+                "{{usoId}}"
               ]
             },
             "description": "Detalhes de um uso específico"
@@ -216,7 +332,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/usos/usos/:id",
+              "raw": "http://localhost:3000/usos/usos/{{usoId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -225,7 +341,7 @@
               "path": [
                 "usos",
                 "usos",
-                ":id"
+                "{{usoId}}"
               ]
             },
             "description": "Atualiza um uso existente"
@@ -238,7 +354,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/usos/:id",
+              "raw": "http://localhost:3000/usos/usos/{{usoId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -247,7 +363,7 @@
               "path": [
                 "usos",
                 "usos",
-                ":id"
+                "{{usoId}}"
               ]
             },
             "description": "Remove um uso"
@@ -260,7 +376,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/buscaid",
+              "raw": "http://localhost:3000/usos/buscaid?solicitante=NOME_OU_ID_DO_SOLICITANTE&sala=1&dia=1&hora=10&motivo=Ensaio",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -269,9 +385,58 @@
               "path": [
                 "usos",
                 "buscaid"
+              ],
+              "query": [
+                {
+                  "key": "solicitante",
+                  "value": "NOME_OU_ID_DO_SOLICITANTE",
+                  "description": "Nome ou ID do solicitante"
+                },
+                {
+                  "key": "sala",
+                  "value": "1",
+                  "description": "Numero da sala"
+                },
+                {
+                  "key": "dia",
+                  "value": "1",
+                  "description": "Dia numerico conforme os dados cadastrados"
+                },
+                {
+                  "key": "hora",
+                  "value": "10",
+                  "description": "Hora numerica conforme os dados cadastrados"
+                },
+                {
+                  "key": "motivo",
+                  "value": "Ensaio",
+                  "description": "Motivo do uso"
+                }
               ]
             },
             "description": "Busca ID de uso por filtros"
+          },
+          "response": []
+        },
+        {
+          "name": "Gerar 10 usos de teste",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/usos/usos/gerar-teste",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "usos",
+                "usos",
+                "gerar-teste"
+              ]
+            },
+            "description": "Exige sessao de admin/adm e tenant apto a criar registros. Cria dados de teste."
           },
           "response": []
         }
@@ -280,6 +445,27 @@
     {
       "name": "Solicitantes",
       "item": [
+        {
+          "name": "Lista de estúdios para cadastro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/solicitantes/lista-simples",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "solicitantes",
+                "lista-simples"
+              ]
+            },
+            "description": "Rota publica; lista estudios disponiveis para selecao no cadastro."
+          },
+          "response": []
+        },
         {
           "name": "Teste inicial de solicitantes",
           "request": {
@@ -327,7 +513,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes/:id",
+              "raw": "http://localhost:3000/solicitantes/solicitantes/{{solicitanteId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -336,7 +522,7 @@
               "path": [
                 "solicitantes",
                 "solicitantes",
-                ":id"
+                "{{solicitanteId}}"
               ]
             },
             "description": "Busca solicitante por ID"
@@ -349,7 +535,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/buscaidsolicitante",
+              "raw": "http://localhost:3000/solicitantes/buscaidsolicitante?solicitante=NOME_DO_USUARIO&estudio=ID_DO_ESTUDIO",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -358,6 +544,18 @@
               "path": [
                 "solicitantes",
                 "buscaidsolicitante"
+              ],
+              "query": [
+                {
+                  "key": "solicitante",
+                  "value": "NOME_DO_USUARIO",
+                  "description": "Nome exato do solicitante"
+                },
+                {
+                  "key": "estudio",
+                  "value": "ID_DO_ESTUDIO",
+                  "description": "ID ou identificador do estudio"
+                }
               ]
             },
             "description": "Busca ID de solicitante por filtros"
@@ -371,7 +569,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"solicitante\": \"Novo Usuario\",\n    \"password\": \"senha123\"\n}",
+              "raw": "{\n    \"solicitante\": \"Novo Usuario\",\n    \"senha\": \"senha123\",\n    \"email\": \"novo.usuario@example.com\",\n    \"estudioName\": \"NOME_EXATO_DE_UM_ESTUDIO_EXISTENTE\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -379,18 +577,17 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes",
+              "raw": "http://localhost:3000/solicitantes",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "3000",
               "path": [
-                "solicitantes",
                 "solicitantes"
               ]
             },
-            "description": "Cadastra solicitante"
+            "description": "Cadastro público. Informe os dados e o nome exato de um estúdio existente; se não existir, a API pode provisionar um novo tenant."
           },
           "response": []
         },
@@ -409,7 +606,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes/:id",
+              "raw": "http://localhost:3000/solicitantes/solicitantes/{{solicitanteId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -418,7 +615,7 @@
               "path": [
                 "solicitantes",
                 "solicitantes",
-                ":id"
+                "{{solicitanteId}}"
               ]
             },
             "description": "Atualiza solicitante existente"
@@ -431,7 +628,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes/:id",
+              "raw": "http://localhost:3000/solicitantes/solicitantes/{{solicitanteId}}",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -440,7 +637,7 @@
               "path": [
                 "solicitantes",
                 "solicitantes",
-                ":id"
+                "{{solicitanteId}}"
               ]
             },
             "description": "Remove solicitante"
@@ -452,6 +649,137 @@
     {
       "name": "Admin",
       "item": [
+        {
+          "name": "Usuários",
+          "item": [
+            {
+              "name": "Lista usuários do tenant",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/usuarios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "usuarios"
+                  ]
+                },
+                "description": "Exige sessao de admin/adm."
+              },
+              "response": []
+            },
+            {
+              "name": "Busca usuário do tenant por ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/usuarios/{{solicitanteId}}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "usuarios",
+                    "{{solicitanteId}}"
+                  ]
+                },
+                "description": "Exige sessao de admin/adm."
+              },
+              "response": []
+            },
+            {
+              "name": "Cria usuário no tenant",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/usuarios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "usuarios"
+                  ]
+                },
+                "description": "Exige sessao de admin/adm. Use o nome de um estudio ja provisionado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"solicitante\": \"Novo Usuario\",\n  \"senha\": \"senha123\",\n  \"email\": \"novo.usuario@example.com\",\n  \"estudioName\": \"NOME_EXATO_DO_ESTUDIO\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Atualiza usuário do tenant",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/usuarios/{{solicitanteId}}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "usuarios",
+                    "{{solicitanteId}}"
+                  ]
+                },
+                "description": "Exige sessao autenticada e permissao sobre o usuario.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"solicitante\": \"Nome atualizado\",\n  \"email\": \"usuario@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove usuário do tenant",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/usuarios/{{solicitanteId}}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "usuarios",
+                    "{{solicitanteId}}"
+                  ]
+                },
+                "description": "Operacao destrutiva. Exige sessao autenticada e permissao sobre o usuario."
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "Estúdios",
           "item": [
@@ -521,7 +849,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/estudios/:id",
+                  "raw": "http://localhost:3000/admin/estudios/{{estudioId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -530,7 +858,7 @@
                   "path": [
                     "admin",
                     "estudios",
-                    ":id"
+                    "{{estudioId}}"
                   ]
                 },
                 "description": "Atualiza um estúdio"
@@ -543,7 +871,7 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/estudios/:id",
+                  "raw": "http://localhost:3000/admin/estudios/{{estudioId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -552,7 +880,7 @@
                   "path": [
                     "admin",
                     "estudios",
-                    ":id"
+                    "{{estudioId}}"
                   ]
                 },
                 "description": "Remove um estúdio"
@@ -630,7 +958,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/motivos/:id",
+                  "raw": "http://localhost:3000/admin/motivos/{{motivoId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -639,7 +967,7 @@
                   "path": [
                     "admin",
                     "motivos",
-                    ":id"
+                    "{{motivoId}}"
                   ]
                 },
                 "description": "Atualiza um motivo existente"
@@ -652,7 +980,7 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/motivos/:id",
+                  "raw": "http://localhost:3000/admin/motivos/{{motivoId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -661,7 +989,7 @@
                   "path": [
                     "admin",
                     "motivos",
-                    ":id"
+                    "{{motivoId}}"
                   ]
                 },
                 "description": "Remove um motivo"
@@ -739,7 +1067,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/salas/:id",
+                  "raw": "http://localhost:3000/admin/salas/{{salaId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -748,7 +1076,7 @@
                   "path": [
                     "admin",
                     "salas",
-                    ":id"
+                    "{{salaId}}"
                   ]
                 },
                 "description": "Atualiza uma sala"
@@ -761,7 +1089,7 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/salas/:id",
+                  "raw": "http://localhost:3000/admin/salas/{{salaId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -770,7 +1098,7 @@
                   "path": [
                     "admin",
                     "salas",
-                    ":id"
+                    "{{salaId}}"
                   ]
                 },
                 "description": "Remove uma sala"
@@ -848,7 +1176,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/aulas/:id",
+                  "raw": "http://localhost:3000/admin/aulas/{{aulaId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -857,7 +1185,7 @@
                   "path": [
                     "admin",
                     "aulas",
-                    ":id"
+                    "{{aulaId}}"
                   ]
                 },
                 "description": "Atualiza uma aula regular"
@@ -870,7 +1198,7 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/aulas/:id",
+                  "raw": "http://localhost:3000/admin/aulas/{{aulaId}}",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -879,7 +1207,7 @@
                   "path": [
                     "admin",
                     "aulas",
-                    ":id"
+                    "{{aulaId}}"
                   ]
                 },
                 "description": "Remove uma aula regular"
@@ -891,28 +1219,6 @@
         {
           "name": "Manutenção (Limpeza de Banco de Dados)",
           "item": [
-            {
-              "name": "Remove todos os solicitantes",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "http://localhost:3000/admin/limpar/solicitantes",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "3000",
-                  "path": [
-                    "admin",
-                    "limpar",
-                    "solicitantes"
-                  ]
-                },
-                "description": "Remove todos os solicitantes"
-              },
-              "response": []
-            },
             {
               "name": "Remove todos os usos",
               "request": {
@@ -932,28 +1238,6 @@
                   ]
                 },
                 "description": "Remove todos os usos"
-              },
-              "response": []
-            },
-            {
-              "name": "Remove todos os estúdios",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "http://localhost:3000/admin/limpar/estudios",
-                  "protocol": "http",
-                  "host": [
-                    "localhost"
-                  ],
-                  "port": "3000",
-                  "path": [
-                    "admin",
-                    "limpar",
-                    "estudios"
-                  ]
-                },
-                "description": "Remove todos os estúdios"
               },
               "response": []
             },
@@ -1046,8 +1330,300 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Superadmin",
+          "item": [
+            {
+              "name": "Listar todos os tenants",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/platform/tenants",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "platform",
+                    "tenants"
+                  ]
+                },
+                "description": "Lista todos os tenants (estúdios) do mais novo ao mais antigo"
+              },
+              "response": []
+            },
+            {
+              "name": "Ver fila de aprovação",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/platform/tenants/pending-approval",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "platform",
+                    "tenants",
+                    "pending-approval"
+                  ]
+                },
+                "description": "Lista apenas tenants com status pending"
+              },
+              "response": []
+            },
+            {
+              "name": "Aprovar tenant",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/platform/tenants/{{tenantId}}/approve",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "platform",
+                    "tenants",
+                    "{{tenantId}}",
+                    "approve"
+                  ]
+                },
+                "description": "Aprova um tenant permanentemente"
+              },
+              "response": []
+            },
+            {
+              "name": "Reprovar tenant",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"motivo\": \"Dados incompletos\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/platform/tenants/{{tenantId}}/reject",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "platform",
+                    "tenants",
+                    "{{tenantId}}",
+                    "reject"
+                  ]
+                },
+                "description": "Reprova um tenant (bloqueia novas inclusões)"
+              },
+              "response": []
+            },
+            {
+              "name": "Excluir tenant (irreversível)",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"confirmTenantDbName\": \"gus_tenant_estudio-abc123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/platform/tenants/{{tenantId}}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "platform",
+                    "tenants",
+                    "{{tenantId}}"
+                  ]
+                },
+                "description": "Exclui tenant, banco, usuários e sessões (sem desfazer)"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Relatórios",
+          "item": [
+            {
+              "name": "Agendamentos da semana",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/relatorios/semana",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "relatorios",
+                    "semana"
+                  ]
+                },
+                "description": "Relatório de agendamentos da semana atual"
+              },
+              "response": []
+            },
+            {
+              "name": "Agendamentos do mês",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/relatorios/mes",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "relatorios",
+                    "mes"
+                  ]
+                },
+                "description": "Relatório de agendamentos do mês atual"
+              },
+              "response": []
+            },
+            {
+              "name": "Usos por professor",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/relatorios/professor/{{professorId}}",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "relatorios",
+                    "professor",
+                    "{{professorId}}"
+                  ]
+                },
+                "description": "Relatório de agendamentos de um professor específico"
+              },
+              "response": []
+            },
+            {
+              "name": "Aulas regulares",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/relatorios/aulas",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "relatorios",
+                    "aulas"
+                  ]
+                },
+                "description": "Relatório de todas as aulas regulares"
+              },
+              "response": []
+            },
+            {
+              "name": "Professores",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/admin/relatorios/professores",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "admin",
+                    "relatorios",
+                    "professores"
+                  ]
+                },
+                "description": "Relatório de todos os professores"
+              },
+              "response": []
+            }
+          ]
         }
       ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "usoId",
+      "value": "SUBSTITUA_PELO_ID_DO_USO",
+      "type": "string"
+    },
+    {
+      "key": "solicitanteId",
+      "value": "SUBSTITUA_PELO_ID_DO_SOLICITANTE",
+      "type": "string"
+    },
+    {
+      "key": "estudioId",
+      "value": "SUBSTITUA_PELO_ID_DO_ESTUDIO",
+      "type": "string"
+    },
+    {
+      "key": "motivoId",
+      "value": "SUBSTITUA_PELO_ID_DO_MOTIVO",
+      "type": "string"
+    },
+    {
+      "key": "salaId",
+      "value": "SUBSTITUA_PELO_ID_DA_SALA",
+      "type": "string"
+    },
+    {
+      "key": "aulaId",
+      "value": "SUBSTITUA_PELO_ID_DA_AULA",
+      "type": "string"
+    },
+    {
+      "key": "tenantId",
+      "value": "SUBSTITUA_PELO_ID_DO_TENANT",
+      "type": "string"
+    },
+    {
+      "key": "professorId",
+      "value": "SUBSTITUA_PELO_ID_DO_PROFESSOR",
+      "type": "string"
     }
   ]
 }

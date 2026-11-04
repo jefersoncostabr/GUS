@@ -189,25 +189,28 @@ describe('Login e sessão', () => {
 });
 
 describe('Autorização e validação da sessão', () => {
-    it('retorna JSON 401 para APIs e redireciona navegação sem sessão', () => {
+    it('retorna JSON 401 para APIs e redireciona navegação sem sessão com um aviso', () => {
         const apiResponse = createResponse();
         authMiddleware({
             session: {},
             method: 'GET',
-            originalUrl: '/admin/usuarios',
-            headers: {}
+            originalUrl: '/rotas-disponiveis',
+            headers: { accept: '*/*' }
         }, apiResponse, jest.fn());
         expect(apiResponse.statusCode).toBe(401);
-        expect(apiResponse.body).toEqual(expect.objectContaining({ error: expect.any(String) }));
+        expect(apiResponse.body).toEqual({
+            error: 'É necessário fazer login para acessar esta rota.',
+            loginUrl: '/login.html'
+        });
 
         const browserResponse = createResponse();
         authMiddleware({
             session: {},
             method: 'GET',
-            originalUrl: '/painelAdm.html',
-            headers: {}
+            originalUrl: '/rotas-disponiveis',
+            headers: { accept: 'text/html,application/xhtml+xml' }
         }, browserResponse, jest.fn());
-        expect(browserResponse.redirectPath).toBe('/login.html');
+        expect(browserResponse.redirectPath).toBe('/login.html?aviso=login-obrigatorio');
     });
 
     it('permite requisições autenticadas e métodos de escrita sem sessão retornam 401', () => {

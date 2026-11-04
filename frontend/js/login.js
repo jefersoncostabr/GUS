@@ -2,6 +2,12 @@ console.log('login.js carregado');
 import { resetarNavbar } from "./resetarNavbar.js";
 import { API_BASE_URL } from "./config.js";
 
+const painelMensagem = document.getElementById('painelMensagem');
+const aviso = new URLSearchParams(window.location.search).get('aviso');
+if (aviso === 'login-obrigatorio' && painelMensagem) {
+    painelMensagem.textContent = 'Faça login para acessar esta rota.';
+}
+
 // Ao carregar a página de login, fazemos uma requisição para garantir que a sessão seja encerrada no servidor
 (async function logoutAutomatico() {
     try {
@@ -27,7 +33,7 @@ async function handleLogin(event) {
     const form = event.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-    const painelSaida = document.getElementById('painelMensagem');
+    const painelSaida = painelMensagem;
 
     // Feedback visual de carregamento
     const btnSubmit = form.querySelector('button');

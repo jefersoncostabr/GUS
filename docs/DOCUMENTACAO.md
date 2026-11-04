@@ -191,81 +191,16 @@ DELETE /usos/usos/:id
 
 
 ================================================================================
-LISTA DE ENDPOINTS
+ROTAS DA API
 ================================================================================
 
-GET /solicitantes/
-    - Descrição: Rota inicial de teste.
-    - Retorno: Mensagem simples confirmando funcionamento.
+O inventário atualizado, com métodos, permissões e observações por endpoint,
+está em [ROTAS_MULTI_TENANT.md](./ROTAS_MULTI_TENANT.md).
 
-GET /solicitantes/solicitantes
-    - Descrição: Retorna todos os registros de solicitantes.
-    - Retorno: Array JSON com os objetos de solicitantes.
-
-GET /solicitantes/solicitantes/:id
-    - Descrição: Busca os detalhes de um solicitante específico pelo ID.
-    - Retorno: Objeto JSON do solicitante.
-
-GET /solicitantes/buscaidsolicitante
-    - Descrição: Busca o _id de um solicitante com base em parâmetros (solicitante, estudio).
-    - Query Params: solicitante, estudio.
-    - Retorno: JSON com o _id do solicitante.
-
-GET /solicitantes/usersess
-    - Descrição: Retorna informações do usuário logado na sessão (solicitante e role).
-    - Retorno: JSON com dados da sessão.
-
-POST /solicitantes/solicitantes
-    - Descrição: Cria um novo solicitante (com hash de senha).
-    - Retorno: Objeto criado.
-
-PUT /solicitantes/solicitantes/:id
-    - Descrição: Atualiza um solicitante existente.
-    - Retorno: Objeto atualizado.
-
-DELETE /solicitantes/solicitantes/:id
-    - Descrição: Remove um registro de solicitante.
-    - Retorno: Mensagem de sucesso.
-================================================================================
-
-
-================================================================================
-LISTA DE ENDPOINTS - ADMINISTRAÇÃO
-================================================================================
-
-GET /admin/estudios
-    - Descrição: Retorna lista de estúdios cadastrados.
-    - Retorno: Array JSON.
-
-POST /admin/estudios
-    - Descrição: Cria um novo estúdio.
-
-PUT /admin/estudios/:id
-    - Descrição: Atualiza um estúdio existente.
-
-DELETE /admin/estudios/:id
-    - Descrição: Remove um estúdio.
-
-GET /admin/salas
-    - Descrição: Retorna lista de salas cadastradas.
-    - Retorno: Array JSON.
-
-POST /admin/salas
-    - Descrição: Cria uma nova sala.
-
-PUT /admin/salas/:id
-    - Descrição: Atualiza uma sala existente.
-
-DELETE /admin/salas/:id
-    - Descrição: Remove uma sala.
-
-GET /admin/aulas
-    - Descrição: Retorna lista de aulas regulares.
-    - Retorno: Array JSON.
-
-POST /admin/aulas
-    - Descrição: Cria uma nova aula regular.
-
-DELETE /admin/aulas/:id
-    - Descrição: Remove uma aula regular.
+- `GET /rotas-disponiveis`: mapa das rotas gerais, restrito a `admin`/`adm`.
+- `GET /rotas-superadimin`: mapa das rotas da plataforma, restrito a `superadmin`.
+- O cadastro público é `POST /solicitantes`; não existe
+  `POST /solicitantes/solicitantes`.
+- Consulte a [coleção Postman](./GUS.postman_collection.json) para exemplos
+  de requisição.
 ================================================================================

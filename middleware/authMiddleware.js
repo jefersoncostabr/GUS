@@ -7,10 +7,8 @@
  * Explicação passo a passo para estudo:
  * 1. Verifica se existe uma sessão ativa (`req.session.user`).
  * 2. Se NÃO existir (usuário não logado):
- *    a. Verifica se a requisição espera JSON (API) ou é uma rota específica.
- *       - Se sim: Retorna erro 401 (Unauthorized) em JSON.
- *       - Isso evita que o frontend tente ler HTML de login como JSON.
- *    b. Se não (navegador comum): Redireciona para a página de login.
+ *    a. Requisições de API recebem erro 401 em JSON.
+ *    b. Navegação HTML é redirecionada para o login com um aviso.
  * 3. Se existir (usuário logado):
  *    - Chama `next()` para permitir que a requisição continue para a rota.
  */
@@ -20,25 +18,25 @@ export function authMiddleware(req, res, next) {
         
         console.log(`[BLOQUEIO AUTH] Requisição sem sessão: ${req.method} ${req.originalUrl}`);
 
-        /**
-         * 2. Tratamento inteligente para APIs
-         * Se for um método de escrita (POST, PUT, DELETE) ou se a URL pertencer aos módulos de dados,
-         * retornamos JSON 401 em vez de redirecionar para HTML.
-         */
+        const acceptHeader = req.headers?.accept || '';
         const isApiRoute = req.originalUrl.includes('/solicitantes') || 
                            req.originalUrl.includes('/admin') || 
                            req.originalUrl.includes('/usos') ||
                            req.originalUrl.includes('/platform');
+        const isHtmlNavigation = req.method === 'GET'
+            && acceptHeader.includes('text/html')
+            && !acceptHeader.includes('application/json');
 
-        if (req.method !== 'GET' || isApiRoute || (req.headers.accept && req.headers.accept.includes('application/json'))) {
+        if (req.method !== 'GET' || isApiRoute || !isHtmlNavigation) {
             console.log(` -> Resposta: 401 JSON (Correto para APIs)`);
-            return res.status(401).json({ error: 'Usuário não autenticado. Faça login primeiro.' });
+            return res.status(401).json({
+                error: 'É necessário fazer login para acessar esta rota.',
+                loginUrl: '/login.html'
+            });
         }
 
-        // 3. Tratamento para Navegação Comum (Navegador)
-        // Redireciona o usuário para a tela de login
-        console.log(` -> Resposta: REDIRECIONAMENTO para login.html (Isso causa o SyntaxError se o front esperar JSON)`);
-        return res.redirect('/login.html');
+        console.log(' -> Redirecionando para login com aviso de autenticação necessária.');
+        return res.redirect('/login.html?aviso=login-obrigatorio');
     }
 
     // 4. Permissão de Acesso (Usuário Logado)

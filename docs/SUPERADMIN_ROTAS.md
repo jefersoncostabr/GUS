@@ -3,6 +3,8 @@
 > Este guia é para **você, desenvolvedor(a) da plataforma GUS**.
 > Aqui estão as rotas que cuidam da **vida dos tenants** (estúdios): listar, aprovar, reprovar e excluir.
 
+[Visão geral do superadmin](./SUPERADMIN.md) · [Mapa de rotas multi-tenant](./ROTAS_MULTI_TENANT.md) · [Manutenção do banco](./MANUTENCAO_DB.md)
+
 ### Visão geral em 30 segundos
 
 | Você quer... | Use | O que acontece? |
@@ -15,6 +17,9 @@
 
 > ⚠️ **Acesso exclusivo:** todas exigem login como `superadmin`.
 > Logado como `admin` ou `user` → `403 Forbidden`.
+> Para consultar o mapa JSON dessas rotas, use `GET /rotas-superadimin`.
+> O mapa geral `GET /rotas-disponiveis` é exclusivo para `admin`/`adm` e não
+> exibe operações de superadmin.
 
 **Onde mora no código:**
 
@@ -241,7 +246,7 @@ Copie e cole, não digite à mão.
 4. **`rejected`:** bloqueia na hora.
 5. Tenants antigos foram marcados `approved` via `npm run tenant:migrate-lifecycle`.
 
-📖 Detalhes: `docs/ROTAS_MULTI_TENANT.md`.
+📖 Detalhes: [documentação de rotas multi-tenant](./ROTAS_MULTI_TENANT.md).
 
 ---
 
@@ -289,14 +294,15 @@ Copie e cole, não digite à mão.
 | `400` na exclusão | Confirmação divergente | Cole o valor exato do GET |
 | `404` no approve/reject | ID errado ou `provisioning`/`deleting` | Reconsulte a lista |
 | `423` ao criar | Trial expirado ou `rejected` | Aprove o tenant (B) |
-| `409` ao excluir | Sem banco associado | Veja `docs/MANUTENCAO_DB.md` |
+| `409` ao excluir | Sem banco associado | Veja [Manutenção do banco](./MANUTENCAO_DB.md) |
 
 ---
 
 ## 📚 Referências
 
 - Código: `routes/platformTenantRoutes.js`, `src/controllers/platformTenantController.js`
-- Descoberta: `routes/sistemaRoutes.js` (`GET /rotas-disponiveis`)
-- Multi-tenant: `docs/ROTAS_MULTI_TENANT.md`
-- Banco: `docs/MANUTENCAO_DB.md`
-- Postman: `docs/GUS.postman_collection.json` (ainda sem pasta `platform`)
+- Descoberta: `routes/sistemaRoutes.js` (`GET /rotas-superadimin`)
+- Visão geral: [SUPERADMIN.md](./SUPERADMIN.md)
+- Multi-tenant: [ROTAS_MULTI_TENANT.md](./ROTAS_MULTI_TENANT.md)
+- Banco: [MANUTENCAO_DB.md](./MANUTENCAO_DB.md)
+- Postman: [coleção GUS](./GUS.postman_collection.json), pasta **Admin / Superadmin**
