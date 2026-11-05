@@ -52,6 +52,23 @@ export function createApp({ sessionStore } = {}) {
     app.use(express.json());
     app.use('/login', authLimiter);
     app.use('/solicitantes/solicitantes', authLimiter);
+
+    app.get('/health', (req, res) => {
+        res.status(200).json({ status: 'ok' });
+    });
+
+    app.get('/', (req, res) => {
+        res.redirect(302, '/painelGeral.html');
+    });
+
+    app.get(['/home', '/painelgeral'], (req, res) => {//Rota para redirecionar /home e /painelgeral para /painelGeral.html
+        res.redirect(302, '/painelGeral.html');
+    });
+
+    app.get(/^\/painelgeral\.html$/, (req, res) => {//Rota para redirecionar /painelgeral.html para /painelGeral.html
+        res.redirect(302, '/painelGeral.html');
+    });
+
     app.use(express.static(path.join(process.cwd(), 'frontend')));
 
     const sessionSecret = process.env.SESSION_SECRET || 'segredo-padrao-dev-gus';

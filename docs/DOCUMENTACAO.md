@@ -75,12 +75,20 @@ GUS/
 
 Endpoints utilizados:
 
-http://localhoast:3000/
-http://localhoast:3000/painelGeral.html
-http://localhoast:3000/painelAdm.html
+http://localhost:3000/
+http://localhost:3000/health
+http://localhost:3000/home
+http://localhost:3000/painelgeral
+http://localhost:3000/painelgeral.html
+http://localhost:3000/painelGeral.html
+http://localhost:3000/painelAdm.html
 http://localhost:3000/sobre.html
 http://localhost:3000/login.html
 http://localhost:3000/loginCriar.html
+
+A raiz (`/`) e os atalhos `/home`, `/painelgeral` e `/painelgeral.html`
+redirecionam para `/painelGeral.html`. Use `/health` para verificar se o
+servidor está disponível; essa rota responde com status `200` e não redireciona.
 
 
 ================================================================================

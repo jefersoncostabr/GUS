@@ -6,15 +6,6 @@ import routerSolicitantes from './routerSolicitantes.js';
 const router = express.Router();
 
 /**
- * Rota raiz para verificação de saúde da API (Health Check).
- * Retorna status 200 e uma mensagem simples se o servidor estiver acessível.
- * @route GET /
- */
-router.get("/", (req, res) => {// http://localhost:3000
-    res.status(200).send("Rota inicial funcionando");
-});
-
-/**
  * Roteadores Específicos.
  * Redireciona as requisições para os roteadores correspondentes.
  */

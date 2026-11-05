@@ -20,7 +20,11 @@ tenant. Os mapas JSON também estão disponíveis em `/rotas-disponiveis` e
 
 | Método | Endpoint | Acesso / descrição |
 |--------|----------|--------------------|
-| GET | `/` | Público; health check da API |
+| GET | `/health` | Público; health check, retorna `200` e `{ "status": "ok" }` |
+| GET | `/` | Público; redireciona para `/painelGeral.html` |
+| GET | `/home` | Público; atalho que redireciona para o painel |
+| GET | `/painelgeral` | Público; atalho que redireciona para o painel |
+| GET | `/painelgeral.html` | Público; variação em minúsculas que redireciona para o painel |
 | POST | `/login` | Público; cria a sessão |
 | POST | `/logout` | Encerra a sessão |
 | GET | `/usuario-logado` | Retorna os dados da sessão ou `401` |
@@ -32,6 +36,11 @@ tenant. Os mapas JSON também estão disponíveis em `/rotas-disponiveis` e
 O cadastro público exige `solicitante`, `senha`, `email` e `estudioName`.
 Consulte [a coleção Postman](./GUS.postman_collection.json) para exemplos dos
 corpos das requisições.
+
+Os atalhos do painel e a rota raiz respondem com redirecionamento HTTP `302`
+para `/painelGeral.html`. O endpoint `/health` é separado e não redireciona,
+para que verificadores de disponibilidade recebam diretamente uma resposta
+`200`.
 
 ## Descoberta de rotas
 

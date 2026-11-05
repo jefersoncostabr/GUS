@@ -15,12 +15,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/rotas-disponiveis",
-              "protocol": "http",
+              "raw": "{{base_url}}/rotas-disponiveis",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "rotas-disponiveis"
               ]
@@ -30,20 +28,90 @@
           "response": []
         },
         {
-          "name": "Rota raiz (health check)",
+          "name": "Rota raiz (redireciona para o painel)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/",
-              "protocol": "http",
+              "raw": "{{base_url}}/",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": []
             },
-            "description": "Verifica se a API est? acess?vel."
+            "description": "Redireciona para /painelGeral.html."
+          },
+          "response": []
+        },
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Retorna status 200 e { \"status\": \"ok\" }, sem exigir sessao."
+          },
+          "response": []
+        },
+        {
+          "name": "Atalho /home para o painel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/home",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "home"
+              ]
+            },
+            "description": "Redireciona para /painelGeral.html."
+          },
+          "response": []
+        },
+        {
+          "name": "Atalho /painelgeral para o painel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/painelgeral",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "painelgeral"
+              ]
+            },
+            "description": "Redireciona para /painelGeral.html."
+          },
+          "response": []
+        },
+        {
+          "name": "Atalho /painelgeral.html para o painel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/painelgeral.html",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "painelgeral.html"
+              ]
+            },
+            "description": "Redireciona o nome em minusculas para /painelGeral.html."
           },
           "response": []
         },
@@ -53,12 +121,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/estudios",
-              "protocol": "http",
+              "raw": "{{base_url}}/estudios",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "estudios"
               ]
@@ -73,12 +139,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/rotas-superadimin",
-              "protocol": "http",
+              "raw": "{{base_url}}/rotas-superadimin",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "rotas-superadimin"
               ]
@@ -107,12 +171,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/login",
-              "protocol": "http",
+              "raw": "{{base_url}}/login",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "login"
               ]
@@ -127,12 +189,10 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/logout",
-              "protocol": "http",
+              "raw": "{{base_url}}/logout",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "logout"
               ]
@@ -147,12 +207,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usuario-logado",
-              "protocol": "http",
+              "raw": "{{base_url}}/usuario-logado",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usuario-logado"
               ]
@@ -167,12 +225,10 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/esqueci-senha",
-              "protocol": "http",
+              "raw": "{{base_url}}/esqueci-senha",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "esqueci-senha"
               ]
@@ -196,12 +252,10 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/resetar-senha",
-              "protocol": "http",
+              "raw": "{{base_url}}/resetar-senha",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "resetar-senha"
               ]
@@ -230,12 +284,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos"
               ]
@@ -250,12 +302,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/usos",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/usos",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "usos"
@@ -271,12 +321,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/usos/{{usoId}}",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/usos/{{usoId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "usos",
@@ -302,12 +350,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/usos/usos",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/usos",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "usos"
@@ -332,12 +378,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/usos/usos/{{usoId}}",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/usos/{{usoId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "usos",
@@ -354,12 +398,10 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/usos/{{usoId}}",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/usos/{{usoId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "usos",
@@ -376,12 +418,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/buscaid?solicitante=NOME_OU_ID_DO_SOLICITANTE&sala=1&dia=1&hora=10&motivo=Ensaio",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/buscaid?solicitante=NOME_OU_ID_DO_SOLICITANTE&sala=1&dia=1&hora=10&motivo=Ensaio",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "buscaid"
@@ -424,12 +464,10 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/usos/usos/gerar-teste",
-              "protocol": "http",
+              "raw": "{{base_url}}/usos/usos/gerar-teste",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "usos",
                 "usos",
@@ -451,12 +489,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/lista-simples",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes/lista-simples",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes",
                 "lista-simples"
@@ -472,12 +508,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes"
               ]
@@ -492,12 +526,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes/solicitantes",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes",
                 "solicitantes"
@@ -513,12 +545,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes/{{solicitanteId}}",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes/solicitantes/{{solicitanteId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes",
                 "solicitantes",
@@ -535,12 +565,10 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/buscaidsolicitante?solicitante=NOME_DO_USUARIO&estudio=ID_DO_ESTUDIO",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes/buscaidsolicitante?solicitante=NOME_DO_USUARIO&estudio=ID_DO_ESTUDIO",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes",
                 "buscaidsolicitante"
@@ -577,12 +605,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/solicitantes",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes"
               ]
@@ -606,12 +632,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes/{{solicitanteId}}",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes/solicitantes/{{solicitanteId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes",
                 "solicitantes",
@@ -628,12 +652,10 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:3000/solicitantes/solicitantes/{{solicitanteId}}",
-              "protocol": "http",
+              "raw": "{{base_url}}/solicitantes/solicitantes/{{solicitanteId}}",
               "host": [
-                "localhost"
+                "{{base_url}}"
               ],
-              "port": "3000",
               "path": [
                 "solicitantes",
                 "solicitantes",
@@ -658,12 +680,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/usuarios",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/usuarios",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "usuarios"
@@ -679,12 +699,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/usuarios/{{solicitanteId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/usuarios/{{solicitanteId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "usuarios",
@@ -701,12 +719,10 @@
                 "method": "POST",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/usuarios",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/usuarios",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "usuarios"
@@ -731,12 +747,10 @@
                 "method": "PUT",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/usuarios/{{solicitanteId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/usuarios/{{solicitanteId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "usuarios",
@@ -762,12 +776,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/usuarios/{{solicitanteId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/usuarios/{{solicitanteId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "usuarios",
@@ -789,12 +801,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/estudios",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/estudios",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "estudios"
@@ -819,12 +829,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/estudios",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/estudios",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "estudios"
@@ -849,12 +857,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/estudios/{{estudioId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/estudios/{{estudioId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "estudios",
@@ -871,12 +877,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/estudios/{{estudioId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/estudios/{{estudioId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "estudios",
@@ -898,12 +902,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/motivos",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/motivos",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "motivos"
@@ -928,12 +930,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/motivos",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/motivos",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "motivos"
@@ -958,12 +958,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/motivos/{{motivoId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/motivos/{{motivoId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "motivos",
@@ -980,12 +978,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/motivos/{{motivoId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/motivos/{{motivoId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "motivos",
@@ -1007,12 +1003,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/salas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/salas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "salas"
@@ -1037,12 +1031,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/salas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/salas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "salas"
@@ -1067,12 +1059,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/salas/{{salaId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/salas/{{salaId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "salas",
@@ -1089,12 +1079,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/salas/{{salaId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/salas/{{salaId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "salas",
@@ -1116,12 +1104,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/aulas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/aulas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "aulas"
@@ -1146,12 +1132,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/aulas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/aulas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "aulas"
@@ -1176,12 +1160,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/admin/aulas/{{aulaId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/aulas/{{aulaId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "aulas",
@@ -1198,12 +1180,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/aulas/{{aulaId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/aulas/{{aulaId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "aulas",
@@ -1225,12 +1205,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/limpar/usos",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/limpar/usos",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "limpar",
@@ -1247,12 +1225,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/limpar/motivos",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/limpar/motivos",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "limpar",
@@ -1269,12 +1245,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/limpar/salas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/limpar/salas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "limpar",
@@ -1291,12 +1265,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/limpar/aulas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/limpar/aulas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "limpar",
@@ -1313,12 +1285,10 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/limpar/tudo",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/limpar/tudo",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "limpar",
@@ -1335,17 +1305,64 @@
           "name": "Superadmin",
           "item": [
             {
+              "name": "Login do superadmin (atalho duplicado)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"EMAIL_DO_SUPERADMIN\",\n  \"password\": \"SENHA_DO_SUPERADMIN\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                },
+                "description": "Atalho de login para obter sess?o de superadmin. Substitua os valores de exemplo; n?o salve credenciais reais na cole??o."
+              },
+              "response": []
+            },
+            {
+              "name": "Listar tenants (consulta duplicada)",
+              "request": {
+                "auth": {
+                  "type": "inherit"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/platform/tenants",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "platform",
+                    "tenants"
+                  ]
+                },
+                "description": "Consulta alternativa para listar todos os tenants; duplicada para facilitar o fluxo de superadmin."
+              },
+              "response": []
+            },
+            {
               "name": "Listar todos os tenants",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/platform/tenants",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/platform/tenants",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "platform",
                     "tenants"
@@ -1361,12 +1378,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/platform/tenants/pending-approval",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/platform/tenants/pending-approval",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "platform",
                     "tenants",
@@ -1383,12 +1398,10 @@
                 "method": "POST",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/platform/tenants/{{tenantId}}/approve",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/platform/tenants/{{tenantId}}/approve",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "platform",
                     "tenants",
@@ -1415,12 +1428,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/platform/tenants/{{tenantId}}/reject",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/platform/tenants/{{tenantId}}/reject",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "platform",
                     "tenants",
@@ -1447,12 +1458,10 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:3000/platform/tenants/{{tenantId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/platform/tenants/{{tenantId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "platform",
                     "tenants",
@@ -1474,12 +1483,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/relatorios/semana",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/relatorios/semana",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "relatorios",
@@ -1496,12 +1503,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/relatorios/mes",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/relatorios/mes",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "relatorios",
@@ -1518,12 +1523,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/relatorios/professor/{{professorId}}",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/relatorios/professor/{{professorId}}",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "relatorios",
@@ -1541,12 +1544,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/relatorios/aulas",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/relatorios/aulas",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "relatorios",
@@ -1563,12 +1564,10 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://localhost:3000/admin/relatorios/professores",
-                  "protocol": "http",
+                  "raw": "{{base_url}}/admin/relatorios/professores",
                   "host": [
-                    "localhost"
+                    "{{base_url}}"
                   ],
-                  "port": "3000",
                   "path": [
                     "admin",
                     "relatorios",
@@ -1585,6 +1584,11 @@
     }
   ],
   "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
     {
       "key": "usoId",
       "value": "SUBSTITUA_PELO_ID_DO_USO",

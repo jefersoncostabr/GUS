@@ -7,7 +7,8 @@ Os testes usam Jest e Supertest, já configurados no projeto. O comando geral é
 
 ### `app.test.js`
 
-Testa a criação do Express sem conexão automática ao MongoDB, o health check,
+Testa a criação do Express sem conexão automática ao MongoDB, o endpoint `/health`,
+o redirecionamento da raiz para o painel,
 o carregamento do painel estático, a proteção de rotas sem sessão e regras
 isoladas de autorização para trial e superadmin.
 

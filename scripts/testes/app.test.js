@@ -12,10 +12,17 @@ describe('Inicialização isolada da aplicação', () => {
     });
 
     it('responde ao health check sem banco de dados', async () => {
-        const response = await request(app).get('/');
+        const response = await request(app).get('/health');
 
         expect(response.statusCode).toBe(200);
-        expect(response.text).toContain('Rota inicial funcionando');
+        expect(response.body).toEqual({ status: 'ok' });
+    });
+
+    it('redireciona a raiz para o painel geral', async () => {
+        const response = await request(app).get('/').redirects(0);
+
+        expect(response.statusCode).toBe(302);
+        expect(response.headers.location).toBe('/painelGeral.html');
     });
 
     it('serve o painel administrativo estático sem banco de dados', async () => {

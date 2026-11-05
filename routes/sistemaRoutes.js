@@ -5,7 +5,11 @@ const router = express.Router();
 
 const rotasDisponiveis = [
     { metodo: 'GET', endpoint: '/rotas-disponiveis', descricao: 'Exibe as rotas gerais da API; acesso admin/adm' },
-    { metodo: 'GET', endpoint: '/', descricao: 'Verifica se a API está acessível' },
+    { metodo: 'GET', endpoint: '/health', descricao: 'Verifica se a API está acessível; retorna status 200' },
+    { metodo: 'GET', endpoint: '/', descricao: 'Redireciona para /painelGeral.html' },
+    { metodo: 'GET', endpoint: '/home', descricao: 'Atalho que redireciona para o painel geral' },
+    { metodo: 'GET', endpoint: '/painelgeral', descricao: 'Atalho que redireciona para o painel geral' },
+    { metodo: 'GET', endpoint: '/painelgeral.html', descricao: 'Variação em minúsculas que redireciona para o painel geral' },
 
     // Autenticação
     { metodo: 'POST', endpoint: '/login', descricao: 'Login de usuário' },
